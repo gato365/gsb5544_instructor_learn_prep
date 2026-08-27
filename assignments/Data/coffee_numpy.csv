@@ -1,0 +1,822 @@
+amount,year,month,day_of_week,account
+-20.1,2018,October,Monday,Kelley
+-7.43,2018,October,Monday,Eman
+-2.75,2019,June,Monday,Eman
+-2.75,2019,June,Monday,Eman
+-9.21,2019,August,Wednesday,Kelley
+-5.33,2019,October,Monday,Eman
+-12.91,2020,January,Friday,Eman
+-2.75,2020,January,Monday,Eman
+-2.75,2020,January,Wednesday,Eman
+-3.25,2020,January,Tuesday,Eman
+-2.75,2020,January,Tuesday,Eman
+-3.25,2020,January,Monday,Eman
+-2.0,2020,January,Monday,Eman
+-5.75,2020,March,Monday,Eman
+-3.25,2020,March,Monday,Eman
+-3.25,2020,March,Wednesday,Eman
+-2.0,2020,March,Wednesday,Eman
+-1.0,2020,March,Friday,Eman
+-6.73,2020,March,Friday,Eman
+-9.35,2020,March,Monday,Eman
+-5.25,2020,March,Monday,Eman
+-3.6,2020,March,Monday,Eman
+-3.25,2020,March,Thursday,Eman
+-3.0,2020,March,Thursday,Eman
+-2.75,2020,April,Monday,Eman
+-6.0,2020,April,Thursday,Eman
+-6.0,2020,May,Wednesday,Eman
+-3.03,2020,May,Monday,Eman
+-4.25,2020,May,Monday,Eman
+-3.25,2020,June,Monday,Eman
+-3.25,2020,June,Thursday,Eman
+-4.25,2020,June,Monday,Eman
+-4.25,2020,June,Thursday,Eman
+-3.0,2020,June,Thursday,Eman
+-3.03,2020,June,Friday,Eman
+-6.05,2020,June,Monday,Eman
+-4.25,2020,June,Tuesday,Eman
+-3.25,2020,July,Monday,Eman
+-6.5,2020,July,Monday,Eman
+-3.25,2020,July,Monday,Eman
+-7.0,2020,July,Monday,Eman
+-3.5,2020,July,Monday,Eman
+-2.75,2020,August,Monday,Eman
+-3.0,2020,August,Monday,Eman
+-5.58,2020,August,Monday,Eman
+-6.25,2020,August,Friday,Eman
+-4.23,2020,August,Monday,Eman
+-4.25,2020,August,Monday,Eman
+-4.25,2020,August,Monday,Eman
+-10.5,2020,September,Wednesday,Eman
+-5.0,2020,September,Tuesday,Eman
+-4.25,2020,September,Wednesday,Eman
+-4.25,2020,September,Monday,Eman
+-3.25,2020,September,Tuesday,Eman
+-4.25,2020,September,Monday,Eman
+-7.25,2020,October,Monday,Eman
+-7.25,2020,October,Monday,Eman
+-7.25,2020,October,Thursday,Eman
+-2.75,2020,October,Tuesday,Eman
+-7.25,2020,October,Tuesday,Eman
+-4.25,2020,October,Monday,Eman
+-3.5,2020,October,Tuesday,Eman
+-2.5,2020,November,Monday,Eman
+-7.25,2020,November,Monday,Eman
+-11.61,2020,November,Monday,Eman
+-24.2,2021,January,Monday,Eman
+-3.03,2021,January,Friday,Eman
+-5.01,2021,February,Monday,Eman
+-6.66,2021,February,Tuesday,Eman
+-5.25,2021,February,Thursday,Eman
+-2.75,2021,February,Monday,Eman
+-6.0,2021,February,Monday,Eman
+-5.25,2021,March,Monday,Eman
+-7.0,2021,March,Monday,Eman
+-2.0,2021,March,Wednesday,Eman
+-5.77,2021,March,Monday,Eman
+-6.5,2021,March,Monday,Eman
+-12.6,2021,March,Monday,Eman
+-7.15,2021,March,Wednesday,Eman
+-16.8,2021,March,Wednesday,Eman
+-7.5,2021,March,Monday,Eman
+-3.6,2021,March,Monday,Eman
+-5.77,2021,March,Wednesday,Eman
+-2.2,2021,March,Thursday,Eman
+-3.03,2021,March,Thursday,Eman
+-4.75,2021,March,Friday,Eman
+-3.03,2021,March,Monday,Eman
+-6.5,2021,March,Monday,Eman
+-4.0,2021,March,Monday,Eman
+-5.23,2021,April,Monday,Eman
+-13.65,2021,April,Wednesday,Eman
+-3.16,2021,April,Monday,Eman
+-3.16,2021,April,Monday,Eman
+-3.0,2021,April,Monday,Eman
+-5.5,2021,April,Monday,Eman
+-6.0,2021,April,Monday,Eman
+-3.74,2021,April,Tuesday,Eman
+-5.23,2021,April,Friday,Eman
+-7.5,2021,April,Monday,Eman
+-5.77,2021,April,Friday,Eman
+-5.01,2021,April,Monday,Eman
+-5.0,2021,April,Monday,Eman
+-6.3,2021,April,Monday,Eman
+-4.43,2021,May,Monday,Eman
+-4.0,2021,May,Monday,Eman
+-5.25,2021,May,Monday,Eman
+-6.6,2021,May,Monday,Eman
+-4.8,2021,May,Monday,Eman
+-10.8,2021,May,Wednesday,Eman
+-3.9,2021,May,Thursday,Eman
+-2.75,2021,May,Friday,Eman
+-7.7,2021,May,Monday,Eman
+-12.29,2021,May,Monday,Eman
+-5.7,2021,May,Monday,Eman
+-9.0,2021,May,Monday,Eman
+-3.57,2021,May,Tuesday,Eman
+-3.9,2021,May,Tuesday,Eman
+-5.86,2021,May,Wednesday,Eman
+-8.75,2021,May,Wednesday,Eman
+-3.16,2021,May,Friday,Eman
+-11.55,2021,May,Monday,Eman
+-4.75,2021,May,Monday,Eman
+-3.23,2021,May,Monday,Eman
+-4.2,2021,May,Monday,Eman
+-8.4,2021,May,Monday,Eman
+-4.8,2021,May,Monday,Eman
+-5.23,2021,May,Wednesday,Eman
+-3.9,2021,May,Wednesday,Eman
+-3.03,2021,May,Thursday,Eman
+-3.03,2021,May,Friday,Eman
+-6.0,2021,May,Friday,Eman
+-2.4,2021,May,Monday,Eman
+-7.0,2021,May,Monday,Eman
+-3.6,2021,May,Tuesday,Eman
+-4.25,2021,May,Thursday,Eman
+-2.3,2021,June,Tuesday,Eman
+-3.16,2021,June,Tuesday,Eman
+-4.75,2021,June,Tuesday,Eman
+-3.6,2021,June,Wednesday,Eman
+-3.6,2021,June,Friday,Eman
+-4.25,2021,June,Monday,Eman
+-5.5,2021,June,Monday,Eman
+-12.1,2021,June,Monday,Eman
+-3.03,2021,June,Tuesday,Eman
+-2.2,2021,June,Monday,Eman
+-3.6,2021,June,Monday,Eman
+-2.6,2021,June,Thursday,Eman
+-3.6,2021,June,Friday,Eman
+-4.8,2021,June,Friday,Eman
+-3.9,2021,June,Tuesday,Eman
+-2.0,2021,June,Wednesday,Eman
+-3.03,2021,July,Thursday,Eman
+-2.75,2021,July,Tuesday,Eman
+-2.75,2021,July,Tuesday,Eman
+-2.4,2021,July,Tuesday,Eman
+-7.4,2021,July,Wednesday,Eman
+-4.2,2021,July,Wednesday,Eman
+-5.0,2021,July,Thursday,Eman
+-4.0,2021,July,Friday,Eman
+-4.67,2021,July,Friday,Eman
+-2.0,2021,July,Friday,Eman
+-3.6,2021,July,Friday,Eman
+-8.25,2021,July,Monday,Eman
+-4.0,2021,July,Monday,Eman
+-4.2,2021,July,Monday,Eman
+-6.6,2021,July,Monday,Eman
+-10.4,2021,July,Monday,Eman
+-3.6,2021,July,Monday,Eman
+-6.5,2021,July,Tuesday,Eman
+-3.6,2021,July,Tuesday,Eman
+-5.6,2021,July,Wednesday,Eman
+-7.45,2021,July,Thursday,Eman
+-2.16,2021,July,Thursday,Eman
+-9.6,2021,July,Friday,Eman
+-3.6,2021,July,Friday,Eman
+-8.53,2021,July,Monday,Eman
+-25.45,2021,July,Monday,Eman
+-3.25,2021,July,Monday,Eman
+-9.75,2021,July,Monday,Eman
+-19.5,2021,July,Tuesday,Eman
+-10.4,2021,July,Thursday,Eman
+-10.8,2021,July,Friday,Eman
+-2.0,2021,August,Monday,Eman
+-10.08,2021,August,Wednesday,Eman
+-8.7,2021,August,Wednesday,Eman
+-5.05,2021,August,Monday,Eman
+-10.14,2021,August,Tuesday,Eman
+-4.0,2021,August,Tuesday,Eman
+-15.6,2021,August,Wednesday,Eman
+-3.6,2021,August,Friday,Eman
+-7.49,2021,August,Monday,Eman
+-3.24,2021,August,Monday,Eman
+-9.0,2021,August,Monday,Eman
+-2.4,2021,August,Monday,Eman
+-12.0,2021,August,Tuesday,Eman
+-9.6,2021,September,Wednesday,Eman
+-3.45,2021,September,Thursday,Eman
+-2.4,2021,September,Friday,Eman
+-3.0,2021,September,Tuesday,Eman
+-4.0,2021,September,Tuesday,Eman
+-4.0,2021,September,Tuesday,Eman
+-6.0,2021,September,Tuesday,Eman
+-2.4,2021,September,Wednesday,Eman
+-4.5,2021,September,Thursday,Eman
+-5.23,2021,September,Monday,Eman
+-3.0,2021,September,Monday,Eman
+-4.0,2021,September,Monday,Eman
+-2.4,2021,September,Monday,Eman
+-3.9,2021,September,Monday,Eman
+-6.0,2021,September,Monday,Eman
+-3.22,2021,September,Tuesday,Eman
+-11.6,2021,September,Monday,Eman
+-3.0,2021,September,Monday,Eman
+-14.0,2021,September,Monday,Eman
+-4.5,2021,September,Monday,Eman
+-5.25,2021,September,Wednesday,Eman
+-10.3,2021,October,Monday,Eman
+-5.5,2021,October,Monday,Eman
+-7.25,2021,October,Tuesday,Eman
+-3.25,2021,October,Tuesday,Eman
+-4.51,2021,October,Tuesday,Eman
+-9.26,2021,October,Tuesday,Eman
+-9.01,2021,October,Tuesday,Eman
+-5.15,2021,October,Tuesday,Eman
+-2.58,2021,October,Tuesday,Eman
+-4.5,2021,October,Monday,Eman
+-3.86,2021,October,Monday,Eman
+-7.95,2021,October,Friday,Eman
+-3.86,2021,October,Monday,Eman
+-3.86,2021,October,Monday,Eman
+-4.0,2021,November,Monday,Eman
+-3.86,2021,November,Monday,Eman
+-3.25,2021,November,Thursday,Eman
+-3.75,2021,November,Monday,Eman
+-7.75,2021,November,Friday,Eman
+-3.5,2021,November,Friday,Eman
+-3.75,2021,November,Monday,Eman
+-5.75,2021,November,Monday,Eman
+-5.15,2021,November,Monday,Eman
+-3.22,2021,November,Monday,Eman
+-9.0,2021,November,Friday,Eman
+-5.5,2021,November,Monday,Eman
+-4.0,2021,November,Monday,Eman
+-5.25,2021,November,Monday,Eman
+-3.25,2021,November,Monday,Eman
+-4.25,2021,November,Wednesday,Eman
+-4.5,2021,November,Friday,Eman
+-2.7,2021,December,Friday,Eman
+-7.5,2021,December,Friday,Eman
+-6.11,2021,December,Friday,Eman
+-5.25,2022,January,Friday,Eman
+-2.75,2022,January,Monday,Eman
+-4.75,2022,January,Friday,Eman
+-2.75,2022,January,Friday,Eman
+-10.0,2022,January,Tuesday,Eman
+-4.75,2022,February,Wednesday,Eman
+-3.5,2022,February,Thursday,Eman
+-6.25,2022,February,Friday,Eman
+-6.25,2022,February,Monday,Eman
+-6.75,2022,February,Monday,Eman
+-5.75,2022,February,Thursday,Eman
+-9.0,2022,February,Thursday,Eman
+-3.75,2022,February,Tuesday,Eman
+-3.25,2022,February,Monday,Eman
+-12.36,2022,March,Friday,Eman
+-6.0,2022,March,Monday,Eman
+-4.0,2022,March,Monday,Eman
+-5.8,2022,March,Monday,Eman
+-4.25,2022,March,Monday,Eman
+-4.0,2022,March,Monday,Eman
+-6.5,2022,March,Monday,Eman
+-5.0,2022,March,Tuesday,Eman
+-6.0,2022,March,Wednesday,Eman
+-6.01,2022,March,Wednesday,Eman
+-2.75,2022,March,Thursday,Eman
+-1.0,2022,March,Monday,Eman
+-5.5,2022,March,Monday,Eman
+-3.25,2022,March,Monday,Eman
+-2.25,2022,March,Tuesday,Eman
+-1.25,2022,March,Wednesday,Eman
+-2.75,2022,March,Thursday,Eman
+-5.0,2022,March,Monday,Eman
+-5.5,2022,March,Monday,Eman
+-5.45,2022,April,Monday,Eman
+-8.35,2022,April,Tuesday,Business
+-10.45,2022,April,Monday,Eman
+-13.14,2022,April,Friday,Eman
+-4.0,2022,April,Monday,Eman
+-3.25,2022,April,Friday,Eman
+-4.5,2022,May,Monday,Eman
+-5.0,2022,May,Monday,Eman
+-2.75,2022,May,Monday,Eman
+-3.0,2022,May,Monday,Eman
+-3.0,2022,May,Monday,Eman
+-3.25,2022,May,Thursday,Business
+-3.0,2022,May,Tuesday,Eman
+-3.52,2022,May,Wednesday,Eman
+-5.75,2022,May,Monday,Eman
+-2.5,2022,May,Tuesday,Eman
+-7.5,2022,May,Tuesday,Eman
+-7.5,2022,May,Tuesday,Eman
+-6.0,2022,May,Tuesday,Eman
+-3.25,2022,June,Thursday,Eman
+-9.7,2022,June,Thursday,Eman
+-3.25,2022,June,Friday,Eman
+-8.0,2022,June,Monday,Eman
+-2.7,2022,July,Tuesday,Eman
+-4.25,2022,July,Tuesday,Eman
+-4.0,2022,July,Tuesday,Eman
+-7.6,2022,July,Wednesday,Eman
+-5.45,2022,July,Wednesday,Eman
+-4.0,2022,July,Thursday,Eman
+-9.25,2022,July,Friday,Eman
+-7.75,2022,July,Friday,Eman
+-3.0,2022,July,Monday,Eman
+-8.0,2022,July,Monday,Eman
+-2.5,2022,July,Tuesday,Eman
+-2.5,2022,July,Tuesday,Eman
+-3.5,2022,July,Wednesday,Eman
+-3.5,2022,July,Thursday,Eman
+-3.0,2022,July,Thursday,Eman
+-2.6,2022,July,Friday,Eman
+-4.25,2022,July,Friday,Eman
+-3.0,2022,July,Monday,Eman
+-4.25,2022,July,Monday,Eman
+-12.08,2022,July,Monday,Eman
+-2.7,2022,July,Tuesday,Eman
+-6.75,2022,July,Tuesday,Eman
+-2.75,2022,July,Wednesday,Eman
+-2.5,2022,July,Wednesday,Eman
+-4.5,2022,July,Wednesday,Eman
+-2.5,2022,July,Thursday,Eman
+-7.0,2022,July,Thursday,Eman
+-1.5,2022,July,Friday,Eman
+-3.25,2022,July,Friday,Eman
+-2.5,2022,August,Monday,Eman
+-4.25,2022,August,Monday,Eman
+-4.9,2022,August,Monday,Eman
+-11.0,2022,August,Monday,Eman
+-3.0,2022,August,Tuesday,Eman
+-3.0,2022,August,Thursday,Eman
+-4.0,2022,August,Thursday,Eman
+-3.25,2022,August,Friday,Eman
+-2.5,2022,August,Monday,Eman
+-2.5,2022,August,Monday,Eman
+-3.0,2022,August,Monday,Eman
+-3.5,2022,August,Monday,Eman
+-5.0,2022,August,Monday,Eman
+-2.75,2022,August,Tuesday,Eman
+-3.0,2022,August,Wednesday,Eman
+-3.0,2022,August,Thursday,Business
+-7.7,2022,August,Thursday,Business
+-7.25,2022,August,Friday,Eman
+-4.25,2022,August,Friday,Eman
+-4.0,2022,August,Friday,Eman
+-4.5,2022,August,Monday,Eman
+-9.6,2022,August,Monday,Eman
+-9.0,2022,August,Monday,Eman
+-9.0,2022,August,Monday,Eman
+-4.25,2022,August,Tuesday,Eman
+-2.75,2022,August,Tuesday,Eman
+-2.5,2022,August,Wednesday,Business
+-5.0,2022,August,Wednesday,Eman
+-4.75,2022,August,Wednesday,Business
+-4.5,2022,August,Thursday,Eman
+-4.25,2022,August,Friday,Eman
+-3.7,2022,August,Monday,Eman
+-4.86,2022,August,Monday,Eman
+-4.25,2022,August,Monday,Eman
+-4.0,2022,August,Monday,Eman
+-4.25,2022,August,Monday,Eman
+-4.0,2022,August,Monday,Eman
+-3.0,2022,August,Tuesday,Eman
+-2.75,2022,August,Tuesday,Eman
+-5.25,2022,August,Wednesday,Eman
+-4.25,2022,August,Thursday,Eman
+-3.0,2022,August,Friday,Eman
+-3.0,2022,August,Friday,Eman
+-4.59,2022,August,Monday,Eman
+-3.0,2022,August,Tuesday,Eman
+-4.75,2022,August,Wednesday,Eman
+-2.75,2022,August,Wednesday,Eman
+-8.75,2022,September,Friday,Eman
+-5.25,2022,September,Friday,Eman
+-7.0,2022,September,Tuesday,Eman
+-9.84,2022,September,Tuesday,Eman
+-9.0,2022,September,Tuesday,Eman
+-2.5,2022,September,Tuesday,Eman
+-9.0,2022,September,Tuesday,Eman
+-3.0,2022,September,Tuesday,Eman
+-8.0,2022,September,Wednesday,Eman
+-9.0,2022,September,Thursday,Eman
+-3.0,2022,September,Thursday,Eman
+-8.5,2022,September,Friday,Eman
+-5.5,2022,September,Monday,Eman
+-4.0,2022,September,Monday,Eman
+-4.75,2022,September,Monday,Eman
+-6.25,2022,September,Monday,Eman
+-4.25,2022,September,Tuesday,Eman
+-9.5,2022,September,Thursday,Eman
+-4.0,2022,September,Thursday,Eman
+-3.0,2022,September,Thursday,Eman
+-4.5,2022,September,Thursday,Eman
+-4.25,2022,September,Thursday,Eman
+-3.5,2022,September,Friday,Eman
+-8.5,2022,September,Monday,Eman
+-4.0,2022,September,Monday,Eman
+-10.11,2022,September,Monday,Eman
+-9.75,2022,September,Monday,Eman
+-5.0,2022,September,Monday,Eman
+-3.5,2022,September,Monday,Eman
+-3.5,2022,September,Tuesday,Eman
+-3.0,2022,September,Wednesday,Eman
+-25.0,2022,September,Thursday,Eman
+-3.0,2022,September,Thursday,Eman
+-4.0,2022,September,Friday,Eman
+-3.0,2022,September,Monday,Eman
+-4.59,2022,September,Monday,Eman
+-4.0,2022,September,Monday,Eman
+-3.0,2022,September,Monday,Eman
+-5.59,2022,September,Wednesday,Eman
+-3.5,2022,September,Wednesday,Eman
+-3.5,2022,September,Thursday,Eman
+-6.9,2022,September,Friday,Eman
+-9.7,2022,September,Friday,Eman
+-4.0,2022,October,Monday,Eman
+-6.59,2022,October,Monday,Eman
+-4.45,2022,October,Monday,Eman
+-20.26,2022,October,Monday,Eman
+-4.0,2022,October,Tuesday,Eman
+-2.5,2022,October,Wednesday,Business
+-7.75,2022,October,Friday,Business
+-4.08,2022,October,Friday,Eman
+-5.75,2022,October,Friday,Eman
+-3.0,2022,October,Tuesday,Eman
+-2.5,2022,October,Tuesday,Eman
+-3.0,2022,October,Tuesday,Eman
+-3.3,2022,October,Thursday,Eman
+-5.0,2022,October,Thursday,Eman
+-11.73,2022,October,Friday,Eman
+-4.0,2022,October,Monday,Eman
+-5.0,2022,October,Monday,Eman
+-4.5,2022,October,Monday,Eman
+-3.0,2022,October,Tuesday,Business
+-8.5,2022,October,Wednesday,Business
+-2.75,2022,October,Wednesday,Business
+-10.0,2022,October,Thursday,Eman
+-10.0,2022,October,Monday,Eman
+-9.0,2022,October,Monday,Eman
+-6.0,2022,October,Monday,Business
+-8.0,2022,October,Monday,Eman
+-6.5,2022,October,Monday,Eman
+-7.75,2022,October,Monday,Eman
+-5.85,2022,October,Wednesday,Eman
+-7.75,2022,October,Friday,Eman
+-5.0,2022,October,Monday,Eman
+-3.25,2022,October,Monday,Eman
+-10.25,2022,October,Monday,Eman
+-5.0,2022,November,Thursday,Eman
+-4.25,2022,November,Thursday,Eman
+-7.0,2022,November,Thursday,Eman
+-10.25,2022,November,Thursday,Eman
+-9.0,2022,November,Monday,Eman
+-4.0,2022,November,Monday,Eman
+-3.25,2022,November,Monday,Eman
+-4.0,2022,November,Tuesday,Eman
+-9.1,2022,November,Wednesday,Eman
+-5.0,2022,November,Wednesday,Eman
+-10.0,2022,November,Monday,Credit Card
+-10.0,2022,November,Monday,Credit Card
+-10.0,2022,November,Monday,Eman
+-3.0,2022,November,Monday,Eman
+-7.5,2022,November,Monday,Eman
+-3.25,2022,November,Wednesday,Credit Card
+-3.25,2022,November,Wednesday,Credit Card
+-8.0,2022,November,Thursday,Credit Card
+-8.0,2022,November,Thursday,Credit Card
+-9.0,2022,November,Thursday,Credit Card
+-9.0,2022,November,Thursday,Credit Card
+-5.75,2022,November,Friday,Credit Card
+-5.75,2022,November,Friday,Credit Card
+-11.0,2022,November,Saturday,Credit Card
+-11.0,2022,November,Saturday,Credit Card
+-5.0,2022,November,Monday,Eman
+-3.0,2022,November,Monday,Eman
+-9.1,2022,November,Tuesday,Credit Card
+-9.1,2022,November,Wednesday,Credit Card
+-10.5,2022,December,Thursday,Credit Card
+-4.7,2022,December,Monday,Eman
+-8.0,2022,December,Monday,Eman
+-3.0,2022,December,Monday,Eman
+-4.75,2022,December,Wednesday,Credit Card
+-3.25,2022,December,Wednesday,Credit Card
+-14.85,2022,December,Wednesday,Eman
+-5.25,2022,December,Friday,Credit Card
+-2.75,2023,January,Friday,Eman
+-4.5,2023,January,Monday,Eman
+-3.45,2023,January,Monday,Eman
+-2.16,2023,January,Monday,Eman
+-5.75,2023,January,Monday,Eman
+-3.25,2023,January,Monday,Eman
+-13.52,2023,January,Monday,Business
+-3.0,2023,January,Monday,Eman
+-2.0,2023,January,Monday,Eman
+-3.0,2023,January,Thursday,Eman
+-2.75,2023,January,Tuesday,Eman
+-5.06,2023,January,Tuesday,Eman
+-3.1,2023,January,Tuesday,Eman
+-2.5,2023,January,Tuesday,Eman
+-3.1,2023,January,Tuesday,Eman
+-3.0,2023,January,Tuesday,Eman
+-3.25,2023,January,Thursday,Business
+-13.5,2023,January,Monday,Business
+-10.0,2023,January,Monday,Eman
+-3.25,2023,January,Monday,Eman
+-2.4,2023,January,Monday,Eman
+-2.75,2023,January,Tuesday,Eman
+-5.1,2023,January,Wednesday,Eman
+-3.2,2023,January,Thursday,Eman
+-4.25,2023,January,Friday,Eman
+-9.0,2023,January,Monday,Eman
+-6.0,2023,January,Monday,Eman
+-3.2,2023,January,Tuesday,Eman
+-2.6,2023,February,Wednesday,Eman
+-3.7,2023,February,Thursday,Eman
+-2.75,2023,February,Friday,Eman
+-13.2,2023,February,Monday,Eman
+-4.7,2023,February,Monday,Eman
+-2.55,2023,February,Monday,Eman
+-5.0,2023,February,Monday,Eman
+-8.75,2023,February,Tuesday,Eman
+-9.0,2023,February,Wednesday,Eman
+-5.25,2023,February,Thursday,Eman
+-7.88,2023,February,Thursday,Eman
+-8.0,2023,February,Monday,Eman
+-6.25,2023,February,Monday,Eman
+-6.5,2023,February,Monday,Eman
+-12.25,2023,February,Tuesday,Eman
+-2.0,2023,February,Monday,Eman
+-6.0,2023,March,Monday,Eman
+-4.0,2023,March,Monday,Eman
+-6.0,2023,March,Friday,Eman
+-11.0,2023,March,Monday,Eman
+-2.0,2023,March,Monday,Eman
+-3.0,2023,March,Friday,Eman
+-3.26,2023,March,Friday,Eman
+-4.0,2023,March,Monday,Eman
+-4.0,2023,March,Tuesday,Eman
+-5.44,2023,March,Wednesday,Eman
+-6.52,2023,March,Thursday,Eman
+-4.0,2023,March,Friday,Eman
+-8.0,2023,March,Friday,Eman
+-10.0,2023,April,Monday,Eman
+-2.5,2023,April,Monday,Eman
+-9.24,2023,April,Thursday,Credit Card
+-9.24,2023,April,Saturday,Credit Card
+-3.35,2023,April,Friday,Credit Card
+-3.0,2023,April,Saturday,Credit Card
+-13.25,2023,April,Wednesday,Credit Card
+-8.85,2023,April,Thursday,Credit Card
+-10.7,2023,April,Saturday,Credit Card
+-3.25,2023,April,Saturday,Credit Card
+-12.0,2023,April,Sunday,Credit Card
+-7.75,2023,April,Saturday,Credit Card
+-17.5,2023,April,Sunday,Credit Card
+-12.44,2023,May,Monday,Credit Card
+-5.5,2023,June,Monday,Eman
+-7.75,2023,June,Friday,Eman
+-2.5,2023,June,Monday,Eman
+-4.25,2023,June,Monday,Eman
+-7.19,2023,June,Monday,Eman
+-4.5,2023,June,Tuesday,Credit Card
+-3.0,2023,June,Wednesday,Credit Card
+-3.0,2023,June,Friday,Eman
+-8.0,2023,June,Wednesday,Eman
+-3.25,2023,June,Thursday,Eman
+-8.69,2023,August,Thursday,Eman
+-3.25,2023,August,Monday,Eman
+-3.25,2023,September,Monday,Eman
+-6.5,2023,September,Thursday,Eman
+-4.5,2023,September,Thursday,Eman
+-10.14,2023,September,Tuesday,Eman
+-9.0,2023,September,Wednesday,Eman
+-3.0,2023,September,Thursday,Eman
+-5.45,2023,September,Monday,Eman
+-6.44,2023,September,Monday,Eman
+-10.5,2023,September,Friday,Eman
+-6.25,2023,October,Tuesday,Eman
+-3.26,2023,October,Monday,Eman
+-3.51,2023,October,Monday,Eman
+-7.1,2023,October,Wednesday,Eman
+-4.0,2023,November,Monday,Eman
+-2.75,2023,November,Tuesday,Eman
+-8.14,2023,November,Tuesday,Eman
+-2.75,2023,November,Monday,Eman
+-4.0,2023,November,Monday,Eman
+-10.1,2023,December,Friday,Eman
+-4.65,2023,December,Friday,Eman
+-10.1,2023,December,Monday,Eman
+-13.13,2023,December,Wednesday,Eman
+-7.2,2023,December,Thursday,Eman
+-5.0,2024,January,Sunday,Credit Card
+-8.9,2024,January,Monday,Credit Card
+-3.0,2024,January,Monday,Eman
+-7.07,2024,February,Tuesday,Eman
+-3.0,2024,February,Monday,Eman
+-3.0,2024,March,Monday,Eman
+-12.27,2024,March,Monday,Eman
+-22.5,2024,March,Monday,Eman
+-3.5,2024,March,Monday,Eman
+-7.0,2024,March,Monday,Eman
+-2.72,2024,March,Monday,Eman
+-5.25,2024,March,Thursday,Eman
+-3.5,2024,April,Monday,Eman
+-7.0,2024,April,Monday,Eman
+-6.65,2024,April,Tuesday,Eman
+-5.75,2024,April,Wednesday,Eman
+-4.0,2024,April,Wednesday,Eman
+-3.26,2024,April,Friday,Eman
+-4.65,2024,April,Monday,Eman
+-2.75,2024,April,Monday,Eman
+-3.0,2024,April,Monday,Eman
+-14.45,2024,April,Monday,Eman
+-19.59,2024,April,Monday,Eman
+-7.0,2024,April,Monday,Eman
+-42.2,2024,May,Monday,Eman
+-3.26,2024,May,Monday,Eman
+-4.35,2024,May,Tuesday,Eman
+-3.15,2024,May,Tuesday,Eman
+-4.65,2024,June,Monday,Eman
+-2.0,2024,June,Monday,Eman
+-4.0,2024,June,Monday,Eman
+-4.65,2024,June,Thursday,Eman
+-4.65,2024,June,Thursday,Eman
+-5.25,2024,June,Friday,Eman
+-7.0,2024,June,Monday,Eman
+-4.35,2024,June,Monday,Eman
+-5.0,2024,June,Monday,Eman
+-7.6,2024,July,Monday,Eman
+-7.6,2024,July,Friday,Eman
+-8.91,2024,July,Monday,Eman
+-5.17,2024,July,Monday,Eman
+-4.65,2024,July,Monday,Eman
+-5.17,2024,July,Tuesday,Eman
+-7.5,2024,July,Wednesday,Eman
+-5.5,2024,July,Monday,Eman
+-2.75,2024,July,Monday,Eman
+-2.0,2024,July,Monday,Eman
+-3.43,2024,July,Monday,Eman
+-7.4,2024,July,Monday,Eman
+-4.81,2024,July,Monday,Eman
+-3.25,2024,July,Tuesday,Eman
+-8.62,2024,July,Tuesday,Eman
+-4.0,2024,July,Wednesday,Eman
+-3.25,2024,July,Thursday,Eman
+-3.75,2024,July,Friday,Eman
+-5.75,2024,July,Monday,Eman
+-3.25,2024,July,Monday,Eman
+-10.27,2024,July,Monday,Eman
+-7.22,2024,July,Monday,Eman
+-2.75,2024,July,Monday,Eman
+-5.75,2024,July,Monday,Eman
+-3.25,2024,July,Tuesday,Eman
+-2.16,2024,July,Monday,Eman
+-4.65,2024,July,Monday,Eman
+-4.35,2024,July,Monday,Eman
+-3.25,2024,July,Monday,Eman
+-2.0,2024,July,Monday,Eman
+-3.25,2024,July,Tuesday,Eman
+-5.94,2024,July,Wednesday,Eman
+-4.35,2024,July,Wednesday,Eman
+-2.3,2024,August,Friday,Eman
+-2.47,2024,August,Monday,Eman
+-3.25,2024,August,Tuesday,Eman
+-4.95,2024,August,Tuesday,Eman
+-3.25,2024,August,Wednesday,Eman
+-3.25,2024,August,Thursday,Eman
+-3.25,2024,August,Monday,Eman
+-7.02,2024,August,Monday,Eman
+-5.0,2024,August,Friday,Eman
+-5.0,2024,August,Monday,Eman
+-2.75,2024,August,Monday,Eman
+-9.3,2024,June,Sunday,Credit Card
+-32.24,2024,June,Sunday,Credit Card
+-4.35,2024,June,Thursday,Credit Card
+-10.0,2024,August,Thursday,Credit Card
+-15.0,2024,August,Friday,Credit Card
+-3.25,2024,August,Friday,Credit Card
+-3.95,2024,August,Saturday,Credit Card
+-4.0,2024,September,Monday,Eman
+-5.2,2024,September,Monday,Eman
+-3.25,2024,September,Tuesday,Eman
+-13.22,2024,September,Monday,Eman
+-3.75,2024,September,Wednesday,Eman
+-10.25,2024,September,Thursday,Eman
+-4.7,2024,September,Monday,Eman
+-10.7,2024,September,Monday,Eman
+-22.0,2024,September,Monday,Eman
+-2.5,2024,September,Monday,Eman
+-11.0,2024,November,Wednesday,Eman
+-13.08,2024,December,Monday,Eman
+-13.0,2024,December,Monday,Eman
+-6.5,2025,January,Monday,Eman
+-55.89,2025,January,Monday,Eman
+-3.25,2025,January,Monday,Eman
+-5.0,2025,February,Monday,Eman
+-5.25,2025,February,Tuesday,Eman
+-3.5,2025,February,Monday,Eman
+-5.0,2025,March,Tuesday,Eman
+-3.78,2025,March,Monday,Eman
+-12.35,2025,April,Thursday,Eman
+-4.0,2025,April,Tuesday,Eman
+-5.0,2025,April,Tuesday,Eman
+-12.45,2025,May,Monday,Eman
+-3.5,2025,May,Monday,Eman
+-8.0,2025,May,Thursday,Eman
+-6.75,2025,May,Monday,Eman
+-3.4,2025,May,Tuesday,Eman
+-3.4,2025,May,Thursday,Eman
+-6.35,2025,May,Tuesday,Eman
+-9.0,2025,May,Thursday,Eman
+-8.7,2025,May,Thursday,Eman
+-8.5,2025,May,Tuesday,Eman
+-4.0,2025,June,Monday,Eman
+-6.0,2025,June,Monday,Eman
+-53.5,2025,June,Monday,Eman
+-6.5,2025,January,Monday,Joint
+-55.89,2025,January,Monday,Joint
+-3.25,2025,January,Monday,Joint
+-5.0,2025,February,Monday,Joint
+-5.25,2025,February,Tuesday,Joint
+-3.5,2025,February,Monday,Joint
+-5.0,2025,March,Tuesday,Joint
+-3.78,2025,March,Monday,Joint
+-12.35,2025,April,Thursday,Joint
+-4.0,2025,April,Tuesday,Joint
+-5.0,2025,April,Tuesday,Joint
+-12.45,2025,May,Monday,Joint
+-3.5,2025,May,Monday,Joint
+-8.0,2025,May,Thursday,Joint
+-6.75,2025,May,Monday,Joint
+-3.4,2025,May,Tuesday,Joint
+-3.4,2025,May,Thursday,Joint
+-6.35,2025,May,Tuesday,Joint
+-9.0,2025,May,Thursday,Joint
+-8.7,2025,May,Thursday,Joint
+-8.5,2025,May,Tuesday,Joint
+-4.0,2025,June,Monday,Joint
+-6.0,2025,June,Monday,Joint
+-53.5,2025,June,Monday,Joint
+-5.0,2024,October,Friday,Credit Card
+-9.0,2024,October,Friday,Credit Card
+-5.45,2024,October,Saturday,Credit Card
+-5.0,2024,October,Sunday,Credit Card
+-8.5,2024,October,Sunday,Credit Card
+-5.0,2024,October,Monday,Credit Card
+-9.0,2024,October,Tuesday,Credit Card
+-7.0,2024,October,Friday,Credit Card
+-2.75,2024,October,Saturday,Credit Card
+-5.5,2024,October,Saturday,Credit Card
+-13.05,2024,October,Saturday,Credit Card
+-3.62,2024,October,Sunday,Credit Card
+-5.94,2024,October,Monday,Credit Card
+-8.2,2024,October,Monday,Credit Card
+-9.35,2024,November,Saturday,Credit Card
+-3.55,2024,November,Sunday,Credit Card
+-10.0,2024,November,Monday,Credit Card
+-12.11,2024,December,Monday,Credit Card
+-7.0,2024,December,Wednesday,Credit Card
+-8.6,2024,December,Thursday,Credit Card
+-3.5,2024,December,Friday,Credit Card
+-3.25,2024,December,Sunday,Credit Card
+-3.53,2024,December,Monday,Credit Card
+-2.0,2024,December,Monday,Credit Card
+-3.35,2024,December,Monday,Credit Card
+-8.75,2024,December,Tuesday,Credit Card
+-10.25,2025,January,Thursday,Credit Card
+-5.0,2025,February,Wednesday,Credit Card
+-5.12,2025,February,Wednesday,Credit Card
+-7.25,2025,March,Friday,Credit Card
+-5.85,2025,March,Wednesday,Credit Card
+-5.25,2025,March,Thursday,Credit Card
+-6.0,2025,March,Saturday,Credit Card
+-7.75,2025,April,Saturday,Credit Card
+-6.0,2025,April,Sunday,Credit Card
+-3.0,2025,April,Wednesday,Credit Card
+-13.09,2025,April,Wednesday,Credit Card
+-2.25,2025,April,Wednesday,Credit Card
+-6.75,2025,April,Wednesday,Credit Card
+-15.0,2025,June,Friday,Eman
+-9.0,2025,June,Monday,Eman
+-2.1,2025,June,Monday,Eman
+-5.0,2025,June,Tuesday,Eman
+-2.5,2025,June,Wednesday,Eman
+-3.5,2025,June,Friday,Eman
+-2.0,2025,June,Monday,Eman
+-7.65,2025,July,Monday,Eman
+-8.3,2025,July,Monday,Eman
+-9.05,2025,July,Monday,Eman
+-5.0,2025,July,Tuesday,Eman
+-2.5,2025,July,Tuesday,Eman
+-3.25,2025,July,Friday,Eman
+-9.2,2025,July,Monday,Eman
+-2.0,2025,July,Monday,Eman
+-6.49,2025,July,Monday,Eman
+-5.5,2025,July,Monday,Eman
+-4.0,2025,July,Monday,Eman
+-2.0,2025,July,Friday,Eman
+-3.6,2025,July,Monday,Eman
+-3.25,2025,July,Monday,Eman
+-3.5,2025,July,Tuesday,Eman
+-5.94,2025,July,Wednesday,Eman
+-8.75,2025,July,Wednesday,Eman
+-6.0,2025,July,Thursday,Eman
+-6.6,2025,August,Monday,Eman
+-3.25,2025,August,Monday,Eman
+-2.0,2025,August,Monday,Eman
+-9.1,2025,August,Monday,Eman
+-55.0,2025,August,Tuesday,Eman
+-4.95,2025,August,Tuesday,Credit Card
+-6.5,2025,August,Tuesday,Credit Card
