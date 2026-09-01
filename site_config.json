@@ -36,7 +36,7 @@
         { "title": "PA 2.1 — Grammar of Graphics",
           "student": "assignments/practice_activities/week_2/GSB5544_PA_2_1_grammar_of_graphics-empty.ipynb",
           "solution": "assignments/practice_activities/week_2/GSB5544_PA_2_1_grammar_of_graphics-solution.ipynb",
-          "publish_solution": false,
+          "publish_solution": true,
           "solution_placeholder": "Solutions will be posted after class." },
         { "title": "Topic 2.2 — Data Wrangling (tidy data & the Big Five verbs)",
           "publish": false,
