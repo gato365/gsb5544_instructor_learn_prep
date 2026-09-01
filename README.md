@@ -17,19 +17,21 @@ Teaching materials for GSB 5544 (Cal Poly).
 
 `*-empty.ipynb` notebooks contain `____` blanks for students; `*-solution.ipynb` files are completed **and executed**, so GitHub renders them with outputs.
 
-## Week 1 notebooks (click to view rendered)
-| Topic | Empty (student) | Solution (with outputs) |
-|---|---|---|
-| 1.2 Intro to Pandas | [student](assignments/practice_activities/week_1/pandas_practice_activity/GSB5544_Topic_1_2_Intro_to_Pandas.ipynb) | — |
-| 1.3 Pandas Fundamentals | [student](assignments/practice_activities/week_1/pandas_practice_activity/GSB5544_Topic_1_3_Pandas_Fundamentals-empty.ipynb) | [solution](assignments/practice_activities/week_1/pandas_practice_activity/GSB5544_Topic_1_3_Pandas_Fundamentals-solution.ipynb) |
-| 1.4 NumPy Essentials | [student](assignments/practice_activities/week_1/numpy_practice_activity/GSB5544_Topic_1_4_NumPy_Essentials-empty.ipynb) | [solution](assignments/practice_activities/week_1/numpy_practice_activity/GSB5544_Topic_1_4_NumPy_Essentials-solution.ipynb) |
+## Naming convention
+`GSB5544_<Topic|PA>_<week>_<number>_<slug>-empty.ipynb` — student version (fill in the `____` blanks / "YOUR CODE HERE" cells)
+`GSB5544_<Topic|PA>_<week>_<number>_<slug>-solution.ipynb` — completed **and executed** (GitHub renders outputs)
+No suffix — complete lecture notes with no student version.
 
-Notebooks load the coffee data directly from this repo's raw URL, so they run in Colab as-is.
+Notebooks live under `assignments/practice_activities/week_<N>/`.
 
-## Week 2 notebooks
-| Topic | Empty (student) | Solution (with outputs) |
-|---|---|---|
-| 2.1 Data Visualization (plotnine) | [student](assignments/practice_activities/week_2/GSB5544_Topic_2_1_Data_Visualization-empty.ipynb) | [solution](assignments/practice_activities/week_2/GSB5544_Topic_2_1_Data_Visualization-solution.ipynb) |
-| 2.2 Data Wrangling (tidy data, Big Five verbs, crosstabs) | [student](assignments/practice_activities/week_2/GSB5544_Topic_2_2_Data_Wrangling-empty.ipynb) | [solution](assignments/practice_activities/week_2/GSB5544_Topic_2_2_Data_Wrangling-solution.ipynb) |
+## Course website
+The site is a single generated page, `docs/index.html`, served by GitHub Pages.
 
-Week 2 student notebooks are front-loaded: the first sections are fully worked, middle sections have `____` blanks, and the last sections plus the Practice Activities are `# your answer here`. Every ✅ Check and PA has an answer in the solution file only.
+- **Edit `site_config.json`** to add/retitle notebooks or change what is published.
+- **Hide material** with `"publish": false` + a `"placeholder"` line (the page shows the
+  placeholder, e.g. "Coming Thursday: ..."), or hide just a solution with
+  `"publish_solution": false` + `"solution_placeholder"`. Files stay in the repo either way.
+- **Rebuild** after editing: `python3 tools/build_site.py`, then commit `docs/`.
+
+Note: the repository is public, so hiding removes material from the *website page* only —
+a determined student can still browse the repo. Keep anything truly secret out of the repo.
