@@ -12,7 +12,9 @@ Teaching materials for GSB 5544 (Cal Poly).
   - `pandas_practice_activity/` — pandas notebooks
   - `numpy_practice_activity/` — numpy notebooks
   - `GSB5544_PA_1_1_decode_message*.ipynb`
-- `assignments/practice_activities/week_2/` — 2.1 plotnine visualization (Kobe), 2.2 tidy data + Big Five verbs (SC crime)
+- `assignments/practice_activities/week_2/`
+  - `grammar_of_graphics/` — Topic/PA 2.1 student and solution notebooks
+  - `data_wrangling/` — Topic/PA 2.2 student and solution notebooks; Topic 2.2 directly scaffolds the grouped calculations and reshaping used in PA 2.2
 - `assignments/labs/`, `assignments/quizzes/`
 
 `*-empty.ipynb` notebooks contain `____` blanks for students; `*-solution.ipynb` files are completed **and executed**, so GitHub renders them with outputs.
@@ -22,7 +24,7 @@ Teaching materials for GSB 5544 (Cal Poly).
 `GSB5544_<Topic|PA>_<week>_<number>_<slug>-solution.ipynb` — completed **and executed** (GitHub renders outputs)
 No suffix — complete lecture notes with no student version.
 
-Notebooks live under `assignments/practice_activities/week_<N>/`.
+Notebooks live under `assignments/practice_activities/week_<N>/`, with topic directories where a week contains multiple units.
 
 ## Course website
 The site is a single generated page, `docs/index.html`, served by GitHub Pages.

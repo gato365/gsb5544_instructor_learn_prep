@@ -41,23 +41,27 @@
       "items": [
         {
           "title": "Topic 2.1 \u2014 Data Visualization (plotnine & the grammar of graphics)",
-          "student": "assignments/practice_activities/week_2/GSB5544_Topic_2_1_Data_Visualization-empty.ipynb",
-          "solution": "assignments/practice_activities/week_2/GSB5544_Topic_2_1_Data_Visualization-solution.ipynb",
+          "student": "assignments/practice_activities/week_2/grammar_of_graphics/GSB5544_Topic_2_1_Data_Visualization-empty.ipynb",
+          "solution": "assignments/practice_activities/week_2/grammar_of_graphics/GSB5544_Topic_2_1_Data_Visualization-solution.ipynb",
           "publish_solution": true
         },
         {
           "title": "PA 2.1 \u2014 Grammar of Graphics",
-          "student": "assignments/practice_activities/week_2/GSB5544_PA_2_1_grammar_of_graphics-empty.ipynb",
-          "solution": "assignments/practice_activities/week_2/GSB5544_PA_2_1_grammar_of_graphics-solution.ipynb",
+          "student": "assignments/practice_activities/week_2/grammar_of_graphics/GSB5544_PA_2_1_grammar_of_graphics-empty.ipynb",
+          "solution": "assignments/practice_activities/week_2/grammar_of_graphics/GSB5544_PA_2_1_grammar_of_graphics-solution.ipynb",
           "publish_solution": true
         },
         {
           "title": "Topic 2.2 \u2014 Data Wrangling (tidy data & the Big Five verbs)",
-          "publish": false,
-          "placeholder": "Coming Thursday: tidy data, filtering, sorting, new columns, and group summaries with the SC crime data.",
-          "student": "assignments/practice_activities/week_2/GSB5544_Topic_2_2_Data_Wrangling-empty.ipynb",
-          "solution": "assignments/practice_activities/week_2/GSB5544_Topic_2_2_Data_Wrangling-solution.ipynb",
-          "publish_solution": false
+          "student": "assignments/practice_activities/week_2/data_wrangling/GSB5544_Topic_2_2_Data_Wrangling-empty.ipynb",
+          "solution": "assignments/practice_activities/week_2/data_wrangling/GSB5544_Topic_2_2_Data_Wrangling-solution.ipynb",
+          "publish_solution": true
+        },
+        {
+          "title": "PA 2.2 — Wrangling and Summarizing Data",
+          "student": "assignments/practice_activities/week_2/data_wrangling/GSB5544_PA_2_2_data_wrangling-empty.ipynb",
+          "solution": "assignments/practice_activities/week_2/data_wrangling/GSB5544_PA_2_2_data_wrangling-solution.ipynb",
+          "publish_solution": true
         }
       ]
     }
