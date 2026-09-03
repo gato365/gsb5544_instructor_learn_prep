@@ -24,8 +24,13 @@ def load(path: Path) -> dict:
 def save(path: Path, notebook: dict) -> None:
     if notebook.get("nbformat") == 4:
         notebook["nbformat_minor"] = max(5, notebook.get("nbformat_minor", 0))
+    seen: set[str] = set()
     for index, cell in enumerate(notebook.get("cells", [])):
-        cell.setdefault("id", f"cell-{index:03d}")
+        if not cell.get("id") or cell["id"] in seen:
+            cell["id"] = next(
+                f"cell-{n:03d}" for n in range(index, index + 10_000) if f"cell-{n:03d}" not in seen
+            )
+        seen.add(cell["id"])
     path.write_text(json.dumps(notebook, indent=1, ensure_ascii=False) + "\n")
 
 
@@ -223,40 +228,99 @@ def update_pa() -> None:
         sol["cells"][1],
         intro + "\n\nThis completed version follows the Topic 2.2 workflow and includes rendered outputs."
     )
+    # Code answers follow Kevin Ross's reference solutions; a list means several
+    # cells are inserted for that question (alternatives / checks).
     answers = {
-        6: 'import numpy as np\ndf_titanic["type"] = np.where(df_titanic["crew"].notna(), "crew", "passenger")\ndf_titanic[["class", "type"]].value_counts()',
-        8: 'df_titanic["type"].value_counts(normalize=True)',
-        10: 'df_titanic["survived"].mean()',
-        12: 'pd.crosstab(df_titanic["survived"], df_titanic["type"], margins=True)',
-        14: 'df_titanic.groupby("type")["survived"].mean()',
+        6: 'def class_to_type(c):\n  if c in ["1st", "2nd", "3rd"]:\n    return "passenger"\n  else:\n    return "crew"\n\ndf_titanic["type"] = df_titanic["class"].map(class_to_type)\n\ndf_titanic',
+        8: 'df_titanic["type"].value_counts(normalize = True)',
+        10: [
+            'df_titanic["survived"].mean()',
+            'df_titanic["survived"].value_counts(normalize = True)',
+        ],
+        12: 'pd.crosstab(df_titanic["type"], df_titanic["survived"], normalize = True)',
+        14: [
+            'df_titanic.groupby("type")["survived"].mean()',
+            'pd.crosstab(df_titanic["type"], df_titanic["survived"], normalize = "index")',
+            'pd.crosstab(df_titanic["type"], df_titanic["survived"], normalize = "index")[1]',
+        ],
         16: 'df_titanic.groupby(["gender", "type"])["survived"].mean()',
-        18: '# Passenger/crew survival reverses after accounting for gender (Simpson\'s paradox).\npd.crosstab(df_titanic["gender"], df_titanic["type"], normalize="columns").round(3)',
-        24: 'df_college[df_college["Institution"].str.contains("California Polytechnic", case=False, na=False)]',
-        26: 'df_college_complete = df_college.dropna(subset=["Median Earnings"]).copy()\ndf_college_complete.shape',
-        28: 'df_college_complete["Median Earnings"].describe()\ndf_college_complete["Median Earnings"].hist(bins=30)',
-        30: 'df_college_complete["log_earnings"] = np.log(df_college_complete["Median Earnings"])\ndf_college_complete["log_earnings"].hist(bins=30)',
-        32: 'df_college_complete["weight"] = df_college_complete["Undergraduates"] / df_college_complete["Undergraduates"].sum()\n(df_college_complete["weight"] * df_college_complete["Median Earnings"]).sum()',
-        34: 'state_mean = df_college_complete.groupby("State")["Median Earnings"].mean().sort_values(ascending=False)\nstate_mean.plot.bar(figsize=(12, 4))',
-        36: 'df_college_complete["state_total"] = df_college_complete.groupby("State")["Undergraduates"].transform("sum")\ndf_college_complete["state_weight"] = df_college_complete["Undergraduates"] / df_college_complete["state_total"]\ndf_college_complete["weighted_earnings"] = df_college_complete["Median Earnings"] * df_college_complete["state_weight"]\nstate_weighted_mean = df_college_complete.groupby("State")["weighted_earnings"].sum().sort_values(ascending=False)\nstate_weighted_mean.plot.bar(figsize=(12, 4))',
-        42: 'event_cols = df_gym.loc[:, "Floor Exercise":"Pommelled Horse"].columns.tolist()\ngym_scores = df_gym.set_index(["Round", "Year", "Gymnast"])[event_cols].copy()\ngym_scores',
-        44: 'gym_scores.describe()',
-        50: 'gym_scores = gym_scores.replace(0, np.nan)\ngym_scores.isna().sum()',
-        52: 'gym_scores.describe()',
-        54: 'gym_scores.corr().round(3)',
-        56: 'gym_z = (gym_scores - gym_scores.mean()) / gym_scores.std()\ngym_z.head()',
-        58: 'gym_z["total_z"] = gym_z.sum(axis=1, min_count=len(event_cols))\ngym_z.sort_values("total_z", ascending=False).head(10)',
-        60: 'gym_long = gym_scores.reset_index().melt(id_vars=["Round", "Year", "Gymnast"], var_name="Event", value_name="Score")\nyearly_event_means = gym_long.groupby(["Year", "Event"])["Score"].mean().unstack()\nyearly_event_means',
-        62: 'gym_long[gym_long["Event"] == "Floor Exercise"].boxplot(column="Score", by="Year")',
-        64: 'year_means = gym_scores.groupby(level="Year").transform("mean")\nyear_sds = gym_scores.groupby(level="Year").transform("std")\ngym_year_z = (gym_scores - year_means) / year_sds\ngym_year_z.head()',
-        66: 'gym_year_z["total_z"] = gym_year_z.sum(axis=1, min_count=len(event_cols))\ngym_year_z.sort_values("total_z", ascending=False).head(10)',
+        18: [
+            'df_titanic.groupby(["gender"])["survived"].mean()',
+            'df_titanic.groupby(["gender"])["type"].value_counts(normalize = True)',
+        ],
+        24: [
+            'df_college[df_college["Institution"].str.contains("California Polytechnic")]',
+            'df_college[df_college["City"] == "San Luis Obispo"]',
+        ],
+        26: [
+            'df_college["Median Earnings"].isna().sum()',
+            'df_college2 = df_college[df_college["Median Earnings"].isna() == False]\n\ndf_college2',
+            'df_college.dropna(subset = ["Median Earnings"])',
+        ],
+        28: [
+            'df_college2["Median Earnings"].describe()',
+            'df_college2["Median Earnings"].plot.hist()',
+            'from plotnine import *\n\n(ggplot(df_college2, aes(x = "Median Earnings"))\n + geom_histogram()\n)',
+        ],
+        30: [
+            'import numpy as np\n\ndf_college2["log_earnings"] = np.log(df_college2["Median Earnings"])\n\ndf_college2',
+            'df_college2["log_earnings"].plot.hist()',
+            '(ggplot(df_college2, aes(x = "log_earnings"))\n + geom_histogram()\n)',
+        ],
+        32: [
+            'df_college2["weight"] = df_college2["Undergraduates"] / df_college2["Undergraduates"].sum()\n\ndf_college2',
+            'df_college2["weight"].sum()',
+            '(df_college2["Median Earnings"] * df_college2["weight"]).sum()',
+        ],
+        34: [
+            'df_state = df_college2.groupby("State")["Median Earnings"].mean().sort_values(ascending=False)\n\ndf_state',
+            'df_state = df_state.reset_index().sort_values("Median Earnings", ascending = False)\n\ndf_state',
+            '(ggplot(df_state.reset_index(), aes(x = "State", y = "Median Earnings"))\n + geom_col()\n)',
+            'df_state["State"] = pd.Categorical(\n    df_state["State"],\n    categories=df_state["State"],  # already sorted by Median Earnings\n    ordered=True\n)\n\n(ggplot(df_state, aes(x="State", y="Median Earnings"))\n + geom_col()\n)',
+            '(ggplot(df_state, aes(x="State", y="Median Earnings"))\n + geom_col()\n + theme(axis_text_x=element_text(rotation=90, hjust=0.5))\n)',
+        ],
+        36: [
+            'df_college2.groupby("State")["Undergraduates"].sum()',
+            'df_college2.groupby("State")["Undergraduates"].transform("sum")',
+            'df_college2["state_total"] = df_college2.groupby("State")["Undergraduates"].transform("sum")\n\ndf_college2["state_weight"] = df_college2["Undergraduates"] / df_college2["state_total"]\n\ndf_college2["weighted"] = df_college2["state_weight"] * df_college2["Median Earnings"]\n\ndf_state2 = df_college2.groupby("State")["weighted"].sum().sort_values(ascending=False)\n\ndf_state2',
+            'df_state2 = df_state2.reset_index()\n\ndf_state2["State"] = pd.Categorical(\n    df_state2["State"],\n    categories=df_state2["State"],  # already sorted by Median Earnings\n    ordered=True\n)\n\n(ggplot(df_state2, aes(x="State", y="weighted"))\n + geom_col()\n + theme(axis_text_x=element_text(rotation=90, hjust=0.5))\n)',
+        ],
+        42: [
+            'df_gym = df_gym.set_index(["Round", "Year", "Gymnast"])\n\ndf_gym',
+            'df_scores = df_gym.loc[:, "Floor Exercise":"Pommelled Horse"]\n\ndf_scores',
+        ],
+        44: 'df_scores.describe()',
+        50: [
+            'df_scores = df_scores.replace(0, np.nan)',
+            'df_scores',
+        ],
+        52: 'df_scores.describe()',
+        54: 'df_scores.corr()',
+        56: [
+            'df_scores_z = (df_scores - df_scores.mean()) / df_scores.std()\n\ndf_scores_z',
+            'df_scores_z.mean()',
+            'df_scores_z.std()',
+        ],
+        58: [
+            'df_scores_z["total_z"] = df_scores_z.sum(axis = "columns")\n\ndf_scores_z',
+            'df_scores_z.sort_values("total_z", ascending = False)',
+        ],
+        60: 'df_scores.groupby("Year").mean()',
+        62: 'df_scores.groupby("Year")["Horse Vault"].plot.density();',
+        64: 'df_scores_z = (df_scores - df_scores.groupby("Year").mean()) / df_scores.groupby("Year").std()\n\ndf_scores_z',
+        66: 'df_scores_z["total"] = df_scores_z.sum(axis = "columns")\n\ndf_scores_z.sort_values("total", ascending = False)',
     }
     responses = {
         22: '**Solution:** The observational unit is one college. `earnings` is the median annual earnings, ten years after entry, among federally aided former students whose tax records are available.',
         46: '**Solution:** Missing event scores are excluded from each column separately, so each event can have a different non-missing sample size.',
         48: '**Solution:** `NaN` is more appropriate because not competing is missing information, not a genuine score of zero. Treating it as zero would distort means, standard deviations, correlations, and totals.',
     }
-    for index, value in {**answers, **responses}.items():
-        set_source(sol["cells"][index], value)
+    for index in sorted({**answers, **responses}, reverse=True):
+        value = {**answers, **responses}[index]
+        cells = value if isinstance(value, list) else [value]
+        set_source(sol["cells"][index], cells[0])
+        for offset, extra in enumerate(cells[1:], start=1):
+            sol["cells"].insert(index + offset, code(extra))
     clear_outputs(sol)
     save(solution_path, sol)
     if source_path.exists():
