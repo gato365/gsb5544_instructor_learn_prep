@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pandas in motion</title>
+<style>
+:root{color-scheme:light;--bg:#f5f6f9;--panel:#fff;--fg:#192538;--line:#ccd4df;--accent:#225ab5;--active:#e1edff;--trace:#eef4ff;--missing:#8b4809;--muted:#5d6a7e;--ok:#1d7a3e;--bad:#b3261e;--okbg:#e6f5ea;--badbg:#fbe9e7}
+:root[data-theme=dark]{color-scheme:dark;--bg:#151b25;--panel:#202938;--fg:#edf2fa;--line:#465369;--accent:#92baff;--active:#304768;--trace:#28384f;--missing:#ffcb87;--muted:#a3b0c4;--ok:#7fd49a;--bad:#ff9b93;--okbg:#1d3a28;--badbg:#4a2622}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#151b25;--panel:#202938;--fg:#edf2fa;--line:#465369;--accent:#92baff;--active:#304768;--trace:#28384f;--missing:#ffcb87;--muted:#a3b0c4;--ok:#7fd49a;--bad:#ff9b93;--okbg:#1d3a28;--badbg:#4a2622}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif}main{max-width:1120px;margin:auto;padding:28px}h1{font-size:32px;margin:0}h2{font-size:20px;margin:0 0 10px}h3{font-size:16px;margin:14px 0 6px}p{margin:8px 0 16px}header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}header small{letter-spacing:.12em;color:var(--accent)}
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin:18px 0}.tabs button{border:0;border-bottom:3px solid transparent;border-radius:0;background:none;padding:10px 16px;font-weight:600;color:var(--muted)}.tabs button[aria-selected=true]{color:var(--accent);border-bottom-color:var(--accent)}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:22px 0}button,select,input[type=text],textarea{font:inherit;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--fg);padding:10px 14px;min-height:44px}button{cursor:pointer}button:disabled{opacity:.4;cursor:default}button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,tr[tabindex]:focus-visible{outline:3px solid var(--accent);outline-offset:2px}.primary{background:var(--accent);color:var(--bg);font-weight:600}#play{min-width:96px}select{max-width:100%}.hint{font-size:13px;color:var(--muted);margin-left:auto}.small{font-size:13px;color:var(--muted)}
+.stage{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}.panel{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}.source+.source{margin-top:18px}.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);white-space:nowrap}th{font-weight:600}th.key{color:var(--accent)}th.key::after{content:" ⚷";font-size:12px}
+tr.active{background:var(--active);outline:2px solid var(--accent);outline-offset:-2px}tr.active td.key{font-weight:700;text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px}
+tr.trace{background:var(--trace);outline:2px dashed var(--accent);outline-offset:-2px}
+tr.pending,tr.landing{visibility:hidden}tr.new{animation:arrive .45s ease-out}
+#output tbody tr:not(.pending){cursor:pointer}.na{color:var(--missing);font-style:italic}.caption{font-size:13px;margin-bottom:5px}.status{min-height:76px;padding:15px 0;color:var(--accent);font-weight:600}.error{color:var(--bad)}
+.rule{border-left:3px solid var(--accent);padding-left:14px}.question{background:var(--active);border-radius:10px;padding:12px 16px;margin:0 0 18px}.question b{display:block;margin-bottom:2px}
+.progress{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin:4px 0 12px}.progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.code{margin-top:22px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.6 ui-monospace,monospace;margin:12px 0}details{margin-top:14px}summary{cursor:pointer;min-height:40px;font-weight:600}footer{font-size:13px;margin-top:22px}a{color:var(--accent)}
+.editor{display:grid;gap:14px;margin-top:10px}.editor textarea{width:100%;min-height:110px;font:13px/1.5 ui-monospace,monospace;resize:vertical}.editor .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.flight{position:fixed;z-index:5;pointer-events:none;background:var(--active);border:2px solid var(--accent);border-radius:6px;padding:7px;font-size:13px;max-width:260px;overflow:hidden;white-space:nowrap}.muted{opacity:.75}
+.quiz .modes{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.quiz .modes button[aria-pressed=true]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.choices{display:grid;gap:8px;margin:12px 0}.choices label{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:8px;cursor:pointer}.choices label:has(input:checked){border-color:var(--accent);background:var(--active)}.choices input{margin-top:5px}
+.answer{display:grid;gap:12px;margin:12px 0}.answer label{display:grid;gap:4px;font-weight:600}.answer input[type=text]{width:100%;font-family:ui-monospace,monospace}
+.feedback{border-radius:10px;padding:12px 16px;margin:12px 0}.feedback.ok{background:var(--okbg);color:var(--ok)}.feedback.bad{background:var(--badbg);color:var(--bad)}.feedback pre{color:var(--fg)}
+.score{font-weight:600;margin-left:auto}
+@keyframes arrive{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:680px){main{padding:16px}.stage{grid-template-columns:1fr}h1{font-size:26px}.toolbar{gap:8px}.panel{padding:12px}th,td{padding:8px 6px}.hint{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style></head><body><main>
+<header><div><small>PYTHON / PANDAS • SAMPLE COLLEGE DATA</small><h1>Pandas in motion</h1><p>Follow the highlighted input rows as each result is built. Hover any row to trace it; click a result row to jump to that step.</p></div><button id="theme" aria-label="Switch color theme">Theme: Auto</button></header>
+<div class="tabs" role="tablist"><button role="tab" id="tab-learn" aria-selected="true" aria-controls="learn">Learn</button><button role="tab" id="tab-quiz" aria-selected="false" aria-controls="quiz">Quiz</button></div>
+
+<section id="learn" role="tabpanel">
+<div class="toolbar"><label for="technique">Technique</label><select id="technique"></select><button id="prev" aria-label="Previous step">← Back</button><button id="play" class="primary">Play</button><button id="next">Step →</button><button id="restart">Restart</button><label for="speed" class="muted">Speed</label><select id="speed" aria-label="Playback speed"><option value="3600">Slow</option><option value="2300" selected>Normal</option><option value="1200">Fast</option></select><span class="hint">Keys: ← → step · Space play/pause · R restart</span></div>
+<h2 id="title"></h2><p id="why"></p><div class="question"><b>Question we can now answer</b><span id="question"></span></div><p id="rule" class="rule"></p>
+<div class="stage"><section class="panel"><h2>Input tables</h2><div id="inputs"></div>
+<details id="editbox"><summary>Edit or generate input data</summary><p class="small">One row per line, comma-separated; the first line is the header. Leave a cell empty or write NA for a missing value. The result, steps, and setup code recompute from whatever you enter.</p><div id="editor" class="editor"></div><div class="row" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button id="apply" class="primary">Apply changes</button><button id="resetdata">Reset to sample data</button></div><p id="editmsg" class="small error"></p></details>
+</section><section class="panel"><h2>Result <span id="count" class="muted"></span></h2><div class="progress" aria-hidden="true"><i id="bar"></i></div><div id="output"></div><div id="status" class="status" aria-live="polite"></div><span class="caption">NA = missing, not zero. Index omitted except in the index-alignment example. ⚷ marks key columns.</span></section></div>
+<section class="panel code"><h2>Python syntax</h2><pre id="code"></pre><details><summary>Sample data setup — copy before running the code</summary><pre id="setup"></pre></details></section>
+</section>
+
+<section id="quiz" role="tabpanel" class="quiz" hidden>
+<div class="modes" role="group" aria-label="Quiz mode"><button data-mode="write" aria-pressed="true">Write the call</button><button data-mode="pick-op" aria-pressed="false">Pick the technique</button><button data-mode="pick-q" aria-pressed="false">What question is answered?</button><span class="score" id="score">0 / 0 correct</span></div>
+<section class="panel"><div id="qprompt"></div><div id="qbody"></div><div id="qanswer"></div><div id="qfeedback"></div><div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><button id="qcheck" class="primary">Check answer</button><button id="qhint">Show hint</button><button id="qnext">Next question</button></div></section>
+</section>
+
+<footer>Results, steps, and setup code are computed in the browser from the displayed data with a small pandas-behaviour engine (checked against pandas 2.2.3 on the sample data). Anti joins use a version-compatible filtering pattern. Link to a technique with the address bar (e.g. <code>#left-join</code>).<br>Reference: <a href="https://pandas.pydata.org/docs/reference/api/pandas.merge.html" target="_blank" rel="noreferrer">pandas merge</a> · <a href="https://pandas.pydata.org/docs/user_guide/merging.html" target="_blank" rel="noreferrer">Combining tables</a> · <a href="https://pandas.pydata.org/docs/user_guide/reshaping.html" target="_blank" rel="noreferrer">Reshaping</a> · <a href="https://pandas.pydata.org/docs/user_guide/groupby.html" target="_blank" rel="noreferrer">GroupBy</a></footer>
+</main><script>
+/* ============================== SAMPLE DATA ============================== */
+const T=(name,cols,rows)=>({name,cols,rows:rows.map(r=>[...r])});
+const S={
+  students:()=>T('students',['student_id','name'],[[1,'Ava'],[2,'Ben'],[3,'Cam']]),
+  grades:()=>T('grades',['student_id','score'],[[2,80],[3,90],[4,70]]),
+  gradesId:()=>T('grades',['id','score'],[[2,80],[3,90],[4,70]]),
+  names:()=>T('students',['name'],[['Ava'],['Ben'],['Cam']]),
+  courses:()=>T('courses',['course'],[['Stats'],['Python']]),
+  enrollment:()=>T('enrollment',['student_id','course'],[[1,'Stats'],[1,'Python'],[2,'Stats']]),
+  courseGrades:()=>T('grades',['student_id','course','score'],[[1,'Python',95],[1,'Stats',80],[2,'Stats',90]]),
+  clubs:()=>T('clubs',['student_id','club'],[[2,'Art'],[2,'Music']]),
+  examGrades:()=>T('grades',['student_id','exam','score'],[[2,'E1',80],[2,'E2',90]]),
+  fall:()=>T('fall',['student','score'],[['Ava',80],['Ben',90]]),
+  spring:()=>T('spring',['student','score'],[['Cam',70]]),
+  idxNames:()=>T('names',['index','name'],[[0,'Ava'],[1,'Ben']]),
+  idxScores:()=>T('scores',['index','score'],[[1,90],[2,70]]),
+  longGrades:()=>T('grades',['student','exam','score'],[['Ava','E1',80],['Ava','E2',90],['Ben','E1',70],['Ben','E2',100]]),
+  longGradesDup:()=>T('grades',['student','exam','score'],[['Ava','E1',80],['Ava','E2',90],['Ben','E1',70],['Ben','E2',100],['Ava','E1',100]]),
+  wide:()=>T('wide',['student','E1','E2'],[['Ava',80,90],['Ben',70,100]]),
+  midterm:()=>T('midterm',['student_id','score'],[[1,72],[2,85],[3,90]]),
+  final:()=>T('final',['student_id','score'],[[1,80],[2,79],[3,95]]),
+  roster:()=>T('roster',['student_id','name'],[[1,'Ava'],[2,'Ben'],[2,'Ben'],[3,'Cam'],[1,'Ava']]),
+  enroll2:()=>T('enrollment',['student','course'],[['Ava','Stats'],['Ava','Python'],['Ben','Stats'],['Cam','Python'],['Cam','Stats']])
+};
+
+/* ============================== TECHNIQUES ============================== */
+// op types handled by run(): merge, anti, cross, concatRows, concatCols, pivot, pivotTable, melt, groupby, dropDuplicates, crosstab
+const demos=[
+{title:'Inner join',group:'Match keys',why:'Analyze only students who have a score.',question:'Among students on the roster, who has a score and what is it? (e.g. their average score)',
+ tables:()=>[S.students(),S.grades()],op:{type:'merge',how:'inner',on:['student_id']},keys:['student_id'],
+ code:'result = students.merge(grades, on="student_id", how="inner")',rule:'Keep only keys present in both tables.',
+ accept:t=>/merge/.test(t)&&(!/how=/.test(t)||/how="inner"/.test(t)),hint:'.merge(...) with how="inner" (the default).'},
+{title:'Left join',group:'Match keys',why:'Keep the complete student roster, even when a score is missing.',question:'Which rostered students are still missing a score?',
+ tables:()=>[S.students(),S.grades()],op:{type:'merge',how:'left',on:['student_id']},keys:['student_id'],
+ code:'result = students.merge(grades, on="student_id", how="left")',rule:'Keep every left row; attach all matching right rows.',
+ accept:t=>/merge/.test(t)&&/how="left"/.test(t),hint:'Every row of the LEFT table survives.'},
+{title:'Right join',group:'Match keys',why:'Keep all score records, including an ID missing from the roster.',question:'Which score records belong to an ID that is not on the roster?',
+ tables:()=>[S.students(),S.grades()],op:{type:'merge',how:'right',on:['student_id']},keys:['student_id'],
+ code:'result = students.merge(grades, on="student_id", how="right")',rule:'Keep every right row; attach all matching left rows.',
+ accept:t=>/merge/.test(t)&&/how="right"/.test(t),hint:'Every row of the RIGHT table survives.'},
+{title:'Full / outer join',group:'Match keys',why:'Audit the complete set of IDs across both sources.',question:'Across both files, which IDs appear in only one source, and which appear in both?',
+ tables:()=>[S.students(),S.grades()],op:{type:'merge',how:'outer',on:['student_id']},keys:['student_id'],
+ code:'result = students.merge(grades, on="student_id", how="outer")',rule:'Keep rows from both tables; unmatched fields are missing.',
+ accept:t=>/merge/.test(t)&&/how="outer"/.test(t),hint:'Nothing is dropped from either side.'},
+{title:'Left anti join',group:'Match keys',why:'Find roster entries with no counterpart in the scores.',question:'Which students have not received a score yet?',
+ tables:()=>[S.students(),S.grades()],op:{type:'anti',side:0,on:['student_id']},keys:['student_id'],
+ code:'result = students[\n    ~students["student_id"].isin(grades["student_id"])\n]',rule:'Keep unmatched rows from the left side only. This isin pattern also works in pandas 2.x.',
+ accept:t=>/students\[~students\["student_id"\]\.isin\(grades\["student_id"\]\)\]/.test(t),hint:'Filter students with ~ and .isin(...).'},
+{title:'Right anti join',group:'Match keys',why:'Find score records with no counterpart in the roster.',question:'Which scores were recorded under an ID that no student has?',
+ tables:()=>[S.students(),S.grades()],op:{type:'anti',side:1,on:['student_id']},keys:['student_id'],
+ code:'result = grades[\n    ~grades["student_id"].isin(students["student_id"])\n]',rule:'Keep unmatched rows from the right side only. This isin pattern also works in pandas 2.x.',
+ accept:t=>/grades\[~grades\["student_id"\]\.isin\(students\["student_id"\]\)\]/.test(t),hint:'Filter grades with ~ and .isin(...).'},
+{title:'Cross join',group:'Match keys',why:'Build all student–course possibilities.',question:'What would a full enrollment grid look like if every student took every course?',
+ tables:()=>[S.names(),S.courses()],op:{type:'cross'},keys:[],
+ code:'result = students.merge(courses, how="cross")',rule:(t,o)=>`Pair every left row with every right row: ${t[0].rows.length} × ${t[1].rows.length} = ${o.rows.length} rows.`,
+ accept:t=>/merge/.test(t)&&/how="cross"/.test(t),hint:'No key at all; how="cross".'},
+{title:'Different key names',group:'Join details',why:'Combine sources that name the same identifier differently.',question:'How do we attach scores when the two files spell the ID column differently?',
+ tables:()=>[S.students(),S.gradesId()],op:{type:'merge',how:'left',leftOn:['student_id'],rightOn:['id']},keys:['student_id','id'],
+ code:'result = students.merge(grades, how="left",\n    left_on="student_id", right_on="id")',rule:'Match student_id to id; both key columns remain.',
+ accept:t=>/merge/.test(t)&&/left_on="student_id"/.test(t)&&/right_on="id"/.test(t),hint:'left_on= and right_on= instead of on=.'},
+{title:'Multiple keys',group:'Join details',why:'Attach the score for the correct student AND course.',question:'What score did each student earn in each specific course?',
+ tables:()=>[S.enrollment(),S.courseGrades()],op:{type:'merge',how:'left',on:['student_id','course']},keys:['student_id','course'],
+ code:'result = enrollment.merge(grades, how="left",\n    on=["student_id", "course"])',rule:'Both key values must match; ID alone would mix courses.',
+ accept:t=>/merge/.test(t)&&/on=\["student_id","course"\]/.test(t),hint:'Pass a list to on=.'},
+{title:'Audit + validate',group:'Join details',why:'Identify source coverage and check the expected key relationship.',question:'Did every row come from the roster, the scores, or both — and is each student listed once?',
+ tables:()=>[S.students(),S.grades()],op:{type:'merge',how:'outer',on:['student_id'],indicator:true,validate:'one_to_many'},keys:['student_id'],
+ code:'result = students.merge(grades, on="student_id",\n    how="outer", indicator=True, validate="one_to_many")',rule:'one_to_many checks that left keys are unique. _merge records each row’s origin.',
+ accept:t=>/merge/.test(t)&&/indicator=true/.test(t)&&/validate="one_to_many"/.test(t),hint:'indicator=True adds _merge; validate= checks uniqueness.'},
+{title:'Duplicate matches',group:'Join details',why:'Spot why a join can unexpectedly increase the number of rows.',question:'Why did my row count jump after the join?',
+ tables:()=>[S.clubs(),S.examGrades()],op:{type:'merge',how:'inner',on:['student_id']},keys:['student_id'],
+ code:'result = clubs.merge(grades, on="student_id")\n# validate="one_to_many" would raise MergeError here.\n# validate="many_to_many" permits this; it checks nothing.',rule:(t,o)=>`${t[0].rows.length} left rows × ${t[1].rows.length} right rows for the same ID produces ${o.rows.length} combinations.`,
+ accept:t=>/merge/.test(t)&&/on="student_id"/.test(t)&&(!/how=/.test(t)||/how="inner"/.test(t)),hint:'A plain merge on the shared key.'},
+{title:'Overlapping columns (suffixes)',group:'Join details',why:'Join two tables that both have a column called score without losing either.',question:'How did each student’s score change from midterm to final?',
+ tables:()=>[S.midterm(),S.final()],op:{type:'merge',how:'inner',on:['student_id'],suffixes:['_mid','_final']},keys:['student_id'],
+ code:'result = midterm.merge(final, on="student_id",\n    suffixes=("_mid", "_final"))',rule:'Non-key columns with the same name get a suffix; the default is _x and _y.',
+ accept:t=>/merge/.test(t)&&/suffixes=\(?"_mid","_final"\)?/.test(t),hint:'suffixes=("_mid", "_final")'},
+{title:'Concat: add rows',group:'Concatenate',why:'Append another batch of observations.',question:'What is the combined list of scores across fall and spring?',
+ tables:()=>[S.fall(),S.spring()],op:{type:'concatRows'},keys:[],
+ code:'result = pd.concat([fall, spring], ignore_index=True)',rule:'Stack rows; align column names. ignore_index=True creates a fresh row index.',
+ accept:t=>/pd\.concat\(\[fall,spring\]/.test(t)&&/ignore_index=true/.test(t),hint:'pd.concat with a list of tables.'},
+{title:'Concat: add columns',group:'Concatenate',why:'Combine columns whose index labels represent the same observation.',question:'How do we place two measurements side by side when they share index labels but not row positions?',
+ tables:()=>[S.idxNames(),S.idxScores()],op:{type:'concatCols',index:'index'},keys:['index'],
+ code:'result = pd.concat([\n    names.set_index("index"), scores.set_index("index")\n], axis=1).reset_index()',rule:'axis=1 aligns INDEX LABELS, not row positions and not student names.',
+ accept:t=>/pd\.concat\(/.test(t)&&/axis=1/.test(t)&&/set_index\("index"\)/.test(t),hint:'set_index on both, then pd.concat(..., axis=1).'},
+{title:'Pivot: long → wide',group:'Reshape',why:'Compare exam scores side by side for each student.',question:'Did each student improve from exam 1 to exam 2?',
+ tables:()=>[S.longGrades()],op:{type:'pivot',index:'student',columns:'exam',values:'score'},keys:['student','exam'],
+ code:'result = grades.pivot(index="student",\n    columns="exam", values="score").reset_index()',rule:'Unique student–exam pairs become cells; pivot does not aggregate.',
+ accept:t=>/\.pivot\(/.test(t)&&/index="student"/.test(t)&&/columns="exam"/.test(t)&&/values="score"/.test(t),hint:'.pivot(index=, columns=, values=)'},
+{title:'Pivot table: aggregate',group:'Reshape',why:'Summarize multiple observations for the same student and exam.',question:'What is each student’s average score per exam when some exams were retaken?',
+ tables:()=>[S.longGradesDup()],op:{type:'pivotTable',index:'student',columns:'exam',values:'score'},keys:['student','exam'],
+ code:'result = grades.pivot_table(index="student",\n    columns="exam", values="score", aggfunc="mean").reset_index()',rule:'Repeated pairs need an aggregation. pivot() would raise ValueError on this input.',
+ accept:t=>/pivot_table\(/.test(t)&&/index="student"/.test(t)&&/columns="exam"/.test(t)&&/values="score"/.test(t),hint:'.pivot_table(...) with aggfunc="mean".'},
+{title:'Melt: wide → long',group:'Reshape',why:'Put exam labels in one column and scores in another for plotting or grouping.',question:'How do we plot every exam score as one series, with exam as a category?',
+ tables:()=>[S.wide()],op:{type:'melt',idVars:['student'],varName:'exam',valueName:'score'},keys:['student'],
+ code:'result = wide.melt(id_vars="student",\n    var_name="exam", value_name="score")',rule:'Repeat the identifier for each measurement; column names become values.',
+ accept:t=>/\.melt\(/.test(t)&&/id_vars="student"/.test(t),hint:'.melt(id_vars=...)'},
+{title:'GroupBy: aggregate',group:'Reshape',why:'Collapse many rows per student into one summary row.',question:'What is each student’s average score across all exams?',
+ tables:()=>[S.longGradesDup()],op:{type:'groupby',by:'student',col:'score',agg:'mean'},keys:['student'],
+ code:'result = grades.groupby("student")["score"].mean().reset_index()',rule:'One output row per group, in sorted key order; the aggregate summarizes the group.',
+ accept:t=>/groupby\("student"\)/.test(t)&&/\["score"\]\.mean\(\)/.test(t),hint:'.groupby(...)["score"].mean()'},
+{title:'Drop duplicates',group:'Reshape',why:'Make a key unique before using the table as a lookup, so a later join cannot multiply rows.',question:'Which student IDs are unique, so the table is safe to join one-to-many?',
+ tables:()=>[S.roster()],op:{type:'dropDuplicates',subset:['student_id']},keys:['student_id'],
+ code:'result = roster.drop_duplicates(subset="student_id")',rule:'Keep the first row for each key; later repeats are dropped.',
+ accept:t=>/drop_duplicates\(/.test(t)&&/subset="student_id"/.test(t),hint:'.drop_duplicates(subset=...)'},
+{title:'Crosstab: counts',group:'Reshape',why:'Count how often each pair of categories occurs.',question:'How many times is each student enrolled in each course?',
+ tables:()=>[S.enroll2()],op:{type:'crosstab',index:'student',columns:'course'},keys:['student','course'],
+ code:'result = pd.crosstab(enrollment["student"],\n    enrollment["course"]).reset_index()',rule:'Rows are one category, columns the other; cells count matching input rows.',
+ accept:t=>/pd\.crosstab\(/.test(t)&&/enrollment\["student"\]/.test(t)&&/enrollment\["course"\]/.test(t),hint:'pd.crosstab(series1, series2)'}
+];
+demos.forEach(d=>d.slug=d.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''));
+
+/* ============================== ENGINE ============================== */
+// Tables are {name, cols, rows}; cells are number | string | null. run() returns {output, steps, error}.
+const eq=(a,b)=>a===b||(a!==null&&b!==null&&String(a)===String(b));
+const cmp=(a,b)=>{if(a===null)return 1;if(b===null)return -1;return typeof a==='number'&&typeof b==='number'?a-b:String(a).localeCompare(String(b))};
+const cmpKey=(a,b)=>{for(let i=0;i<a.length;i++){const c=cmp(a[i],b[i]);if(c)return c}return 0};
+const uniqSorted=vals=>{const u=[];vals.forEach(v=>{if(!u.some(x=>eq(x,v)))u.push(v)});return u.sort(cmp)};
+const colIdx=(t,cols)=>cols.map(c=>{const i=t.cols.indexOf(c);if(i<0)throw new Error(`KeyError: '${c}' is not a column of ${t.name}`);return i});
+const keyLabel=(cols,row,idx)=>idx.map((i,k)=>`${cols[k]} ${row[i]===null?'NA':row[i]}`).join(' + ');
+const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+// pandas turns an integer column into float64 when it holds a missing value.
+function floatCols(t,force=[]){const f=new Set(force);t.cols.forEach((c,j)=>{const v=t.rows.map(r=>r[j]);if(v.some(x=>x===null)&&v.some(x=>typeof x==='number')&&v.every(x=>x===null||typeof x==='number'))f.add(j)});t.floats=f;return t}
+
+function merge(L,R,o){
+  const lk=o.on||o.leftOn,rk=o.on||o.rightOn,li=colIdx(L,lk),ri=colIdx(R,rk),same=lk.every((c,i)=>c===rk[i]);
+  const K=(row,idx)=>JSON.stringify(idx.map(i=>row[i]));
+  if(o.validate){const dup=(t,idx)=>{const ks=t.rows.map(r=>K(r,idx));return new Set(ks).size!==ks.length};const [l,r]=o.validate.split('_to_');
+    if(l==='one'&&dup(L,li))throw new Error(`MergeError: Merge keys are not unique in left dataset (${L.name}); not a ${o.validate} merge`);
+    if(r==='one'&&dup(R,ri))throw new Error(`MergeError: Merge keys are not unique in right dataset (${R.name}); not a ${o.validate} merge`)}
+  const rightCols=R.cols.filter((c,j)=>!(same&&ri.includes(j)));const rIdx=rightCols.map(c=>R.cols.indexOf(c));
+  const overlap=L.cols.filter((c,j)=>rightCols.includes(c)&&!(same&&li.includes(j)));const [sx,sy]=o.suffixes||['_x','_y'];
+  const cols=[...L.cols.map(c=>overlap.includes(c)?c+sx:c),...rightCols.map(c=>overlap.includes(c)?c+sy:c)];if(o.indicator)cols.push('_merge');
+  const rows=[],steps=[],sortKeys=[];
+  const emit=(lr,rr,li_,ri_,note,flag)=>{
+    const left=lr?lr:L.cols.map((c,j)=>same&&li.includes(j)?rr[ri[li.indexOf(j)]]:null);
+    const right=rr?rIdx.map(i=>rr[i]):rIdx.map(()=>null);
+    const row=[...left,...right];if(o.indicator)row.push(flag);
+    rows.push(row);steps.push({sources:[li_!==null?[0,li_]:null,ri_!==null?[1,ri_]:null].filter(Boolean),note:note+(o.indicator?` _merge = ${flag}.`:'')});
+    sortKeys.push(lr?li.map(i=>lr[i]):ri.map(i=>rr[i]));
+  };
+  const matchesR=lr=>R.rows.map((rr,j)=>[rr,j]).filter(([rr])=>K(rr,ri)===K(lr,li));
+  const matchesL=rr=>L.rows.map((lr,i)=>[lr,i]).filter(([lr])=>K(lr,li)===K(rr,ri));
+  if(o.how==='right'){
+    R.rows.forEach((rr,j)=>{const m=matchesL(rr),kl=keyLabel(rk,rr,ri);
+      if(m.length)m.forEach(([lr,i])=>emit(lr,rr,i,j,`${kl}: match → combine ${L.name} and ${R.name} fields.${m.length>1?` (${m.length} matches in ${L.name} → one row each.)`:''}`,'both'));
+      else emit(null,rr,null,j,`${kl}: no match in ${L.name} → keep the row, fill ${L.name} fields with NA.`,'right_only')});
+  }else{
+    L.rows.forEach((lr,i)=>{const m=matchesR(lr),kl=keyLabel(lk,lr,li);
+      if(m.length)m.forEach(([rr,j])=>emit(lr,rr,i,j,`${kl}: match → combine ${L.name} and ${R.name} fields.${m.length>1?` (${m.length} matches in ${R.name} → one row each.)`:''}`,'both'));
+      else if(o.how==='left'||o.how==='outer')emit(lr,null,i,null,`${kl}: no match in ${R.name} → keep the row, fill ${R.name} fields with NA.`,'left_only')});
+    if(o.how==='outer')R.rows.forEach((rr,j)=>{if(!matchesL(rr).length)emit(null,rr,null,j,`${keyLabel(rk,rr,ri)}: no match in ${L.name} → keep the row, fill ${L.name} fields with NA.`,'right_only')});
+  }
+  if(o.how==='outer'){const order=rows.map((_,i)=>i).sort((a,b)=>cmpKey(sortKeys[a],sortKeys[b])||a-b);return{output:floatCols(T('result',cols,order.map(i=>rows[i]))),steps:order.map(i=>steps[i])}}
+  return{output:floatCols(T('result',cols,rows)),steps};
+}
+function anti(A,B,o){const ai=colIdx(A,o.on),bi=colIdx(B,o.on);const K=(r,idx)=>JSON.stringify(idx.map(i=>r[i]));const bk=new Set(B.rows.map(r=>K(r,bi)));
+  const rows=[],steps=[];A.rows.forEach((r,i)=>{if(!bk.has(K(r,ai))){rows.push([...r]);steps.push({sources:[[o.side,i]],note:`${keyLabel(o.on,r,ai)} is absent from ${B.name} → keep, with only ${A.name}’s columns.`})}});
+  return{output:floatCols(T('result',[...A.cols],rows)),steps}}
+function cross(L,R){const overlap=L.cols.filter(c=>R.cols.includes(c));const cols=[...L.cols.map(c=>overlap.includes(c)?c+'_x':c),...R.cols.map(c=>overlap.includes(c)?c+'_y':c)];const rows=[],steps=[];
+  L.rows.forEach((lr,i)=>R.rows.forEach((rr,j)=>{rows.push([...lr,...rr]);steps.push({sources:[[0,i],[1,j]],note:`No key needed: pair ${L.name} row ${i+1} with ${R.name} row ${j+1}.`})}));return{output:floatCols(T('result',cols,rows)),steps}}
+function concatRows(ts){const cols=[];ts.forEach(t=>t.cols.forEach(c=>{if(!cols.includes(c))cols.push(c)}));const rows=[],steps=[];
+  ts.forEach((t,k)=>t.rows.forEach((r,i)=>{rows.push(cols.map(c=>{const j=t.cols.indexOf(c);return j<0?null:r[j]}));steps.push({sources:[[k,i]],note:k?`Append ${t.name} row ${i+1}; no key matching or deduplication.`:`Keep ${t.name} row ${i+1}.`})}));
+  return{output:floatCols(T('result',cols,rows)),steps}}
+function concatCols(ts,o){const idx=ts.map(t=>colIdx(t,[o.index])[0]);const labels=[];ts.forEach((t,k)=>t.rows.forEach(r=>{if(!labels.some(l=>eq(l,r[idx[k]])))labels.push(r[idx[k]])}));
+  ts.forEach((t,k)=>{const ks=t.rows.map(r=>String(r[idx[k]]));if(new Set(ks).size!==ks.length)throw new Error(`ValueError: ${t.name} has duplicate index labels; cannot reindex on axis 1`)});
+  const cols=[o.index,...ts.flatMap((t,k)=>t.cols.filter((c,j)=>j!==idx[k]))];const rows=[],steps=[];
+  labels.forEach(l=>{const row=[l],src=[];ts.forEach((t,k)=>{const i=t.rows.findIndex(r=>eq(r[idx[k]],l));if(i>=0)src.push([k,i]);t.cols.forEach((c,j)=>{if(j!==idx[k])row.push(i>=0?t.rows[i][j]:null)})});
+    rows.push(row);const present=src.map(([k])=>ts[k].name);steps.push({sources:src,note:src.length===ts.length?`Label ${l} is in every table → align by label, even if row positions differ.`:`Label ${l} is only in ${present.join(', ')} → other fields are NA.`})});
+  return{output:floatCols(T('result',cols,rows)),steps}}
+function pivotLike(t,o,aggregate){const [ii,ci,vi]=colIdx(t,[o.index,o.columns,o.values]);const idxVals=uniqSorted(t.rows.map(r=>r[ii])),colVals=uniqSorted(t.rows.map(r=>r[ci]));
+  const rows=[],steps=[];idxVals.forEach(iv=>{const src=t.rows.map((r,i)=>[r,i]).filter(([r])=>eq(r[ii],iv));const row=[iv],parts=[];
+    colVals.forEach(cv=>{const cell=src.filter(([r])=>eq(r[ci],cv)).map(([r])=>r[vi]);
+      if(!cell.length){row.push(null);return}
+      if(cell.length>1&&!aggregate)throw new Error(`ValueError: Index contains duplicate entries, cannot reshape (${o.index} ${iv}, ${o.columns} ${cv} appears ${cell.length} times). Use pivot_table with an aggfunc.`);
+      const nums=cell.filter(v=>typeof v==='number');row.push(aggregate?(nums.length?mean(nums):null):cell[0]);
+      if(aggregate&&cell.length>1)parts.push(`${cv}: (${nums.join(' + ')}) / ${nums.length} = ${+mean(nums).toFixed(2)}`)});
+    rows.push(row);steps.push({sources:src.map(([,i])=>[0,i]),note:aggregate?(parts.length?`${iv}: ${parts.join('; ')}. Other cells have one value, so the mean is unchanged.`:`${iv}: each ${o.columns} has one value, so its mean is unchanged.`):`${iv}: each ${o.columns} value moves into its own column.`})});
+  const out=T('result',[o.index,...colVals.map(String)],rows);return{output:floatCols(out,aggregate?colVals.map((_,k)=>k+1):[]),steps}}
+function melt(t,o){const idi=colIdx(t,o.idVars);const vars=t.cols.map((c,j)=>[c,j]).filter(([,j])=>!idi.includes(j));const rows=[],steps=[];
+  vars.forEach(([c,j])=>t.rows.forEach((r,i)=>{rows.push([...idi.map(k=>r[k]),c,r[j]]);steps.push({sources:[[0,i]],note:`${idi.map(k=>r[k]).join(' / ')}’s ${c} column becomes ${o.varName}=${c}, ${o.valueName}=${r[j]===null?'NA':r[j]}.`})}));
+  return{output:floatCols(T('result',[...o.idVars,o.varName,o.valueName],rows)),steps}}
+function groupby(t,o){const [bi,ci]=colIdx(t,[o.by,o.col]);const groups=uniqSorted(t.rows.map(r=>r[bi]));const rows=[],steps=[];
+  groups.forEach(g=>{const src=t.rows.map((r,i)=>[r,i]).filter(([r])=>eq(r[bi],g));const nums=src.map(([r])=>r[ci]).filter(v=>typeof v==='number');rows.push([g,nums.length?mean(nums):null]);
+    steps.push({sources:src.map(([,i])=>[0,i]),note:`${g}: mean of (${nums.join(', ')}) = ${nums.length?+mean(nums).toFixed(2):'NA'}.`})});
+  return{output:floatCols(T('result',[o.by,o.col],rows),[1]),steps}}
+function dropDuplicates(t,o){const si=colIdx(t,o.subset);const K=r=>JSON.stringify(si.map(i=>r[i]));const seen=new Map();t.rows.forEach((r,i)=>{const k=K(r);if(!seen.has(k))seen.set(k,{i,n:0});else seen.get(k).n++});
+  const rows=[],steps=[];t.rows.forEach((r,i)=>{const e=seen.get(K(r));if(e.i===i){rows.push([...r]);steps.push({sources:[[0,i]],note:`${keyLabel(o.subset,r,si)}: first occurrence → keep.${e.n?` ${e.n} later repeat${e.n>1?'s':''} dropped.`:''}`})}});
+  return{output:floatCols(T('result',[...t.cols],rows)),steps}}
+function crosstab(t,o){const [ii,ci]=colIdx(t,[o.index,o.columns]);const iv=uniqSorted(t.rows.map(r=>r[ii])),cv=uniqSorted(t.rows.map(r=>r[ci]));const rows=[],steps=[];
+  iv.forEach(v=>{const src=t.rows.map((r,i)=>[r,i]).filter(([r])=>eq(r[ii],v));rows.push([v,...cv.map(c=>src.filter(([r])=>eq(r[ci],c)).length)]);steps.push({sources:src.map(([,i])=>[0,i]),note:`${v}: count the ${src.length} matching row${src.length>1?'s':''} by ${o.columns}.`})});
+  return{output:floatCols(T('result',[o.index,...cv.map(String)],rows)),steps}}
+function run(d,ts){try{const o=d.op;switch(o.type){
+  case 'merge':return merge(ts[0],ts[1],o);case 'anti':return anti(ts[o.side],ts[1-o.side],o);case 'cross':return cross(ts[0],ts[1]);
+  case 'concatRows':return concatRows(ts);case 'concatCols':return concatCols(ts,o);case 'pivot':return pivotLike(ts[0],o,false);case 'pivotTable':return pivotLike(ts[0],o,true);
+  case 'melt':return melt(ts[0],o);case 'groupby':return groupby(ts[0],o);case 'dropDuplicates':return dropDuplicates(ts[0],o);case 'crosstab':return crosstab(ts[0],o)}}
+  catch(e){return{output:T('result',['(no result)'],[]),steps:[],error:e.message}}}
+
+/* ============================== FORMATTING ============================== */
+const esc=x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+const fmt=(v,t,j)=>v===null?'NA':typeof v==='number'&&t.floats?.has(j)?(Number.isInteger(v)?v.toFixed(1):String(+v.toFixed(2))):String(v);
+const pyLit=v=>v===null?'None':typeof v==='number'?String(v):`'${String(v).replace(/'/g,"\\'")}'`;
+const setupCode=ts=>'import pandas as pd\n\n'+ts.map(t=>`${t.name} = pd.DataFrame({${t.cols.map((c,j)=>`'${c}': [${t.rows.map(r=>pyLit(r[j])).join(', ')}]`).join(', ')}})`).join('\n');
+function table(t,prefix,keys,output){const isKey=j=>keys.includes(t.cols[j]);
+  return '<div class="scroll"><table><thead><tr>'+t.cols.map((c,j)=>'<th scope="col"'+(isKey(j)?' class="key"':'')+'>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'
+  +(t.rows.length?t.rows.map((r,i)=>'<tr id="'+prefix+i+'" data-i="'+i+'"'+(output?' class="pending" tabindex="-1"':'')+'>'+r.map((v,j)=>'<td class="'+(v===null?'na ':'')+(isKey(j)?'key':'')+'">'+esc(fmt(v,t,j))+'</td>').join('')+'</tr>').join(''):'<tr><td colspan="'+t.cols.length+'" class="na">no rows</td></tr>')+'</tbody></table></div>'}
+
+/* ============================== DATA EDITING ============================== */
+const NAMES=['Ava','Ben','Cam','Dee','Eli','Fay','Gus','Hal','Ivy','Jo','Kim','Lex','Mia','Ned'],COURSES=['Stats','Python','Calc','Bio','Econ'],CLUBS=['Art','Music','Chess','Robotics','Drama'];
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function genValue(col,t,ts,j){const mine=t.rows.map(r=>r[j]);const c=col.toLowerCase();
+  if(/id$|^id$|^index$/.test(c)){const others=ts.filter(x=>x!==t).flatMap(x=>{const k=x.cols.findIndex(cc=>/id$|^id$|^index$/.test(cc.toLowerCase()));return k<0?[]:x.rows.map(r=>r[k])}).filter(v=>typeof v==='number');
+    const all=[...mine,...others].filter(v=>typeof v==='number');const fresh=others.filter(v=>!mine.includes(v));const next=(all.length?Math.max(...all):0)+1;return fresh.length&&Math.random()<.6?pick(fresh):next}
+  if(/name|student/.test(c)){const unused=NAMES.filter(n=>!mine.includes(n));return unused.length?unused[0]:pick(NAMES)}
+  if(/score|grade|points/.test(c))return 60+5*Math.floor(Math.random()*9);
+  if(/course/.test(c))return pick(COURSES);if(/exam/.test(c))return 'E'+(1+Math.floor(Math.random()*3));if(/club/.test(c))return pick(CLUBS);
+  if(/^e\d$/i.test(c))return 60+5*Math.floor(Math.random()*9);
+  return mine.every(v=>typeof v==='number'||v===null)?Math.floor(Math.random()*100):'val'+(t.rows.length+1)}
+const genRow=(t,ts)=>t.cols.map((c,j)=>genValue(c,t,ts,j));
+const toCSV=t=>[t.cols.join(','),...t.rows.map(r=>r.map(v=>v===null?'':String(v)).join(',')) ].join('\n');
+function parseCSV(text,name){const lines=text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);if(!lines.length)throw new Error(`${name}: enter a header line.`);
+  const cols=lines[0].split(',').map(s=>s.trim());if(cols.some(c=>!c))throw new Error(`${name}: every header cell needs a name.`);if(new Set(cols).size!==cols.length)throw new Error(`${name}: duplicate column names.`);
+  const rows=lines.slice(1).map((l,i)=>{const cells=l.split(',').map(s=>s.trim());if(cells.length!==cols.length)throw new Error(`${name}: row ${i+1} has ${cells.length} cells but the header has ${cols.length}.`);
+    return cells.map(s=>s===''||/^(na|nan|none|null)$/i.test(s)?null:/^-?\d+(\.\d+)?$/.test(s)?+s:s)});return T(name,cols,rows)}
+
+/* ============================== LEARN TAB ============================== */
+const $=id=>document.getElementById(id);const rows=sel=>[...document.querySelectorAll(sel)];
+const FLIGHT_MS=700;let chosen=0,step=0,timer=null,reveal=null,tables=[],result=null;
+const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ruleText=(d,ts,out)=>typeof d.rule==='function'?d.rule(ts,out):d.rule;
+
+function loadDemo(i,keepData=false){const d=demos[i];if(!keepData)tables=d.tables();result=run(d,tables);step=0;build()}
+function build(){const d=demos[chosen];
+  $('title').textContent=d.title;$('why').textContent=d.why;$('question').textContent=d.question;$('rule').textContent=ruleText(d,tables,result.output);$('code').textContent=d.code;$('setup').textContent=setupCode(tables);
+  $('inputs').innerHTML=tables.map((t,i)=>'<div class="source"><div class="caption">'+esc(t.name)+(tables.length===2&&d.op.type!=='concatRows'?(i===0?' · LEFT':' · RIGHT'):'')+'</div>'+table(t,'s'+i+'r',d.keys,false)+'</div>').join('');
+  $('output').innerHTML=table(result.output,'o',d.keys,true);
+  $('editor').innerHTML=tables.map((t,i)=>'<div><label for="ed'+i+'"><b>'+esc(t.name)+'</b></label><textarea id="ed'+i+'" spellcheck="false">'+esc(toCSV(t))+'</textarea><div class="row"><button data-add="'+i+'">+ Add a row</button><button data-gen="'+i+'">Generate 3 rows</button></div></div>').join('');
+  $('editmsg').textContent='';
+  if(location.hash!=='#'+d.slug)history.replaceState(null,'','#'+d.slug);
+  sync(false)}
+function clearFlights(){clearTimeout(reveal);reveal=null;document.querySelectorAll('.flight').forEach(f=>f.remove())}
+function sync(animate){const d=demos[chosen],n=result.steps.length;clearFlights();
+  rows('#inputs tr, #output tr').forEach(r=>r.classList.remove('active','trace','landing','new'));
+  rows('#output tbody tr[data-i]').forEach((r,i)=>r.classList.toggle('pending',i>=step));
+  $('count').textContent=step+' / '+n+' rows';$('bar').style.width=(n?100*step/n:0)+'%';
+  const st=$('status');st.classList.toggle('error',!!result.error);
+  st.textContent=result.error?result.error:step?result.steps[step-1].note:n?'Press Play or Step to build the result.':'The result is empty for this data.';
+  $('prev').disabled=step===0;$('next').disabled=step===n;$('play').disabled=n===0;
+  if(!step)return;
+  const s=result.steps[step-1],dest=$('o'+(step-1));dest.classList.add('active');
+  const srcs=s.sources.map(([t,r])=>$('s'+t+'r'+r));srcs.forEach(x=>x.classList.add('active'));
+  if(!animate||reduced())return;
+  dest.classList.add('landing');const b=dest.getBoundingClientRect();
+  srcs.forEach(src=>{const a=src.getBoundingClientRect(),f=document.createElement('div');f.className='flight';f.textContent=src.innerText.replaceAll('\t','  ·  ');f.style.left=a.left+'px';f.style.top=a.top+'px';document.body.appendChild(f);
+    const anim=f.animate([{transform:'translate(0,0)',opacity:.9},{transform:'translate('+(b.left-a.left)+'px,'+(b.top-a.top)+'px)',opacity:.2}],{duration:FLIGHT_MS,easing:'ease-in-out'});anim.onfinish=()=>f.remove()});
+  reveal=setTimeout(()=>{dest.classList.remove('landing');dest.classList.add('new');reveal=null},FLIGHT_MS-60)}
+function stop(){clearInterval(timer);timer=null;$('play').textContent='Play'}
+function advance(){const n=result.steps.length;if(step<n){step++;sync(true)}if(step===n)stop()}
+function back(){stop();step=Math.max(0,step-1);sync(false)}
+function restart(){stop();step=0;sync(false)}
+function togglePlay(){if(timer){stop();return}if(step===result.steps.length)step=0;timer=setInterval(advance,+$('speed').value);$('play').textContent='Pause';advance()}
+function trace(tr,on){if(!tr||!tr.dataset.i)return;const i=+tr.dataset.i;
+  if(tr.closest('#output')){if(i>=step)return;result.steps[i].sources.forEach(([t,r])=>$('s'+t+'r'+r).classList.toggle('trace',on));tr.classList.toggle('trace',on)}
+  else{const t=[...$('inputs').children].indexOf(tr.closest('.source'));result.steps.forEach((s,k)=>{if(k<step&&s.sources.some(([tt,r])=>tt===t&&r===i)){$('o'+k).classList.toggle('trace',on);tr.classList.toggle('trace',on)}})}}
+document.querySelector('#learn .stage').addEventListener('mouseover',e=>trace(e.target.closest('tr'),true));
+document.querySelector('#learn .stage').addEventListener('mouseout',e=>trace(e.target.closest('tr'),false));
+$('output').addEventListener('click',e=>{const tr=e.target.closest('tr');if(tr&&tr.dataset.i&&+tr.dataset.i<step){stop();step=+tr.dataset.i+1;sync(false)}});
+
+// editing
+function applyEdits(){try{const ts=tables.map((t,i)=>parseCSV($('ed'+i).value,t.name));stop();tables=ts;result=run(demos[chosen],tables);step=0;build();$('editbox').open=true}catch(e){$('editmsg').textContent=e.message}}
+$('apply').onclick=applyEdits;
+$('resetdata').onclick=()=>{stop();loadDemo(chosen)};
+$('editor').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  const i=b.dataset.add??b.dataset.gen;if(i===undefined)return;
+  let t;try{t=parseCSV($('ed'+i).value,tables[i].name)}catch(err){$('editmsg').textContent=err.message;return}
+  const n=b.dataset.add!==undefined?1:3;for(let k=0;k<n;k++)t.rows.push(genRow(t,tables.map((x,j)=>j==i?t:x)));
+  $('ed'+i).value=toCSV(t);applyEdits()});
+
+// controls
+const groups=[...new Set(demos.map(d=>d.group))];
+$('technique').innerHTML=groups.map(g=>'<optgroup label="'+esc(g)+'">'+demos.map((d,i)=>d.group===g?'<option value="'+i+'">'+esc(d.title)+'</option>':'').join('')+'</optgroup>').join('');
+$('technique').onchange=e=>{stop();chosen=+e.target.value;loadDemo(chosen)};
+$('next').onclick=()=>{stop();advance()};$('prev').onclick=back;$('restart').onclick=restart;$('play').onclick=togglePlay;
+$('speed').onchange=()=>{if(timer){clearInterval(timer);timer=setInterval(advance,+$('speed').value)}};
+document.addEventListener('keydown',e=>{if($('learn').hidden||e.target.matches('select,input,textarea,summary,a')||e.altKey||e.ctrlKey||e.metaKey)return;
+  if(e.key==='ArrowRight'){e.preventDefault();stop();advance()}else if(e.key==='ArrowLeft'){e.preventDefault();back()}
+  else if(e.key===' '&&e.target.tagName!=='BUTTON'){e.preventDefault();togglePlay()}else if(e.key==='r'||e.key==='R')restart()});
+function fromHash(){const k=demos.findIndex(d=>'#'+d.slug===location.hash);if(k>=0&&k!==chosen){stop();chosen=k;$('technique').value=k;loadDemo(k);showTab('learn')}}
+addEventListener('hashchange',fromHash);
+
+/* ============================== THEME ============================== */
+const themes=['auto','light','dark'];let theme='auto';try{theme=localStorage.getItem('pim-theme')||'auto'}catch(e){}
+function applyTheme(){if(theme==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.dataset.theme=theme;$('theme').textContent='Theme: '+theme[0].toUpperCase()+theme.slice(1);try{localStorage.setItem('pim-theme',theme)}catch(e){}}
+$('theme').onclick=()=>{theme=themes[(themes.indexOf(theme)+1)%3];applyTheme()};applyTheme();
+
+/* ============================== TABS ============================== */
+function showTab(name){['learn','quiz'].forEach(n=>{$(n).hidden=n!==name;$('tab-'+n).setAttribute('aria-selected',n===name)});if(name==='learn')stop();if(name==='quiz'&&!quiz.item)newQuestion()}
+$('tab-learn').onclick=()=>showTab('learn');$('tab-quiz').onclick=()=>showTab('quiz');
+
+/* ============================== QUIZ TAB ============================== */
+const quiz={mode:'write',item:null,answered:false,correct:0,total:0,last:-1};
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const allNames=[...new Set(demos.flatMap(d=>d.tables().map(t=>t.name)))].sort();
+const normalize=s=>s.toLowerCase().replace(/\s+/g,'').replace(/'/g,'"').replace(/^result=/,'');
+function distractors(d,n){const same=demos.filter(x=>x!==d&&x.group===d.group),other=demos.filter(x=>x!==d&&x.group!==d.group);return shuffle([...shuffle(same).slice(0,n),...shuffle(other)]).slice(0,n)}
+function staticTables(ts,d,prefix){return ts.map((t,i)=>'<div class="source"><div class="caption">'+esc(t.name)+'</div>'+table(t,prefix+i+'r',d.keys,false)+'</div>').join('')}
+function newQuestion(){let k;do k=Math.floor(Math.random()*demos.length);while(k===quiz.last);quiz.last=k;const d=demos[k],ts=d.tables(),res=run(d,ts);
+  quiz.item={d,ts,res};quiz.answered=false;$('qfeedback').innerHTML='';$('qcheck').disabled=false;$('qhint').disabled=false;
+  const out='<div class="stage" style="margin-top:12px"><div><h3>Input tables</h3>'+staticTables(ts,d,'q')+'</div><div><h3>Result</h3>'+table(res.output,'qo',d.keys,false).replace(/class="pending" tabindex="-1"/g,'')+'</div></div>';
+  if(quiz.mode==='write'){
+    $('qprompt').innerHTML='<h2>Write the call</h2><p>These input tables produced this result. Choose the DataFrame(s) involved and type the pandas code that produces <code>result</code>.</p>';
+    $('qbody').innerHTML=out;
+    const opts=allNames.map(n=>'<option>'+esc(n)+'</option>').join('');
+    $('qanswer').innerHTML='<div class="answer"><label>First DataFrame<select id="qa-left"><option value="">— choose —</option>'+opts+'</select></label><label>Second DataFrame<select id="qa-right"><option value="">— none —</option>'+opts+'</select></label><label>Code<input type="text" id="qa-code" placeholder="e.g. students.merge(grades, on=&quot;student_id&quot;, how=&quot;left&quot;)" autocomplete="off"></label></div>';
+    $('qa-code').addEventListener('keydown',e=>{if(e.key==='Enter')check()});
+  }else if(quiz.mode==='pick-op'){
+    quiz.choices=shuffle([d,...distractors(d,3)]);
+    $('qprompt').innerHTML='<h2>Pick the technique</h2><p>A colleague asks the question below, and you have these tables. Which technique answers it?</p><div class="question"><b>Question</b>'+esc(d.question)+'</div>';
+    $('qbody').innerHTML='<div class="stage" style="margin-top:12px"><div><h3>Input tables</h3>'+staticTables(ts,d,'q')+'</div></div>';
+    $('qanswer').innerHTML='<div class="choices">'+quiz.choices.map((c,i)=>'<label><input type="radio" name="qc" value="'+i+'"><span>'+esc(c.title)+'</span></label>').join('')+'</div>';
+  }else{
+    quiz.choices=shuffle([d,...distractors(d,3)]);
+    $('qprompt').innerHTML='<h2>What question is answered?</h2><p>This code was run on the tables below. Which question was the analyst trying to answer?</p><pre>'+esc(d.code)+'</pre>';
+    $('qbody').innerHTML=out;
+    $('qanswer').innerHTML='<div class="choices">'+quiz.choices.map((c,i)=>'<label><input type="radio" name="qc" value="'+i+'"><span>'+esc(c.question)+'</span></label>').join('')+'</div>';
+  }}
+function check(){if(!quiz.item||quiz.answered)return;const {d,ts}=quiz.item;let ok,detail='';
+  if(quiz.mode==='write'){const l=$('qa-left').value,r=$('qa-right').value,code=normalize($('qa-code').value);
+    if(!l||!code){$('qfeedback').innerHTML='<div class="feedback bad">Choose the first DataFrame and type some code before checking.</div>';return}
+    const namesOk=l===ts[0].name&&(ts.length>1?r===ts[1].name:r==='');const codeOk=d.accept(code);ok=namesOk&&codeOk;
+    detail=(namesOk?'DataFrames: correct. ':'DataFrames: expected '+ts.map(t=>'<code>'+esc(t.name)+'</code>').join(' and ')+(ts.length===1?' only':'')+'. ')+(codeOk?'Code: matches.':'Code: not quite — compare with the reference below.');
+  }else{const sel=document.querySelector('input[name=qc]:checked');if(!sel){$('qfeedback').innerHTML='<div class="feedback bad">Select an option first.</div>';return}
+    const c=quiz.choices[+sel.value];ok=c===d;detail=ok?'':'You chose <b>'+esc(quiz.mode==='pick-op'?c.title:c.question)+'</b>. ';}
+  quiz.answered=true;quiz.total++;if(ok)quiz.correct++;$('score').textContent=quiz.correct+' / '+quiz.total+' correct';$('qcheck').disabled=true;
+  $('qfeedback').innerHTML='<div class="feedback '+(ok?'ok':'bad')+'"><b>'+(ok?'Correct.':'Not quite.')+'</b> '+detail+'<br><b>'+esc(d.title)+'</b> — '+esc(d.why)+' Question it answers: '+esc(d.question)+'<pre>'+esc(d.code)+'</pre><a href="#'+d.slug+'">Watch this technique in the Learn tab</a></div>'}
+$('qcheck').onclick=check;$('qnext').onclick=newQuestion;
+$('qhint').onclick=()=>{const d=quiz.item.d;$('qfeedback').innerHTML='<div class="feedback"><b>Hint:</b> '+esc(quiz.mode==='pick-q'?d.rule===undefined?'':ruleText(d,quiz.item.ts,quiz.item.res.output):quiz.mode==='pick-op'?d.why:d.hint)+'</div>'};
+document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.modes button').forEach(x=>x.setAttribute('aria-pressed',x===b));quiz.mode=b.dataset.mode;newQuestion()});
+
+/* ============================== START ============================== */
+const start=demos.findIndex(d=>'#'+d.slug===location.hash);if(start>=0)chosen=start;$('technique').value=chosen;loadDemo(chosen);
+</script></body></html>
