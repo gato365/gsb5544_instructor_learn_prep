@@ -1,6 +1,17 @@
-# Week 3 — Joining and Merging Data
+# Week 3 — Joining, Merging, and Distances Between Observations
 
-Two pieces that are designed to be used together:
+Two units, each in its own directory (same layout as `week_2/`):
+
+| Directory | Unit | Files |
+|---|---|---|
+| `joining_and_merging/` | 3.1 Joining and merging | `pandas.html` (interactive page), Topic 3.1 notebook (`-empty` / `-solution`), PA 3.1 *Concatenating, Joining, and Pivoting* (`-empty` / `-solution`; MovieLens 1M data) |
+| `distances_between_observations/` | 3.2 Distances | PA 3.2 *Distances Between Observations* (`-empty` / `-solution`; Ames housing and College Scorecard data) |
+
+The PA student/solution copies are produced by `tools/build_week3_pas.py`: it takes each `-empty` notebook as the source, inserts the solution cells after every `# YOUR CODE HERE` / `**YOUR RESPONSE HERE**` placeholder, and executes the solution. Edit the answers in that script, not in the `-solution.ipynb` files. All four PA notebooks are listed in `site_config.json` and published like the other weeks.
+
+## Unit 3.1: the interactive page and the Topic 3.1 notebook
+
+Two pieces that are designed to be used together (both in `joining_and_merging/`):
 
 | File | What it is | Where students get it |
 |---|---|---|
@@ -14,11 +25,12 @@ Every technique on the page has a stable link (`#left-join`, `#pivot-long-wide`,
 
 Notebooks are published as before: `site_config.json` lists the student and solution files and `tools/build_site.py` writes Colab / GitHub links into `docs/index.html`.
 
-The HTML page cannot be opened from GitHub's file view (GitHub shows source, not a rendered page) and it is not a notebook, so it is published a different way: the config item uses a `"page"` key instead of `"student"`/`"solution"`, and `build_site.py` **copies the file into `docs/week_3/pandas.html`** so GitHub Pages serves it, then renders an *Interactive → Open page* button. The source stays in `assignments/practice_activities/week_3/`.
+The HTML page cannot be opened from GitHub's file view (GitHub shows source, not a rendered page) and it is not a notebook, so it is published a different way: the config item uses a `"page"` key instead of `"student"`/`"solution"`, and `build_site.py` **copies the file into `docs/week_3/pandas.html`** so GitHub Pages serves it, then renders an *Interactive → Open page* button. The source stays in `assignments/practice_activities/week_3/joining_and_merging/`; `page_dest` pins the served address to `/week_3/pandas.html`.
 
 ```jsonc
 { "title": "Pandas in motion — interactive joins, concat, and reshaping (Learn + Quiz)",
-  "page":  "assignments/practice_activities/week_3/pandas.html" }
+  "page":  "assignments/practice_activities/week_3/joining_and_merging/pandas.html",
+  "page_dest": "week_3/pandas.html" }
 ```
 
 Consequences:
@@ -30,7 +42,8 @@ Consequences:
 ## Rebuild checklist
 
 ```bash
-python3 tools/build_week3_joins.py     # regenerate + execute the notebooks (needs /opt/anaconda3)
+python3 tools/build_week3_joins.py     # regenerate + execute the Topic 3.1 notebooks (needs /opt/anaconda3)
+python3 tools/build_week3_pas.py       # rebuild + execute the PA 3.1 and PA 3.2 solutions (downloads MovieLens, ~25 MB)
 python3 tools/build_site.py            # copy pandas.html into docs/ and rebuild docs/index.html
 git add assignments/ docs/ site_config.json tools/ && git commit -m "Week 3: joins page + Topic 3.1"
 git push                               # GitHub Pages redeploys docs/ from main within a minute or two
@@ -40,7 +53,7 @@ git push                               # GitHub Pages redeploys docs/ from main 
 
 ### A. Locally, before pushing (about 5 minutes)
 
-Open the file directly in a browser (`open assignments/practice_activities/week_3/pandas.html` on macOS). Everything is self-contained, so no server is needed.
+Open the file directly in a browser (`open assignments/practice_activities/week_3/joining_and_merging/pandas.html` on macOS). Everything is self-contained, so no server is needed.
 
 1. **Learn tab loads** with *Inner join* selected, two input tables on the left, an empty result on the right, and the pandas call in the *Python syntax* panel.
 2. **Play / Step / Back / Restart.** Press *Play*; rows should fly from the inputs into the result one at a time, the status line should explain each row, and the progress bar should reach the end. *Step →* and *← Back* move one row; *Restart* clears the result. Keyboard `→`, `←`, `Space`, `R` do the same.
@@ -63,7 +76,7 @@ The page imitates pandas with its own JavaScript engine (checked against pandas 
 
 ### C. After pushing (about 2 minutes)
 
-1. Open <https://gato365.github.io/gsb5544_instructor_learn_prep/> — a **Week 3** heading with an *Interactive* card and a *Topic 3.1* card should be there.
+1. Open <https://gato365.github.io/gsb5544_instructor_learn_prep/> — a **Week 3** heading with an *Interactive* card, a *Topic 3.1* card, and *PA 3.1* / *PA 3.2* cards should be there.
 2. *Open page* must load the interactive page at `/week_3/pandas.html` (a 404 means `docs/week_3/pandas.html` was not committed — re-run `build_site.py` and commit `docs/`).
 3. Deep link from the notebook: open the student notebook in Colab, click any 🎬 link, and confirm the page opens at that technique.
 4. In Colab, *Run all* on the student notebook up to Section 8: the data cell must load all three CSVs from `raw.githubusercontent.com` (a 404 there means `assignments/Data/nba_teams.csv` or `franchise_moves.csv` was not pushed).

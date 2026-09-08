@@ -25,7 +25,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-WEEK = ROOT / "assignments" / "practice_activities" / "week_3"
+WEEK = ROOT / "assignments" / "practice_activities" / "week_3" / "joining_and_merging"
 DATA_DIR = ROOT / "assignments" / "Data"
 STUDENT = WEEK / "GSB5544_Topic_3_1_Joining_and_Merging-empty.ipynb"
 SOLUTION = WEEK / "GSB5544_Topic_3_1_Joining_and_Merging-solution.ipynb"
