@@ -77,19 +77,22 @@
           "title": "Topic 3.1 — Joining and Merging Data (pairs with the interactive page)",
           "student": "assignments/practice_activities/week_3/joining_and_merging/GSB5544_Topic_3_1_Joining_and_Merging-empty.ipynb",
           "solution": "assignments/practice_activities/week_3/joining_and_merging/GSB5544_Topic_3_1_Joining_and_Merging-solution.ipynb",
-          "publish_solution": true
+          "publish_solution": true,
+          "extended": "assignments/practice_activities/week_3/joining_and_merging/GSB5544_Topic_3_1_Joining_and_Merging-extended.ipynb"
         },
         {
           "title": "PA 3.1 — Concatenating, Joining, and Pivoting (MovieLens)",
           "student": "assignments/practice_activities/week_3/joining_and_merging/GSB5544_PA_3_1_Concatenating_Joining_Pivoting-empty.ipynb",
           "solution": "assignments/practice_activities/week_3/joining_and_merging/GSB5544_PA_3_1_Concatenating_Joining_Pivoting-solution.ipynb",
-          "publish_solution": true
+          "publish_solution": true,
+          "extended": "assignments/practice_activities/week_3/joining_and_merging/GSB5544_PA_3_1_Concatenating_Joining_Pivoting-extended.ipynb"
         },
         {
           "title": "PA 3.2 — Distances Between Observations (Ames housing & College Scorecard)",
           "student": "assignments/practice_activities/week_3/distances_between_observations/GSB5544_PA_3_2_Distances_Between_Observations-empty.ipynb",
           "solution": "assignments/practice_activities/week_3/distances_between_observations/GSB5544_PA_3_2_Distances_Between_Observations-solution.ipynb",
-          "publish_solution": true
+          "publish_solution": true,
+          "extended": "assignments/practice_activities/week_3/distances_between_observations/GSB5544_PA_3_2_Distances_Between_Observations-extended.ipynb"
         }
       ]
     }

@@ -7,6 +7,8 @@ Two units, each in its own directory (same layout as `week_2/`):
 | `joining_and_merging/` | 3.1 Joining and merging | `pandas.html` (interactive page), Topic 3.1 notebook (`-empty` / `-solution`), PA 3.1 *Concatenating, Joining, and Pivoting* (`-empty` / `-solution`; MovieLens 1M data) |
 | `distances_between_observations/` | 3.2 Distances | PA 3.2 *Distances Between Observations* (`-empty` / `-solution`; Ames housing and College Scorecard data) |
 
+Each unit also has **extended** notebooks (`*-extended.ipynb`, executed, no student version), built by `tools/build_week3_extended.py`. They are fully worked walkthroughs: a "why are we doing this?" block before every operation, every input table shown before and the result after as colour-coded ruled tables (columns shaded by the table they came from, pink for missing values), and each PA answer broken into numbered steps with the logic and a plain-language note on every pandas function. They appear on the site as an *Extended* row on the matching card (the `"extended"` key in `site_config.json`).
+
 The PA student/solution copies are produced by `tools/build_week3_pas.py`: it takes each `-empty` notebook as the source, inserts the solution cells after every `# YOUR CODE HERE` / `**YOUR RESPONSE HERE**` placeholder, and executes the solution. Edit the answers in that script, not in the `-solution.ipynb` files. All four PA notebooks are listed in `site_config.json` and published like the other weeks.
 
 ## Unit 3.1: the interactive page and the Topic 3.1 notebook
@@ -44,6 +46,7 @@ Consequences:
 ```bash
 python3 tools/build_week3_joins.py     # regenerate + execute the Topic 3.1 notebooks (needs /opt/anaconda3)
 python3 tools/build_week3_pas.py       # rebuild + execute the PA 3.1 and PA 3.2 solutions (downloads MovieLens, ~25 MB)
+python3 tools/build_week3_extended.py  # rebuild + execute the three extended walkthroughs (same data downloads)
 python3 tools/build_site.py            # copy pandas.html into docs/ and rebuild docs/index.html
 git add assignments/ docs/ site_config.json tools/ && git commit -m "Week 3: joins page + Topic 3.1"
 git push                               # GitHub Pages redeploys docs/ from main within a minute or two
