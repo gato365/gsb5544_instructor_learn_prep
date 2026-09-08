@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the Week 3 *extended* notebooks: fully worked, colour-coded, step-by-step walkthroughs.
+"""Build the Week 3 *extended* notebooks: fully worked, step-by-step walkthroughs.
 
 Usage:  python3 tools/build_week3_extended.py            # write + execute all three
         python3 tools/build_week3_extended.py --no-exec  # write only
@@ -12,8 +12,8 @@ Produces (all executed, no student version — these are reference walkthroughs)
 What "extended" adds over the -solution notebooks:
   * a "Why are we doing this?" block before every operation (the question, why one table
     cannot answer it, what the key is, what to expect),
-  * every input table displayed BEFORE the operation and the result AFTER it, as
-    colour-coded, ruled tables (columns coloured by the table they came from),
+  * every input table displayed BEFORE the operation and the result AFTER it (plain tables;
+    the colour-coded, animated version of each operation lives on the interactive page),
   * every practice-activity answer broken into numbered steps with the logic for each step
     and a plain-language explanation of each pandas function and argument.
 
@@ -50,6 +50,32 @@ METADATA = {
 }
 
 
+import ast
+
+
+def strip_show_args(src: str) -> str:
+    """Rewrite show(df, title, <colour>, sources=..., key=..., rows=n) as show(df, title, rows=n)."""
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return src
+    # ast column offsets are UTF-8 *byte* offsets, so splice on the encoded bytes
+    raw = src.encode("utf-8")
+    offsets = [0]
+    for ln in raw.splitlines(keepends=True):
+        offsets.append(offsets[-1] + len(ln))
+    pos = lambda n, end=False: offsets[(n.end_lineno if end else n.lineno) - 1] + (n.end_col_offset if end else n.col_offset)
+    edits = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "show":
+            args = [ast.get_source_segment(src, a) for a in node.args[:2]]
+            rows = [ast.get_source_segment(src, k.value) for k in node.keywords if k.arg == "rows"]
+            edits.append((node, "show(" + ", ".join(args) + (f", rows={rows[0]}" if rows else "") + ")"))
+    for node, new in sorted(edits, key=lambda e: pos(e[0]), reverse=True):
+        raw = raw[:pos(node)] + new.encode("utf-8") + raw[pos(node, True):]
+    return raw.decode("utf-8")
+
+
 class Book:
     def __init__(self) -> None:
         self.cells: list[dict] = []
@@ -59,7 +85,7 @@ class Book:
 
     def code(self, text: str) -> None:
         self.cells.append({"cell_type": "code", "execution_count": None, "metadata": {}, "outputs": [],
-                           "source": text.strip("\n")})
+                           "source": strip_show_args(text.strip("\n"))})
 
     def notebook(self) -> dict:
         out = []
@@ -71,95 +97,28 @@ class Book:
 
 
 # ============================================================================ #
-#  Shared helper cell: colour-coded, ruled tables
+#  Shared helper cell: captioned plain tables
 # ============================================================================ #
 
 HELPER_MD = """
-### How to read the tables in this notebook
+### How the tables are shown
 
-Every table is drawn with **ruled borders** and a **coloured header** that says which DataFrame it is. When a table is the *result* of an operation, each **column is shaded by the table it came from**, so you can see at a glance which pieces of the two inputs were glued together and which columns the operation created.
-
-| Colour | Meaning |
-|---|---|
-| 🟦 blue | columns from the **left** (first) table |
-| 🟧 orange | columns from the **right** (second) table |
-| 🟩 green | the **key** column(s) the operation matched on (thick borders too) |
-| 🟨 yellow | columns **created or renamed** by the operation (e.g. `_merge`, `score_mid`, a new count) |
-| 🟪 purple header | a **result** table |
-| 🟥 pink cell | a **missing value** (`NaN`) — usually a row that found no partner |
-
-The caption of every table shows the full row × column count even when only the first rows are printed. Run the next cell once; it defines the `show()` helper used throughout.
-"""
+Every table is printed with a caption giving its name and its full size, followed by its first rows. The **interactive page** shows the same operations with columns coloured by the table they came from (blue = left, orange = right, green = key, yellow = created) and animates each result row: [PAGE](PAGE). Run the next cell once; it defines the `show()` helper used throughout.
+""".replace("PAGE", PAGE)
 
 HELPER_CODE = r'''
 import pandas as pd
 import numpy as np
-from IPython.display import display, HTML
+from IPython.display import display, Markdown
 
-COLORS = {"blue": "#dbe9ff", "orange": "#ffe0c2", "green": "#d9f2d9",
-          "purple": "#ead9f7", "yellow": "#fff3b0", "grey": "#eeeeee"}
-
-def show(df, title, header="blue", sources=None, key=None, rows=8):
-    """Display `df` as a captioned, ruled, colour-coded table.
-
-    header  : colour name for the header row (which table this is)
-    sources : {column: colour} — shades each column of a RESULT by where it came from
-    key     : key column(s) — drawn bold with thick borders
-    rows    : how many rows to print (the caption always shows the true size)
-    """
+def show(df, title, rows=8):
+    """Print a caption (name and full size), then the first `rows` rows of `df`."""
     if isinstance(df, pd.Series):
         df = df.to_frame()
-    shown = df.head(rows)
-    hdr = COLORS[header]
-    styler = (shown.style
-              .set_caption(f"{title} — {df.shape[0]:,} rows × {df.shape[1]} columns"
-                           + ("" if len(df) <= rows else f" (first {rows} shown)"))
-              .set_table_styles([
-                  {"selector": "caption", "props": [("caption-side", "top"), ("text-align", "left"),
-                                                    ("font-weight", "bold"), ("font-size", "1.05em"),
-                                                    ("padding", "6px 0"), ("color", "#222")]},
-                  {"selector": "th", "props": [("background-color", hdr), ("border", "1px solid #777"),
-                                               ("text-align", "center"), ("padding", "4px 8px")]},
-                  {"selector": "td", "props": [("border", "1px solid #bbb"), ("padding", "3px 8px")]},
-                  {"selector": "", "props": [("border", "2px solid #444"), ("border-collapse", "collapse"),
-                                             ("margin-bottom", "14px")]},
-              ]))
-    if sources:
-        styler = styler.apply(lambda col: [f"background-color: {COLORS[sources.get(col.name, 'yellow')]}"] * len(col),
-                              axis=0)
-    if key:
-        keys = [key] if isinstance(key, str) else list(key)
-        keys = [k for k in keys if k in shown.columns]
-        if keys:
-            styler = styler.set_properties(subset=keys, **{"font-weight": "bold",
-                                                            "border-left": "2px solid #444",
-                                                            "border-right": "2px solid #444"})
-    styler = styler.highlight_null(color="#ffcdd2")
-    display(styler)
+    more = "" if len(df) <= rows else f"  (first {rows} shown)"
+    display(Markdown(f"**{title}** — {df.shape[0]:,} rows × {df.shape[1]} columns{more}"))
+    display(df.head(rows))
 
-def sources_from(left, right, key, left_color="blue", right_color="orange"):
-    """Colour map for the RESULT of combining `left` and `right` on `key`."""
-    keys = [key] if isinstance(key, str) else list(key)
-    m = {}
-    for c in left.columns:
-        m[c] = left_color
-    for c in right.columns:
-        m[c] = right_color
-    for k in keys:
-        m[k] = "green"
-    return m
-
-def legend():
-    items = [("blue", "left table"), ("orange", "right table"), ("green", "key column"),
-             ("yellow", "created / renamed"), ("purple", "result header")]
-    html = "".join(f'<span style="display:inline-block;margin:2px 10px 2px 0">'
-                   f'<span style="display:inline-block;width:14px;height:14px;border:1px solid #666;'
-                   f'background:{COLORS[c]};vertical-align:middle"></span> {t}</span>' for c, t in items)
-    html += ('<span style="display:inline-block;margin:2px 10px 2px 0"><span style="display:inline-block;'
-             'width:14px;height:14px;border:1px solid #666;background:#ffcdd2;vertical-align:middle"></span> missing value</span>')
-    display(HTML(html))
-
-legend()
 print("show() is ready")
 '''
 
@@ -177,7 +136,7 @@ def build_topic() -> Book:
     b = Book()
     b.md("""
 # GSB 5544 — Topic 3.1 (Extended): Joining and Merging Data, step by step
-*Every operation with the question that motivates it, the tables before, and the table after — in colour.*
+*Every operation with the question that motivates it, the tables before, and the table after.*
 """)
     b.md(f"""
 ## What this extended version adds
@@ -187,9 +146,9 @@ The standard Topic 3.1 notebook shows each technique once. This version slows do
 1. **What question are we trying to answer?** — the reason a single table is not enough.
 2. **Which tables hold the pieces, and what is the key** that links them?
 3. **What do we expect** the result to look like (how many rows, which columns, where the `NaN`s will be)?
-4. **What actually happened** — read off the colour-coded result and check it against the expectation.
+4. **What actually happened** — read off the result and check it against the expectation.
 
-Each operation shows the input table(s) first, then the result, with columns shaded by the table they came from. Watch the same rows move on the interactive page: [{PAGE}]({PAGE}) (every section links to its technique). The standard notebook and its student version are on the course site: [{SITE}]({SITE}).
+Each operation shows the input table(s) first, then the result. The interactive page shows the same operation with columns coloured by the table they came from and the key highlighted, and animates the rows: [{PAGE}]({PAGE}) (every section links to its technique). The standard notebook and its student version are on the course site: [{SITE}]({SITE}).
 """)
     add_helper(b)
 
@@ -236,14 +195,14 @@ show(inner, 'students.merge(grades, on="student_id", how="inner")', "purple",
      sources=sources_from(students, grades, "student_id"), key="student_id")
 """)
     b.md("""
-**What happened:** pandas walked the roster row by row and looked each `student_id` up in `grades`. Rows 2 and 3 found a partner and were glued together — blue columns from the left, orange from the right, the key (green) appears once. Row 1 (no partner) and row 4 (not in the roster at all) were dropped. `how="inner"` is the default, which is why an unadorned `.merge()` quietly loses rows.
+**What happened:** pandas walked the roster row by row and looked each `student_id` up in `grades`. Rows 2 and 3 found a partner and were glued together — the roster's columns first, then the score sheet's; the key appears once. Row 1 (no partner) and row 4 (not in the roster at all) were dropped. `how="inner"` is the default, which is why an unadorned `.merge()` quietly loses rows.
 """)
     b.md(f"""
 ### 2b. Left join  🎬 [{PAGE}#left-join]({PAGE}#left-join)
 
 **Question:** *Give me the complete roster, with scores where they exist — which students are still missing a score?*
 **Why a join:** same two tables, but now the roster is the thing we must not lose.
-**Expect:** all 3 roster rows; Ava's `score` is `NaN` (pink); ID 4 still absent because it is not on the roster.
+**Expect:** all 3 roster rows; Ava's `score` is `NaN`; ID 4 still absent because it is not on the roster.
 """)
     b.code("""
 left = students.merge(grades, on="student_id", how="left")
@@ -267,7 +226,7 @@ show(right, 'students.merge(grades, on="student_id", how="right")', "purple",
      sources=sources_from(students, grades, "student_id"), key="student_id")
 """)
     b.md("""
-**What happened:** the mirror image of the left join. The pink `NaN` under `name` is a score recorded for someone who is not a student — exactly the kind of data-quality problem a right join exposes. (`students.merge(grades, how="right")` is the same as `grades.merge(students, how="left")` apart from column order.)
+**What happened:** the mirror image of the left join. The `NaN` under `name` is a score recorded for someone who is not a student — exactly the kind of data-quality problem a right join exposes. (`students.merge(grades, how="right")` is the same as `grades.merge(students, how="left")` apart from column order.)
 """)
     b.md(f"""
 ### 2d. Outer (full) join  🎬 [{PAGE}#full-outer-join]({PAGE}#full-outer-join)
@@ -282,7 +241,7 @@ show(outer, 'students.merge(grades, on="student_id", how="outer")', "purple",
      sources=sources_from(students, grades, "student_id"), key="student_id")
 """)
     b.md("""
-**What happened:** nothing was dropped. Each pink cell marks a one-sided row. A useful identity when keys are unique on both sides: `rows(outer) = rows(left) + rows(right) − rows(inner)` = 3 + 3 − 2 = 4.
+**What happened:** nothing was dropped. Each `NaN` marks a one-sided row. A useful identity when keys are unique on both sides: `rows(outer) = rows(left) + rows(right) − rows(inner)` = 3 + 3 − 2 = 4.
 
 **Check yourself:** the four results have 2, 3, 3, 4 rows. Say, for each, which of the two "odd" IDs (1 and 4) survived and why.
 """)
@@ -397,7 +356,7 @@ show(one_key, 'on="student_id"  (WRONG: courses mixed, rows multiplied)', "purpl
      sources={"student_id": "green", "course_x": "yellow", "course_y": "yellow", "score": "orange"}, key="student_id")
 """)
     b.md("""
-**What happened:** with both columns in the key, each enrollment found exactly one grade. With one key, every Ava enrollment matched every Ava grade, producing 5 rows, and the two `course` columns collided and were renamed `course_x` / `course_y` (yellow) — a sure sign the key was incomplete.
+**What happened:** with both columns in the key, each enrollment found exactly one grade. With one key, every Ava enrollment matched every Ava grade, producing 5 rows, and the two `course` columns collided and were renamed `course_x` / `course_y` — a sure sign the key was incomplete.
 """)
     b.md(f"""
 ### 5c. Where did each row come from, and is the key really unique?  🎬 [{PAGE}#audit-validate]({PAGE}#audit-validate)
@@ -610,7 +569,7 @@ show(joined[game_cols + ["abbr", "team", "conference", "division"]].sort_values(
               "team": "orange", "conference": "orange", "division": "orange"}, key=["opponent", "abbr"])
 """)
     b.md("""
-**What happened:** 138 games came back with pink cells. **Question: which opponents failed to match?** That is a left anti join on the key.
+**What happened:** 138 games came back with `NaN` in every team column. **Question: which opponents failed to match?** That is a left anti join on the key.
 """)
     b.code("""
 unmatched = games[~games["opponent"].isin(teams["abbr"])]["opponent"].value_counts().reset_index()
@@ -738,7 +697,7 @@ def build_pa31() -> Book:
     b.md(f"""
 ## How to use this notebook
 
-Each question from PA 3.1 is worked in **numbered steps**. Every step has three parts: **the logic** (why this step, in words), **the code**, and **the table it produces**, colour-coded so you can see which input each column came from (legend below). Functions are explained the first time they appear in a *📘 Function* note. The compact answer key is on the course site: [{SITE}]({SITE}); the interactive join page is [{PAGE}]({PAGE}).
+Each question from PA 3.1 is worked in **numbered steps**. Every step has three parts: **the logic** (why this step, in words), **the code**, and **the table it produces**. (The interactive page shows the join operations with columns coloured by the table they came from.) Functions are explained the first time they appear in a *📘 Function* note. The compact answer key is on the course site: [{SITE}]({SITE}); the interactive join page is [{PAGE}]({PAGE}).
 """)
     add_helper(b)
 
@@ -1054,7 +1013,7 @@ def build_pa32() -> Book:
     b.md(f"""
 ## How to use this notebook
 
-"Similar" has to be made precise before a computer can find it: **which variables**, **on what scale**, and **which distance formula**. Every question below is worked in numbered steps that make each of those decisions explicit, show the table before and after each transformation (colour-coded — legend below), and end with an interpretation. Functions are explained in *📘 Function* notes the first time they appear. The compact answer key is on the course site: [{SITE}]({SITE}).
+"Similar" has to be made precise before a computer can find it: **which variables**, **on what scale**, and **which distance formula**. Every question below is worked in numbered steps that make each of those decisions explicit, show the table before and after each transformation, and end with an interpretation. Functions are explained in *📘 Function* notes the first time they appear. The compact answer key is on the course site: [{SITE}]({SITE}).
 
 **The one idea behind everything here.** For a target row *t* and any other row *i*, put both on the same scale and compute
 - Euclidean distance: $d(i,t)=\\sqrt{{\\sum_j (x_{{ij}}-x_{{tj}})^2}}$ — straight-line distance;

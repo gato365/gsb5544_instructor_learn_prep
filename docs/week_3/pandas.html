@@ -26,8 +26,24 @@ tr.pending,tr.landing{visibility:hidden}tr.new{animation:arrive .45s ease-out}
 @keyframes arrive{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:680px){main{padding:16px}.stage{grid-template-columns:1fr}h1{font-size:26px}.toolbar{gap:8px}.panel{padding:12px}th,td{padding:8px 6px}.hint{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+:root{--c-left:#dbe9ff;--c-right:#ffe0c2;--c-key:#d9f2d9;--c-new:#fff3b0;--c-left-s:#1d5fb5;--c-right-s:#b84e00;--c-key-s:#1d7a3e;--c-new-s:#7a5b00}
+:root[data-theme=dark]{--c-left:#23395a;--c-right:#5b3a1c;--c-key:#1f4a2c;--c-new:#5a4d12;--c-left-s:#9cc0ff;--c-right-s:#ffb46e;--c-key-s:#7fd49a;--c-new-s:#ffe27a}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--c-left:#23395a;--c-right:#5b3a1c;--c-key:#1f4a2c;--c-new:#5a4d12;--c-left-s:#9cc0ff;--c-right-s:#ffb46e;--c-key-s:#7fd49a;--c-new-s:#ffe27a}}
+table{border:2px solid var(--line)}
+th,td{border:1px solid var(--line)}
+th.src-left,td.src-left{background:var(--c-left)}th.src-right,td.src-right{background:var(--c-right)}th.src-key,td.src-key{background:var(--c-key)}th.src-new,td.src-new{background:var(--c-new)}
+th.src-left{color:var(--c-left-s)}th.src-right{color:var(--c-right-s)}th.src-key,th.key{color:var(--c-key-s)}th.src-new{color:var(--c-new-s)}
+th.grp,td.grp{border-left:3px solid var(--fg)}
+tr.rsrc-left>td{background:var(--c-left)}tr.rsrc-right>td{background:var(--c-right)}
+tr.active>td,tr.trace>td{background:transparent}
+td.na{background:var(--badbg)}
+.source.left .caption{color:var(--c-left-s);font-weight:600}.source.right .caption{color:var(--c-right-s);font-weight:600}
+.source.left table{border-color:var(--c-left-s)}.source.right table{border-color:var(--c-right-s)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px;color:var(--muted);margin:2px 0 8px}
+.legend i{display:inline-block;width:12px;height:12px;border:1px solid var(--line);vertical-align:-1px;margin-right:6px}
 </style></head><body><main>
-<header><div><small>PYTHON / PANDAS • SAMPLE COLLEGE DATA</small><h1>Pandas in motion</h1><p>Follow the highlighted input rows as each result is built. Hover any row to trace it; click a result row to jump to that step.</p></div><button id="theme" aria-label="Switch color theme">Theme: Auto</button></header>
+<header><div><small>PYTHON / PANDAS • SAMPLE COLLEGE DATA</small><h1>Pandas in motion</h1><p>Follow the highlighted input rows as each result is built. Hover any row to trace it; click a result row to jump to that step. Columns are shaded by the table they came from: blue = left, orange = right, green = key, yellow = created by the operation.</p></div><button id="theme" aria-label="Switch color theme">Theme: Auto</button></header>
 <div class="tabs" role="tablist"><button role="tab" id="tab-learn" aria-selected="true" aria-controls="learn">Learn</button><button role="tab" id="tab-quiz" aria-selected="false" aria-controls="quiz">Quiz</button></div>
 
 <section id="learn" role="tabpanel">
@@ -35,7 +51,7 @@ tr.pending,tr.landing{visibility:hidden}tr.new{animation:arrive .45s ease-out}
 <h2 id="title"></h2><p id="why"></p><div class="question"><b>Question we can now answer</b><span id="question"></span></div><p id="rule" class="rule"></p>
 <div class="stage"><section class="panel"><h2>Input tables</h2><div id="inputs"></div>
 <details id="editbox"><summary>Edit or generate input data</summary><p class="small">One row per line, comma-separated; the first line is the header. Leave a cell empty or write NA for a missing value. The result, steps, and setup code recompute from whatever you enter.</p><div id="editor" class="editor"></div><div class="row" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button id="apply" class="primary">Apply changes</button><button id="resetdata">Reset to sample data</button></div><p id="editmsg" class="small error"></p></details>
-</section><section class="panel"><h2>Result <span id="count" class="muted"></span></h2><div class="progress" aria-hidden="true"><i id="bar"></i></div><div id="output"></div><div id="status" class="status" aria-live="polite"></div><span class="caption">NA = missing, not zero. Index omitted except in the index-alignment example. ⚷ marks key columns.</span></section></div>
+</section><section class="panel"><h2>Result <span id="count" class="muted"></span></h2><div id="legend" class="legend" aria-label="Colour legend"></div><div class="progress" aria-hidden="true"><i id="bar"></i></div><div id="output"></div><div id="status" class="status" aria-live="polite"></div><span class="caption">NA = missing, not zero. Index omitted except in the index-alignment example. ⚷ marks key columns. Cell colours show which input table each column came from (legend above).</span></section></div>
 <section class="panel code"><h2>Python syntax</h2><pre id="code"></pre><details><summary>Sample data setup — copy before running the code</summary><pre id="setup"></pre></details></section>
 </section>
 
@@ -248,9 +264,33 @@ const esc=x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll
 const fmt=(v,t,j)=>v===null?'NA':typeof v==='number'&&t.floats?.has(j)?(Number.isInteger(v)?v.toFixed(1):String(+v.toFixed(2))):String(v);
 const pyLit=v=>v===null?'None':typeof v==='number'?String(v):`'${String(v).replace(/'/g,"\\'")}'`;
 const setupCode=ts=>'import pandas as pd\n\n'+ts.map(t=>`${t.name} = pd.DataFrame({${t.cols.map((c,j)=>`'${c}': [${t.rows.map(r=>pyLit(r[j])).join(', ')}]`).join(', ')}})`).join('\n');
-function table(t,prefix,keys,output){const isKey=j=>keys.includes(t.cols[j]);
-  return '<div class="scroll"><table><thead><tr>'+t.cols.map((c,j)=>'<th scope="col"'+(isKey(j)?' class="key"':'')+'>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'
-  +(t.rows.length?t.rows.map((r,i)=>'<tr id="'+prefix+i+'" data-i="'+i+'"'+(output?' class="pending" tabindex="-1"':'')+'>'+r.map((v,j)=>'<td class="'+(v===null?'na ':'')+(isKey(j)?'key':'')+'">'+esc(fmt(v,t,j))+'</td>').join('')+'</tr>').join(''):'<tr><td colspan="'+t.cols.length+'" class="na">no rows</td></tr>')+'</tbody></table></div>'}
+function table(t,prefix,keys,output,cls){cls=cls||{};const cc=cls.cols||[],rc=cls.rows||[];const isKey=j=>keys.includes(t.cols[j]);
+  const colCls=j=>(isKey(j)?'key ':'')+(cc[j]?'src-'+cc[j]+' ':'')+(j>0&&cc[j]&&cc[j-1]&&cc[j]!==cc[j-1]?'grp':'');
+  return '<div class="scroll"><table><thead><tr>'+t.cols.map((c,j)=>'<th scope="col" class="'+colCls(j).trim()+'">'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'
+  +(t.rows.length?t.rows.map((r,i)=>'<tr id="'+prefix+i+'" data-i="'+i+'" class="'+(output?'pending ':'')+(rc[i]?'rsrc-'+rc[i]:'')+'"'+(output?' tabindex="-1"':'')+'>'+r.map((v,j)=>'<td class="'+(v===null?'na ':'')+colCls(j).trim()+'">'+esc(fmt(v,t,j))+'</td>').join('')+'</tr>').join(''):'<tr><td colspan="'+t.cols.length+'" class="na">no rows</td></tr>')+'</tbody></table></div>'}
+// Which input table each column (or row) of a result came from, for colouring. Also colours the inputs themselves.
+function colourMap(d,ts,res){const o=d.op,out=res.output,keys=d.keys,two=ts.length===2;
+  const inputs=ts.map((t,i)=>t.cols.map(c=>keys.includes(c)?'key':(two&&i===1)?'right':'left'));
+  let cols=[],rows=null;const L=ts[0].cols,R=two?ts[1].cols:[];
+  const stripped=(c,sfx,side)=>c.endsWith(sfx)&&side.includes(c.slice(0,-sfx.length));
+  switch(o.type){
+    case 'merge':case 'cross':{const [sx,sy]=o.suffixes||['_x','_y'];
+      cols=out.cols.map(c=>keys.includes(c)?'key':c==='_merge'?'new':stripped(c,sx,L)?'left':stripped(c,sy,R)?'right':L.includes(c)?'left':R.includes(c)?'right':'new');break}
+    case 'anti':cols=out.cols.map(c=>keys.includes(c)?'key':o.side===0?'left':'right');break;
+    case 'concatRows':cols=out.cols.map(()=>null);rows=res.steps.map(s=>s.sources[0]?(s.sources[0][0]===0?'left':'right'):null);break;
+    case 'concatCols':cols=out.cols.map(c=>keys.includes(c)?'key':L.includes(c)?'left':'right');break;
+    case 'dropDuplicates':cols=out.cols.map(c=>keys.includes(c)?'key':'left');break;
+    default:cols=out.cols.map(c=>keys.includes(c)?'key':'new')}
+  if(res.error)cols=out.cols.map(()=>null);
+  const legend=[];const name=i=>ts[i]?ts[i].name:'';
+  if(rows){legend.push(['left','rows from '+name(0)]);legend.push(['right','rows from '+name(1)])}
+  else{if(cols.includes('left')||inputs[0].includes('left'))legend.push(['left','from '+name(0)+(two?' (left)':'')]);
+    if(two&&(cols.includes('right')||inputs[1].includes('right')))legend.push(['right','from '+name(1)+' (right)']);}
+  if(keys.length)legend.push(['key','key column'+(keys.length>1?'s':'')+' ('+keys.join(', ')+')']);
+  if(cols.includes('new'))legend.push(['new','created by the operation']);
+  legend.push(['na','missing (NA)']);
+  return{inputs,output:{cols,rows},legend}}
+const legendHTML=items=>items.map(([c,l])=>'<span><i style="background:var(--'+(c==='na'?'badbg':'c-'+c)+')"></i>'+esc(l)+'</span>').join('');
 
 /* ============================== DATA EDITING ============================== */
 const NAMES=['Ava','Ben','Cam','Dee','Eli','Fay','Gus','Hal','Ivy','Jo','Kim','Lex','Mia','Ned'],COURSES=['Stats','Python','Calc','Bio','Econ'],CLUBS=['Art','Music','Chess','Robotics','Drama'];
@@ -279,8 +319,10 @@ const ruleText=(d,ts,out)=>typeof d.rule==='function'?d.rule(ts,out):d.rule;
 function loadDemo(i,keepData=false){const d=demos[i];if(!keepData)tables=d.tables();result=run(d,tables);step=0;build()}
 function build(){const d=demos[chosen];
   $('title').textContent=d.title;$('why').textContent=d.why;$('question').textContent=d.question;$('rule').textContent=ruleText(d,tables,result.output);$('code').textContent=d.code;$('setup').textContent=setupCode(tables);
-  $('inputs').innerHTML=tables.map((t,i)=>'<div class="source"><div class="caption">'+esc(t.name)+(tables.length===2&&d.op.type!=='concatRows'?(i===0?' · LEFT':' · RIGHT'):'')+'</div>'+table(t,'s'+i+'r',d.keys,false)+'</div>').join('');
-  $('output').innerHTML=table(result.output,'o',d.keys,true);
+  const cm=colourMap(d,tables,result);
+  $('inputs').innerHTML=tables.map((t,i)=>'<div class="source '+(tables.length===2&&i===1?'right':'left')+'"><div class="caption">'+esc(t.name)+(tables.length===2&&d.op.type!=='concatRows'?(i===0?' · LEFT':' · RIGHT'):'')+'</div>'+table(t,'s'+i+'r',d.keys,false,{cols:cm.inputs[i]})+'</div>').join('');
+  $('output').innerHTML=table(result.output,'o',d.keys,true,cm.output);
+  $('legend').innerHTML=legendHTML(cm.legend);
   $('editor').innerHTML=tables.map((t,i)=>'<div><label for="ed'+i+'"><b>'+esc(t.name)+'</b></label><textarea id="ed'+i+'" spellcheck="false">'+esc(toCSV(t))+'</textarea><div class="row"><button data-add="'+i+'">+ Add a row</button><button data-gen="'+i+'">Generate 3 rows</button></div></div>').join('');
   $('editmsg').textContent='';
   if(location.hash!=='#'+d.slug)history.replaceState(null,'','#'+d.slug);
@@ -350,10 +392,10 @@ const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math
 const allNames=[...new Set(demos.flatMap(d=>d.tables().map(t=>t.name)))].sort();
 const normalize=s=>s.toLowerCase().replace(/\s+/g,'').replace(/'/g,'"').replace(/^result=/,'');
 function distractors(d,n){const same=demos.filter(x=>x!==d&&x.group===d.group),other=demos.filter(x=>x!==d&&x.group!==d.group);return shuffle([...shuffle(same).slice(0,n),...shuffle(other)]).slice(0,n)}
-function staticTables(ts,d,prefix){return ts.map((t,i)=>'<div class="source"><div class="caption">'+esc(t.name)+'</div>'+table(t,prefix+i+'r',d.keys,false)+'</div>').join('')}
+function staticTables(ts,d,prefix,cm){return ts.map((t,i)=>'<div class="source '+(ts.length===2&&i===1?'right':'left')+'"><div class="caption">'+esc(t.name)+'</div>'+table(t,prefix+i+'r',d.keys,false,{cols:cm.inputs[i]})+'</div>').join('')}
 function newQuestion(){let k;do k=Math.floor(Math.random()*demos.length);while(k===quiz.last);quiz.last=k;const d=demos[k],ts=d.tables(),res=run(d,ts);
-  quiz.item={d,ts,res};quiz.answered=false;$('qfeedback').innerHTML='';$('qcheck').disabled=false;$('qhint').disabled=false;
-  const out='<div class="stage" style="margin-top:12px"><div><h3>Input tables</h3>'+staticTables(ts,d,'q')+'</div><div><h3>Result</h3>'+table(res.output,'qo',d.keys,false).replace(/class="pending" tabindex="-1"/g,'')+'</div></div>';
+  quiz.item={d,ts,res};const cm=colourMap(d,ts,res);quiz.answered=false;$('qfeedback').innerHTML='';$('qcheck').disabled=false;$('qhint').disabled=false;
+  const out='<div class="stage" style="margin-top:12px"><div><h3>Input tables</h3>'+staticTables(ts,d,'q',cm)+'</div><div><h3>Result</h3><div class="legend">'+legendHTML(cm.legend)+'</div>'+table(res.output,'qo',d.keys,false,cm.output)+'</div></div>';
   if(quiz.mode==='write'){
     $('qprompt').innerHTML='<h2>Write the call</h2><p>These input tables produced this result. Choose the DataFrame(s) involved and type the pandas code that produces <code>result</code>.</p>';
     $('qbody').innerHTML=out;
@@ -363,7 +405,7 @@ function newQuestion(){let k;do k=Math.floor(Math.random()*demos.length);while(k
   }else if(quiz.mode==='pick-op'){
     quiz.choices=shuffle([d,...distractors(d,3)]);
     $('qprompt').innerHTML='<h2>Pick the technique</h2><p>A colleague asks the question below, and you have these tables. Which technique answers it?</p><div class="question"><b>Question</b>'+esc(d.question)+'</div>';
-    $('qbody').innerHTML='<div class="stage" style="margin-top:12px"><div><h3>Input tables</h3>'+staticTables(ts,d,'q')+'</div></div>';
+    $('qbody').innerHTML='<div class="stage" style="margin-top:12px"><div><h3>Input tables</h3>'+staticTables(ts,d,'q',cm)+'</div></div>';
     $('qanswer').innerHTML='<div class="choices">'+quiz.choices.map((c,i)=>'<label><input type="radio" name="qc" value="'+i+'"><span>'+esc(c.title)+'</span></label>').join('')+'</div>';
   }else{
     quiz.choices=shuffle([d,...distractors(d,3)]);
