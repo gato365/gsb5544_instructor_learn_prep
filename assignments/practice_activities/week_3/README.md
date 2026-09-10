@@ -5,7 +5,7 @@ Two units, each in its own directory (same layout as `week_2/`):
 | Directory | Unit | Files |
 |---|---|---|
 | `joining_and_merging/` | 3.1 Joining and merging | `pandas.html` (interactive page), Topic 3.1 notebook (`-empty` / `-solution`), PA 3.1 *Concatenating, Joining, and Pivoting* (`-empty` / `-solution`; MovieLens 1M data) |
-| `distances_between_observations/` | 3.2 Distances | PA 3.2 *Distances Between Observations* (`-empty` / `-solution`; Ames housing and College Scorecard data) |
+| `distances_between_observations/` | 3.2 Distances | Topic 3.2 notebook (`-empty` / `-solution`; a 15-minute opener on types of distance, why, and when — built by `tools/build_week3_distances.py`), PA 3.2 *Distances Between Observations* (`-empty` / `-solution`; Ames housing and College Scorecard data) |
 
 Each unit also has **extended** notebooks (`*-extended.ipynb`, executed, no student version), built by `tools/build_week3_extended.py`. They are fully worked walkthroughs: a "why are we doing this?" block before every operation, every input table shown before and the result after (plain tables — the colour-coded version is the interactive page), and each PA answer broken into numbered steps with the logic and a plain-language note on every pandas function. They appear on the site as an *Extended* row on the matching card (the `"extended"` key in `site_config.json`).
 
@@ -45,6 +45,7 @@ Consequences:
 
 ```bash
 python3 tools/build_week3_joins.py     # regenerate + execute the Topic 3.1 notebooks (needs /opt/anaconda3)
+python3 tools/build_week3_distances.py # regenerate + execute the Topic 3.2 notebooks (downloads Ames)
 python3 tools/build_week3_pas.py       # rebuild + execute the PA 3.1 and PA 3.2 solutions (downloads MovieLens, ~25 MB)
 python3 tools/build_week3_extended.py  # rebuild + execute the three extended walkthroughs (same data downloads)
 python3 tools/build_site.py            # copy pandas.html into docs/ and rebuild docs/index.html

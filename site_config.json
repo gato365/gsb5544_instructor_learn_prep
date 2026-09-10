@@ -88,6 +88,12 @@
           "extended": "assignments/practice_activities/week_3/joining_and_merging/GSB5544_PA_3_1_Concatenating_Joining_Pivoting-extended.ipynb"
         },
         {
+          "title": "Topic 3.2 — Distances Between Observations (types, why, when)",
+          "student": "assignments/practice_activities/week_3/distances_between_observations/GSB5544_Topic_3_2_Distances_Between_Observations-empty.ipynb",
+          "solution": "assignments/practice_activities/week_3/distances_between_observations/GSB5544_Topic_3_2_Distances_Between_Observations-solution.ipynb",
+          "publish_solution": true
+        },
+        {
           "title": "PA 3.2 — Distances Between Observations (Ames housing & College Scorecard)",
           "student": "assignments/practice_activities/week_3/distances_between_observations/GSB5544_PA_3_2_Distances_Between_Observations-empty.ipynb",
           "solution": "assignments/practice_activities/week_3/distances_between_observations/GSB5544_PA_3_2_Distances_Between_Observations-solution.ipynb",
