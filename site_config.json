@@ -101,6 +101,35 @@
           "extended": "assignments/practice_activities/week_3/distances_between_observations/GSB5544_PA_3_2_Distances_Between_Observations-extended.ipynb"
         }
       ]
+    },
+    {
+      "label": "Week 4 — Text Data: Strings, Regular Expressions, and TF-IDF",
+      "items": [
+        {
+          "title": "Topic 4.1 — Text as Data (bag of words, TF-IDF, cosine distance)",
+          "student": "assignments/practice_activities/week_4/GSB5544_Topic_4_1_Text_as_Data-empty.ipynb",
+          "solution": "assignments/practice_activities/week_4/GSB5544_Topic_4_1_Text_as_Data-solution.ipynb",
+          "publish_solution": true
+        },
+        {
+          "title": "PA 4.1 — Text Data: Spam Emails (Enron corpus)",
+          "student": "assignments/practice_activities/week_4/GSB_5544_PA_4_1_Text_Data.ipynb",
+          "solution": "assignments/practice_activities/week_4/GSB_5544_PA_4_1_Text_Data-solution.ipynb",
+          "publish_solution": true
+        },
+        {
+          "title": "Topic 4.2 — Strings and Regular Expressions",
+          "student": "assignments/practice_activities/week_4/GSB5544_Topic_4_2_Strings_and_Regex-empty.ipynb",
+          "solution": "assignments/practice_activities/week_4/GSB5544_Topic_4_2_Strings_and_Regex-solution.ipynb",
+          "publish_solution": true
+        },
+        {
+          "title": "PA 4.2 — Decode a Message (strings & regex)",
+          "student": "assignments/practice_activities/week_4/GSB_5544_PA_4_2_Decode_a_message.ipynb",
+          "solution": "assignments/practice_activities/week_4/GSB_5544_PA_4_2_Decode_a_message-solution.ipynb",
+          "publish_solution": true
+        }
+      ]
     }
   ]
 }
