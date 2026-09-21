@@ -24,6 +24,9 @@ Teaching materials for GSB 5544 (Cal Poly).
 - `assignments/practice_activities/week_4/`
   - Topic 4.1 (Text as Data: bag of words, TF, TF-IDF, cosine distance) and Topic 4.2 (Strings and Regular Expressions) — 20-minute openers built by `tools/build_week4_topics.py`; Topic 4.1 pairs with PA 4.1, Topic 4.2 with PA 4.2
   - `GSB_5544_PA_4_1_Text_Data.ipynb` (Enron spam sample, read from the data301 URL) and `GSB_5544_PA_4_2_Decode_a_message.ipynb` (scrambled *V for Vendetta* quote from Dropbox) — the student notebooks, kept untouched as received; their `-solution.ipynb` siblings are built by `tools/build_week4_pas.py`
+- `assignments/practice_activities/week_5/`
+  - Topic 5.1 (JSON and APIs) and Topic 5.2 (HTML and Web Scraping) — 15-minute openers built by `tools/build_week5_topics.py`
+  - `GSB5544_PA_5_1_JSON_Data_Format_and_APIs.ipynb` and `GSB5544_PA_5_2_HTML_and_Web_Scraping.ipynb` — student notebooks, kept as received; the detailed `-solution.ipynb` instructor keys (approach, code, expected output, common mistakes) are built by `tools/build_week5_pas.py` against the live sites. The Tasty API section runs live only if `RAPIDAPI_KEY` is set in the environment; otherwise it runs on a labelled mock. The PA solutions are hidden on the website (`publish_solution: false`)
 - `assignments/labs/`, `assignments/quizzes/`
 
 `*-empty.ipynb` notebooks contain `____` blanks for students; `*-solution.ipynb` files are completed **and executed**, so GitHub renders them with outputs.

@@ -130,6 +130,37 @@
           "publish_solution": true
         }
       ]
+    },
+    {
+      "label": "Week 5 — Data from the Web: JSON, APIs, and Web Scraping",
+      "items": [
+        {
+          "title": "Topic 5.1 — JSON and APIs (nested data, json_normalize, requests)",
+          "student": "assignments/practice_activities/week_5/GSB5544_Topic_5_1_JSON_and_APIs-empty.ipynb",
+          "solution": "assignments/practice_activities/week_5/GSB5544_Topic_5_1_JSON_and_APIs-solution.ipynb",
+          "publish_solution": true
+        },
+        {
+          "title": "PA 5.1 — Hierarchical Data, the JSON Data Format, and APIs (TVMaze & Tasty)",
+          "student": "assignments/practice_activities/week_5/GSB5544_PA_5_1_JSON_Data_Format_and_APIs.ipynb",
+          "solution": "assignments/practice_activities/week_5/GSB5544_PA_5_1_JSON_Data_Format_and_APIs-solution.ipynb",
+          "publish_solution": false,
+          "solution_placeholder": "Solution posted after the activity is due."
+        },
+        {
+          "title": "Topic 5.2 — HTML and Web Scraping (Beautiful Soup, read_html, many pages)",
+          "student": "assignments/practice_activities/week_5/GSB5544_Topic_5_2_HTML_and_Web_Scraping-empty.ipynb",
+          "solution": "assignments/practice_activities/week_5/GSB5544_Topic_5_2_HTML_and_Web_Scraping-solution.ipynb",
+          "publish_solution": true
+        },
+        {
+          "title": "PA 5.2 — HTML and Web Scraping (Wikipedia cities & hockey stats)",
+          "student": "assignments/practice_activities/week_5/GSB5544_PA_5_2_HTML_and_Web_Scraping.ipynb",
+          "solution": "assignments/practice_activities/week_5/GSB5544_PA_5_2_HTML_and_Web_Scraping-solution.ipynb",
+          "publish_solution": false,
+          "solution_placeholder": "Solution posted after the activity is due."
+        }
+      ]
     }
   ]
 }
