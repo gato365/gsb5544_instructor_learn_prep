@@ -27,6 +27,9 @@ Teaching materials for GSB 5544 (Cal Poly).
 - `assignments/practice_activities/week_5/`
   - Topic 5.1 (JSON and APIs) and Topic 5.2 (HTML and Web Scraping) — 15-minute openers built by `tools/build_week5_topics.py`
   - `GSB5544_PA_5_1_JSON_Data_Format_and_APIs.ipynb` and `GSB5544_PA_5_2_HTML_and_Web_Scraping.ipynb` — student notebooks, kept as received; the detailed `-solution.ipynb` instructor keys (approach, code, expected output, common mistakes) are built by `tools/build_week5_pas.py` against the live sites. The Tasty API section runs live only if `RAPIDAPI_KEY` is set in the environment; otherwise it runs on a labelled mock.
+- `assignments/practice_activities/week_6/`
+  - Topic 6.1 (Functions, lambda, and map(): *How repetitive is a song?*, public-domain lyrics) — built by `tools/build_week6_topics.py`
+  - `Practice_Activity_6_1_Writing_Functions.ipynb` — student notebook, kept as received; the `-solution.ipynb` instructor key is built by `tools/build_week6_pas.py` (needs `palmerpenguins`). `week_6/README.md` has the optional LyricsGenius instructor prep
 - `assignments/labs/`, `assignments/quizzes/`
 
 `*-empty.ipynb` notebooks contain `____` blanks for students; `*-solution.ipynb` files are completed **and executed**, so GitHub renders them with outputs.

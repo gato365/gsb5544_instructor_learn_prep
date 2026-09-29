@@ -159,6 +159,24 @@
           "publish_solution": true
         }
       ]
+    },
+    {
+      "label": "Week 6 — Writing Functions (def, lambda, and map)",
+      "items": [
+        {
+          "title": "Topic 6.1 — Functions, lambda, and map() (How repetitive is a song?)",
+          "student": "assignments/practice_activities/week_6/GSB5544_Topic_6_1_Functions_Lambda_Map-empty.ipynb",
+          "solution": "assignments/practice_activities/week_6/GSB5544_Topic_6_1_Functions_Lambda_Map-solution.ipynb",
+          "publish_solution": true
+        },
+        {
+          "title": "PA 6.1 — Writing Functions (penguins, times_seven, scope)",
+          "student": "assignments/practice_activities/week_6/Practice_Activity_6_1_Writing_Functions.ipynb",
+          "solution": "assignments/practice_activities/week_6/Practice_Activity_6_1_Writing_Functions-solution.ipynb",
+          "publish_solution": false,
+          "solution_placeholder": "Solution posted after the activity is due."
+        }
+      ]
     }
   ]
 }
