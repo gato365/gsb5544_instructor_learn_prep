@@ -173,8 +173,7 @@
           "title": "PA 6.1 — Writing Functions (penguins, times_seven, scope)",
           "student": "assignments/practice_activities/week_6/Practice_Activity_6_1_Writing_Functions.ipynb",
           "solution": "assignments/practice_activities/week_6/Practice_Activity_6_1_Writing_Functions-solution.ipynb",
-          "publish_solution": false,
-          "solution_placeholder": "Solution posted after the activity is due."
+          "publish_solution": true
         }
       ]
     }
