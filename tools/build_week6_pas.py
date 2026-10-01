@@ -922,6 +922,212 @@ PA62_ANSWERS = [PA62_Q1, PA62_Q2, PA62_Q3, PA62_Q4, PA62_Q5, PA62_Q6, PA62_Q7, P
 
 
 # ============================================================================ #
+#  Practice Activity: Iteration (penguin categories) — the short stand-alone version of PA 6.2 Q6–Q8
+# ============================================================================ #
+
+ITER_HEADER = [
+    md("""
+# GSB 5544 — Practice Activity: Iteration — INSTRUCTOR SOLUTION
+*Textbook: [Section 7.5, Iterating on datasets](https://ds-ml-with-python.github.io/Course-Textbook/06-iteration.html#iterating-on-datasets)
+— a row-by-row function and `.apply(axis=1)`*
+"""),
+    md("""
+**How to use this notebook.** This activity is the penguin part of PA 6.2 (Questions 6–8) on its own, with the
+counting code supplied. The answers below are self-contained — they reload the data and redefine the function —
+so this part runs on its own even if the PA 6.2 cells above were skipped. Same five beats: **Approach → code →
+What the code does → Expected output → Common mistakes**.
+"""),
+]
+
+ITER_Q0 = [
+    md("""
+### Solution 0 — load the data and the libraries
+
+**Approach.** `pandas` for the data frame, `numpy` for the (optional) vectorized check, and `load_penguins` for
+the data. In Colab, `palmerpenguins` is not pre-installed: run `!pip install palmerpenguins` once first.
+"""),
+    code("""
+# !pip install palmerpenguins          # once, in Colab
+import numpy as np
+import pandas as pd
+from palmerpenguins import load_penguins
+
+penguins = load_penguins()
+print(penguins.shape)
+penguins.head()
+"""),
+    md("""
+**Expected output.** `(344, 8)` — 344 penguins; the columns used below are `species`, `sex`, `bill_length_mm`,
+`bill_depth_mm`, `flipper_length_mm`, `body_mass_g`. Note the `NaN`s in row 3: two penguins have no measurements
+and 11 have no recorded sex.
+
+**Common mistakes.** `import palmerpenguins` then `load_penguins()` → `NameError`; it is
+`from palmerpenguins import load_penguins` (or `palmerpenguins.load_penguins()`). Forgetting the `pip install`
+in Colab → `ModuleNotFoundError: No module named 'palmerpenguins'`.
+"""),
+]
+
+ITER_Q1 = [
+    md("""
+### Solution 1 — a function that labels one penguin
+
+**Approach.** The function describes **one** penguin, so each piece of information is a parameter. Test the
+categories in order and `return` at the first match: Billy and Daisy first (they are defined by sex and a
+measurement), then "Average Adelie" (an Adelie that was *not* caught above), then "Other" for everyone left.
+"""),
+    code("""
+def penguin_category(species, sex, bill_length, bill_depth, flipper_length, body_mass):
+  \"\"\"
+  Label one penguin as "Big Mouth Billy", "Dainty Daisy", "Average Adelie", or "Other".
+
+  Parameters
+  ----------
+  species, sex : str
+    "Adelie" / "Chinstrap" / "Gentoo" and "male" / "female", as in the penguins data.
+  bill_length, bill_depth, flipper_length : float
+    Measurements in mm.
+  body_mass : float
+    Body mass in grams.
+
+  Returns
+  -------
+  str
+    The category name.
+  \"\"\"
+  if sex == "male" and bill_length * bill_depth > 800:
+    return "Big Mouth Billy"
+  if sex == "female" and flipper_length < 0.05 * body_mass:
+    return "Dainty Daisy"
+  if species == "Adelie":
+    return "Average Adelie"
+  return "Other"
+"""),
+    code("""
+# Unit tests — one hand-made penguin per category, with the arithmetic in the comment
+print(penguin_category("Gentoo", "male", 50.0, 17.0, 230, 6000))      # 50 * 17 = 850 > 800          -> Billy
+print(penguin_category("Adelie", "female", 36.0, 17.0, 180, 3800))     # 180 < 0.05 * 3800 = 190      -> Daisy
+print(penguin_category("Adelie", "male", 39.0, 18.0, 190, 3700))       # 39 * 18 = 702; Adelie        -> Average Adelie
+print(penguin_category("Chinstrap", "female", 46.0, 17.0, 195, 3500))  # 195 > 175; not Adelie        -> Other
+"""),
+    md("""
+**What the code does.**
+- The `if` lines read like the definitions: `sex == "male" and bill_length * bill_depth > 800` is "male **and**
+  bill area over 800". `and` here joins two single `True`/`False` values — fine for one penguin.
+- The first `return` that fires ends the function, so an Adelie Billy is a Billy, not an "Average Adelie".
+- The last line, `return "Other"`, needs no `if`: anything that reached it matched nothing above.
+- Because this function has `if`s inside, it is **not vectorized** — it cannot take whole columns. That is why
+  the next question needs an iterable function.
+
+**Expected output.** `Big Mouth Billy`, `Dainty Daisy`, `Average Adelie`, `Other`.
+
+**Common mistakes.**
+- **Checking `species == "Adelie"` first** → every Adelie becomes "Average", swallowing 19 Billys and 6 Daisys.
+- **`"Male"` / `"Female"` / `"adelie"`** — the data is lower-case `"male"`/`"female"` and capitalized species.
+- **Writing it for the whole column** (`if penguins["sex"] == "male":`) → `ValueError: The truth value of a Series
+  is ambiguous`.
+- **A missing `return "Other"`** → non-matching penguins get `None`, and `value_counts` silently drops them.
+- Comparing flipper length (mm) with 5 % of body mass (g) looks odd, but it is the definition as written; keep it.
+"""),
+]
+
+ITER_Q2 = [
+    md("""
+### Solution 2 — `.apply()` across rows
+
+**Approach.** `.apply(..., axis=1)` hands the function one row at a time. The row arrives as a single Series, and
+`penguin_category` wants six arguments, so a lambda pulls the six columns out of the row.
+"""),
+    code("""
+penguins["category_name"] = penguins.apply(
+  lambda row: penguin_category(row["species"], row["sex"], row["bill_length_mm"], row["bill_depth_mm"],
+                               row["flipper_length_mm"], row["body_mass_g"]),
+  axis = 1)
+
+penguins[["species", "sex", "bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g", "category_name"]].head(8)
+"""),
+    md("""
+**A vectorized cross-check (optional).** The same labels without `.apply`, using boolean masks and `np.select`,
+which picks the first condition that is `True` for each row — the vectorized cousin of the `if` chain:
+"""),
+    code("""
+is_billy = (penguins["sex"] == "male") & (penguins["bill_length_mm"] * penguins["bill_depth_mm"] > 800)
+is_daisy = (penguins["sex"] == "female") & (penguins["flipper_length_mm"] < 0.05 * penguins["body_mass_g"])
+is_adelie = penguins["species"] == "Adelie"
+
+vectorized = np.select([is_billy, is_daisy, is_adelie],
+                       ["Big Mouth Billy", "Dainty Daisy", "Average Adelie"], default = "Other")
+(vectorized == penguins["category_name"]).all()           # True: both routes agree for every penguin
+"""),
+    md("""
+**What the code does.**
+- `axis=1` → iterate over **rows**. (The default `axis=0` would hand the lambda a whole *column*, and
+  `row["species"]` would fail with `KeyError`.)
+- `lambda row: penguin_category(row["species"], ...)` — the adapter between what `.apply` supplies (one row)
+  and what the function expects (six values). It is the textbook's Section 7.5 pattern exactly.
+- The result is a Series with one label per row, aligned by index, so it drops straight into a new column.
+- `np.select(conditions, choices, default)` evaluates all the masks at once; `&` (not `and`) combines two
+  boolean Series element-wise. `(vectorized == penguins["category_name"]).all()` confirms the two routes agree.
+
+**Expected output.** In the first eight rows: rows 1 and 6 are `Dainty Daisy`, row 5 is `Big Mouth Billy`, the
+rest are `Average Adelie` (including row 3, whose measurements are all `NaN` — every comparison with `NaN` is
+`False`, so it falls through to the species test). The cross-check prints `True`.
+
+**Common mistakes.**
+- **`penguins.apply(penguin_category, axis=1)`** → `TypeError: penguin_category() missing 5 required positional
+  arguments: ...` — `.apply` passes the row as one argument.
+- **Leaving out `axis=1`** → `KeyError: 'species'`.
+- **`map(penguin_category, penguins)`** — iterating a data frame yields its *column names*, not rows.
+- **`for i in range(len(penguins)): penguins.loc[i, "category_name"] = ...`** — works but slow and not what
+  "iterable function" asks for.
+- **Using `and`/`or` in the vectorized version** → the ambiguous-truth-value error; element-wise needs `&`/`|`.
+"""),
+]
+
+ITER_Q3 = [
+    md("""
+### Solution 3 — the counts
+
+**What the code does.** `DataFrame.value_counts("category_name")` counts how many rows take each value of that
+column, largest first — the same numbers as `penguins["category_name"].value_counts()`.
+
+**Expected output.** **Average Adelie 127 · Other 84 · Big Mouth Billy 71 · Dainty Daisy 62** (sums to 344).
+
+**Common mistakes.**
+- Counts that do not add to 344 → the labels were computed on a filtered or `dropna()`'d copy of the data.
+- An extra row with a misspelled label (`"Dainty Daisy "`, `"Big mouth Billy"`) → a typo in Question 1's strings.
+- `NameError: name 'penguins' is not defined` → the given cell was run before Question 0 (or after a kernel restart).
+- Different numbers from the key almost always trace back to **test order** in Question 1 (Adelie checked first
+  gives Average Adelie 152, Billy 52, Daisy 56, Other 84).
+"""),
+]
+
+ITER_SRC = WEEK / "Practice_Activity_Iteration.ipynb"
+ITER_ANSWERS = [ITER_Q0, ITER_Q1, ITER_Q2]                     # one per empty code cell, in order
+ITER_GIVEN = ("code", lambda s: 'value_counts("category_name")' in s, "after", ITER_Q3)   # the supplied cell
+
+
+def iter_rules() -> list:
+    return empty_code_rules(ITER_ANSWERS) + [ITER_GIVEN]
+
+
+COMBINED_DEST = WEEK / "GSB_5544_Week_6_Iteration_Keys-solution.ipynb"
+COMBINED_HEADER = [
+    md("""
+# GSB 5544 — Week 6 Iteration Keys — INSTRUCTOR SOLUTION
+*Two activities from textbook [Chapter 7, Iteration](https://ds-ml-with-python.github.io/Course-Textbook/06-iteration.html), in one notebook*
+
+| | Activity | Questions |
+|---|---|---|
+| **Part 1** | PA 6.2 — Iteration | 1 – 8: *99 Bottles* verses as a list, `sqrt_pos_unvec` / `sqrt_pos_vec`, `sing_verse_3` with `map()` and a lambda, penguin categories with `.apply` |
+| **Part 2** | Practice Activity: Iteration | 0 – 3: the penguin categories on their own (the same task as Part 1, Questions 6 – 8, with the counting code supplied) |
+
+Each part is self-contained — Part 2 reloads the data and redefines its function — so either can be run alone.
+Every answer follows the same five beats: **Approach → code → What the code does → Expected output → Common mistakes**.
+"""),
+]
+
+
+# ============================================================================ #
 #  Build
 # ============================================================================ #
 
@@ -1010,6 +1216,22 @@ def execute(path: Path) -> None:
     print(f"executed {path.relative_to(ROOT)} (no unexpected errors)")
 
 
+def combine(header: list[dict], parts: list[tuple[str, dict]]) -> dict:
+    """Join several solution notebooks into one. Each part's title cell becomes a '## Part n — ...' heading."""
+    out = copy.deepcopy(header)
+    for n, (label, part) in enumerate(parts, start=1):
+        cells = copy.deepcopy(part["cells"])
+        first = cells[0]
+        assert first["cell_type"] == "markdown" and first["source"].startswith("# ")
+        first["source"] = re.sub(r"^# GSB 5544 — ", f"---\n## Part {n} — ", first["source"], count=1)
+        out.extend(cells)
+    for i, c in enumerate(out):
+        c["id"] = f"cell-{i:03d}"
+        if c["cell_type"] == "code":
+            c["outputs"], c["execution_count"] = [], None
+    return {"cells": out, "metadata": copy.deepcopy(METADATA), "nbformat": 4, "nbformat_minor": 5}
+
+
 def main() -> None:
     jobs = [
         (PA61_SRC, PA61_HEADER, PA61_RULES),
@@ -1021,6 +1243,16 @@ def main() -> None:
         print(f"wrote {dest.relative_to(ROOT)}")
         if "--no-exec" not in sys.argv:
             execute(dest)
+
+    # One notebook holding both iteration keys: PA 6.2, then the stand-alone Practice Activity: Iteration
+    combined = combine(COMBINED_HEADER, [
+        ("PA 6.2", build_solution(PA62_SRC, PA62_HEADER, empty_code_rules(PA62_ANSWERS))),
+        ("Iteration", build_solution(ITER_SRC, ITER_HEADER, iter_rules())),
+    ])
+    save(COMBINED_DEST, combined)
+    print(f"wrote {COMBINED_DEST.relative_to(ROOT)}")
+    if "--no-exec" not in sys.argv:
+        execute(COMBINED_DEST)
 
 
 if __name__ == "__main__":

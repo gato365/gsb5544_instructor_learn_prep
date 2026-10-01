@@ -8,6 +8,8 @@
 | `Practice_Activity_6_1_Writing_Functions-solution.ipynb` | Instructor key: approach, code, what each piece does, expected output, common mistakes. Executed. | `tools/build_week6_pas.py` |
 | `GSB_5544_Practice_Activity_6_2_Iteration.ipynb` | PA 6.2 student notebook (textbook Chapter 7 check-ins: *99 Bottles* verses as a list, `sqrt_pos_unvec`/`sqrt_pos_vec`, `sing_verse_3` with `map()` and a lambda, penguin categories with `.apply`). Kept as received. | — |
 | `GSB_5544_Practice_Activity_6_2_Iteration-solution.ipynb` | Instructor key, same five beats. Executed (Python 3.14 kernel: the `map(..., strict=True)` demo needs 3.14+). | `tools/build_week6_pas.py` |
+| `Practice_Activity_Iteration.ipynb` | The short stand-alone *Practice Activity: Iteration* (penguin categories only — PA 6.2 Q6–8 with the counting code supplied). Kept as received. | — |
+| `GSB_5544_Week_6_Iteration_Keys-solution.ipynb` | **Both iteration keys in one notebook**: Part 1 = the PA 6.2 key, Part 2 = the *Practice Activity: Iteration* key (self-contained: reloads the data, redefines the function, adds an `np.select` cross-check). Executed. | `tools/build_week6_pas.py` |
 
 Edit the generators, not the `.ipynb` files, and re-run them. Cells that demonstrate an error on purpose are
 tagged `raises-exception`; every other cell must run cleanly or the build stops.
