@@ -174,6 +174,12 @@
           "student": "assignments/practice_activities/week_6/Practice_Activity_6_1_Writing_Functions.ipynb",
           "solution": "assignments/practice_activities/week_6/Practice_Activity_6_1_Writing_Functions-solution.ipynb",
           "publish_solution": true
+        },
+        {
+          "title": "PA 6.2 — Iteration (99 Bottles, vectorizing, map, lambda, apply)",
+          "student": "assignments/practice_activities/week_6/GSB_5544_Practice_Activity_6_2_Iteration.ipynb",
+          "solution": "assignments/practice_activities/week_6/GSB_5544_Practice_Activity_6_2_Iteration-solution.ipynb",
+          "publish_solution": true
         }
       ]
     }

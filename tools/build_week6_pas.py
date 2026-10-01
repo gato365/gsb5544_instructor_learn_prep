@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-"""Build the Week 6 practice-activity INSTRUCTOR SOLUTION notebook (PA 6.1 — Writing Functions).
+"""Build the Week 6 practice-activity INSTRUCTOR SOLUTION notebooks (PA 6.1 — Writing Functions, PA 6.2 — Iteration).
 
-Usage:  python3 tools/build_week6_pas.py            # build + execute the -solution file
+Usage:  python3 tools/build_week6_pas.py            # build + execute both -solution files
         python3 tools/build_week6_pas.py --no-exec  # build without executing
 
-The student notebook `Practice_Activity_6_1_Writing_Functions.ipynb` is the source of truth for the questions and
-is left untouched.  This script writes a `-solution.ipynb` sibling in which each question gets an answer group:
-the approach, complete runnable code, what each important piece does, the expected output, and the common
-mistakes to watch for in class.  Questions follow the textbook chapter the activity comes from
-(https://ds-ml-with-python.github.io/Course-Textbook/05-function_writing.html): `def`, docstrings, scope and
-dynamic lookup, unit tests, and input validation with `isinstance` + `sys.exit`.
+The student notebooks (`Practice_Activity_6_1_Writing_Functions.ipynb`, `GSB_5544_Practice_Activity_6_2_Iteration.ipynb`)
+are the source of truth for the questions and are left untouched.  For each, this script writes a `-solution.ipynb`
+sibling in which each question gets an answer group: the approach, complete runnable code, what each important piece
+does, the expected output, and the common mistakes to watch for in class.  The questions are the check-ins of the
+textbook chapters the activities come from:
+  PA 6.1 — https://ds-ml-with-python.github.io/Course-Textbook/05-function_writing.html  (def, scope, unit tests, validation)
+  PA 6.2 — https://ds-ml-with-python.github.io/Course-Textbook/06-iteration.html         (for loops, vectorizing, map, lambda, apply)
 
 Cells built with raises=True demonstrate an error on purpose (tagged "raises-exception" so execution continues).
 Executing needs the `palmerpenguins` package in the Anaconda kernel (`pip install palmerpenguins`); no network.
@@ -29,6 +30,7 @@ WEEK = ROOT / "assignments" / "practice_activities" / "week_6"
 JUPYTER = "/opt/anaconda3/bin/jupyter"
 
 PA61_SRC = WEEK / "Practice_Activity_6_1_Writing_Functions.ipynb"
+PA62_SRC = WEEK / "GSB_5544_Practice_Activity_6_2_Iteration.ipynb"
 
 
 def md(text: str) -> dict:
@@ -486,6 +488,440 @@ assignment happens regardless of what the function returns.
 
 
 # ============================================================================ #
+#  PA 6.2 — Iteration
+# ============================================================================ #
+
+PA62_HEADER = [
+    md("""
+# GSB 5544 — PA 6.2: Iteration — INSTRUCTOR SOLUTION
+*Textbook: [Chapter 7, Iteration](https://ds-ml-with-python.github.io/Course-Textbook/06-iteration.html)
+— for loops, vectorized functions, `map()`, lambda functions, and `.apply()`*
+"""),
+    md("""
+**How to use this notebook.** Each question is answered in the same five beats: **Approach** (the idea, in a
+sentence or two) → **code** (complete and executed) → **What the code does** (piece by piece) → **Expected
+output** → **Common mistakes** (what students actually do, and the symptom you will see on their screen).
+
+**The one idea to keep returning to:** *first ask whether the function is vectorized.* If it works on a whole
+array (`np.sqrt`, boolean masks), use it directly. If it only works on one value — anything with an `if` inside —
+you must iterate: a `for` loop, `map()` for lists, or `.apply(axis=1)` for the rows of a data frame. A lambda is
+the glue that fixes the arguments that should *not* change.
+
+The questions refer to "the code above" in the textbook: `sing_verse()` from *99 Bottles of Beer*. It is
+reproduced here so the notebook runs on its own.
+"""),
+    code("""
+import numpy as np
+import pandas as pd
+
+# From the textbook (Section 7.2): one verse, returned as a string rather than printed
+def sing_verse(num):
+  song = str(num) + " bottles of beer on the wall \\n" + str(num) + " bottles of beer \\n" + " take one down, pass it around, \\n" + str(num-1) + " bottles of beer on the wall \\n"
+  return song
+
+print(sing_verse(99))
+"""),
+]
+
+PA62_Q1 = [
+    md("""
+### Solution 1 — a list of verses instead of one long string
+
+**Approach.** The textbook's loop starts with an empty **string** and adds each verse with `+`. Start with an
+empty **list** instead and add each verse as a one-element list (or `.append()` it).
+"""),
+    code("""
+verses = []                                  # empty LIST, not an empty string
+for i in range(100, 97, -1):
+  verses = verses + [sing_verse(i)]          # list + list -> a longer list
+
+print(type(verses), len(verses))
+verses
+"""),
+    code("""
+# The same loop with .append(), which adds one element in place
+verses = []
+for i in range(100, 97, -1):
+  verses.append(sing_verse(i))
+
+print(verses[0])                             # the first verse is still one readable string
+"""),
+    code("""
+print("".join(verses))                       # and the list can be glued back into the whole song
+"""),
+    md("""
+**What the code does.**
+- `verses = []` — the "empty object" to accumulate into is now a list.
+- `verses + [sing_verse(i)]` — the brackets turn the verse string into a one-element list, so `+` is
+  *list + list* and appends one element. `verses.append(sing_verse(i))` does the same thing in place.
+- `range(100, 97, -1)` — 100, 99, 98: start, stop (not included), step.
+- `"".join(verses)` — glues the elements together with nothing between them (each verse already ends in `\\n`).
+
+**Expected output.** A list of **3 strings**, one verse each; `verses[0]` prints the 100-bottles verse.
+
+**Common mistakes.**
+- `verses = verses + sing_verse(i)` → `TypeError: can only concatenate list (not "str") to list`. Without
+  the brackets Python tries to add a string to a list.
+- `verses = verses.append(...)` → `verses` becomes `None` after the first step (`append` changes the list and
+  returns `None`), and the second step fails with `AttributeError: 'NoneType' object has no attribute 'append'`.
+- Keeping `song = ""` from the textbook and ending up with one long string again — check `type()` and `len()`.
+- `sing_verse(i)` *printed* inside the loop instead of stored — nothing accumulates.
+"""),
+]
+
+PA62_Q2 = [
+    md("""
+### Solution 2 — `sqrt_pos_unvec()` and a `for` loop
+
+**Approach.** The function handles **one** value: if it is positive return its square root, otherwise return it
+unchanged. Because of the `if`, the function cannot take a whole array, so a `for` loop feeds it one value at a
+time and collects the results.
+"""),
+    code("""
+def sqrt_pos_unvec(val):
+  if val > 0:
+    return np.sqrt(val)
+  return val                                 # not positive: leave it alone
+
+sqrt_pos_unvec(7), sqrt_pos_unvec(-2), sqrt_pos_unvec(0)
+"""),
+    code("""
+a_vec = np.array([-2, 1, -3, -9, 7])
+
+result = []
+for val in a_vec:
+  result = result + [sqrt_pos_unvec(val)]
+
+result = np.array(result)                    # back to a numpy array
+result
+"""),
+    code("""
+sqrt_pos_unvec(a_vec)                        # why the loop is needed: the if cannot judge a whole array
+""", raises=True),
+    md("""
+**What the code does.**
+- `if val > 0:` compares **one number** to 0, so it gives one `True`/`False` — exactly what `if` needs.
+- The second `return val` runs only when the `if` did not return — the non-positive values pass through.
+- The loop is the textbook's accumulate pattern: empty list → add one result per value → convert to an array.
+- Handing the whole array to the function raises `ValueError: The truth value of an array with more than one
+  element is ambiguous` — the same error as Section 7.2.2, and the reason this function is *unvectorized*.
+
+**Expected output.** `(np.float64(2.6457513110645907), -2, 0)` for the single-value tests, and
+`array([-2., 1., -3., -9., 2.64575131])` from the loop.
+
+**Common mistakes.**
+- **No `else` path** — a function whose only `return` is inside the `if` returns `None` for negatives, so the
+  result is `[-2 → None, ...]`. ("Returns the square root if positive" still needs a decision for the rest.)
+- `result.append(...)` with `result = result.append(...)` — the `None` problem from Question 1.
+- `np.sqrt(val)` on a negative value — `nan` plus a `RuntimeWarning`, which is what happens if the `if` is
+  written as `if val > 0: val = np.sqrt(val)` and the function then returns `np.sqrt(val)` anyway.
+- Writing the loop over `range(len(a_vec))` and indexing — works, but `for val in a_vec` is the Python idiom.
+"""),
+]
+
+PA62_Q3 = [
+    md("""
+### Solution 3 — `sqrt_pos_vec()` without a loop
+
+**Approach.** Replace the `if` with a **boolean mask** (Section 7.2.2): `vec > 0` is an array of `True`/`False`,
+and it can select exactly the positive entries to overwrite. Two details make it safe: work on a **copy** so the
+caller's array is not changed, and make it a **float** array so square roots are not truncated to integers.
+"""),
+    code("""
+def sqrt_pos_vec(vec):
+  out = np.array(vec, dtype = float)         # a float COPY: sqrt(7) must not become 2
+  is_pos = out > 0                           # one True/False per element
+  out[is_pos] = np.sqrt(out[is_pos])         # replace only the positive entries
+  return out
+
+a_vec = np.array([-2, 1, -3, -9, 7])
+sqrt_pos_vec(a_vec)
+"""),
+    code("""
+print(a_vec)                                 # the input is untouched ...
+print(sqrt_pos_vec([-4, 16, 0, 2.25]))      # ... and a plain list works too
+"""),
+    md("""
+Why the two details matter — the textbook's version, applied to an integer array **in place**:
+"""),
+    code("""
+a_int = np.array([-2, 1, -3, -9, 7])
+is_pos = a_int > 0
+a_int[is_pos] = np.sqrt(a_int[is_pos])
+a_int, a_int.dtype                          # sqrt(7) = 2.64... was stored as 2, and a_int itself changed
+"""),
+    md("""
+**What the code does.**
+- `np.array(vec, dtype=float)` makes a new float array from whatever came in (list or array). Without `dtype=float`,
+  an integer input stays integer and numpy **truncates** 2.64 → 2 when storing it. Without the copy, the function
+  silently modifies the caller's array (the `a_int` demonstration).
+- `out > 0` is vectorized: it compares every element at once and returns a boolean array — no `if` needed.
+- `out[is_pos]` on the left selects where to write; on the right it selects what to take the square root of, so
+  `np.sqrt` never sees a negative number (no `nan`, no warning).
+
+**Expected output.** `array([-2., 1., -3., -9., 2.64575131])` — the same values as Question 2, in one
+vectorized step. The in-place integer version gives `array([-2, 1, -3, -9, 2])` with dtype `int64`.
+
+**Common mistakes.**
+- **`if vec > 0:` inside the function** → the ambiguous-truth-value `ValueError`. That is the loop-shaped
+  thinking the question asks you to drop.
+- **Integer truncation** — `array([-2, 1, -3, -9, 2])` looks plausible enough that students do not notice.
+- **`np.sqrt(vec)` then masking** — computes square roots of the negatives first: `RuntimeWarning: invalid
+  value encountered in sqrt`. Mask first, then square-root.
+- **Modifying the input** — the caller's `a_vec` changes; a function should return a new object (Week 6 scope).
+- `np.where(vec > 0, np.sqrt(vec), vec)` is a one-line alternative but still evaluates `np.sqrt` on the whole
+  array (warning); `np.where(vec > 0, np.sqrt(np.clip(vec, 0, None)), vec)` avoids it.
+"""),
+]
+
+PA62_Q4 = [
+    md("""
+### Solution 4 — `sing_verse_3()`, `map()` over three lists, and unequal lengths
+
+**Approach.** Add a third parameter, `container`, and use it wherever the verse said "bottles". `map()` accepts
+as many iterables as the function has parameters and walks them **in step**: the first number with the first
+drink and the first container, and so on.
+"""),
+    code("""
+def sing_verse_3(num, drink, container):
+  song = str(num) + " " + container + " of " + drink + " on the wall \\n"
+  song = song + str(num) + " " + container + " of " + drink + "\\n"
+  song = song + " take one down, pass it around, \\n"
+  song = song + str(num-1) + " " + container + " of " + drink + " on the wall \\n"
+  return song
+
+print(sing_verse_3(99, "beer", "bottles"))          # (a) one verse, to test the function
+"""),
+    code("""
+nums = range(100, 97, -1)
+drinks = ["beer", "milk", "lemonade"]
+containers = ["bottles", "cartons", "cans"]
+
+song = map(sing_verse_3, nums, drinks, containers)   # (b) three iterables -> three arguments, in step
+print("".join(list(song)))
+"""),
+    code("""
+containers_2 = ["bottles", "cans"]                   # (c) three drinks, two containers
+
+song = list(map(sing_verse_3, nums, drinks, containers_2))
+print(len(song), "verses")
+print("".join(song))
+"""),
+    md("""
+No error — `map()` quietly **stops at the end of the shortest iterable**: two containers, two verses; the
+third drink ("lemonade") and the third number (98) are never used. If you want that to be an error instead,
+Python 3.14 added `strict=True` to `map()` (in Colab, which runs an older Python, use
+`zip(nums, drinks, containers_2, strict=True)` to get the same check):
+"""),
+    code("""
+list(map(sing_verse_3, nums, drinks, containers_2, strict = True))     # Python 3.14+
+""", raises=True),
+    md("""
+**What the code does.**
+- `sing_verse_3(num, drink, container)` builds the verse one line at a time, `container` replacing the hard-coded
+  "bottles". The textbook's spacing (`" on the wall \\n"`) is kept so the output matches the book.
+- `map(sing_verse_3, nums, drinks, containers)` — the function, then **one iterable per parameter, in the same
+  order as the parameters**. Step 1 calls `sing_verse_3(100, "beer", "bottles")`, step 2
+  `sing_verse_3(99, "milk", "cartons")`, step 3 `sing_verse_3(98, "lemonade", "cans")`.
+- `list(...)` realizes the lazy map object; `"".join(...)` glues the verses; `print` renders the `\\n`s.
+
+**Expected output.** (a) The 99-bottles verse. (b) Three verses: 100 bottles of beer, 99 cartons of milk,
+98 cans of lemonade. (c) **2 verses** (beer in bottles, milk in cans) — silently, no error. With `strict=True`:
+`ValueError: map() argument 3 is shorter than arguments 1-2`.
+
+**Common mistakes.**
+- **Iterables in the wrong order** — `map(sing_verse_3, drinks, nums, containers)` → `"beer" - 1` →
+  `TypeError: unsupported operand type(s) for -: 'str' and 'int'`. Match the order of the parameters.
+- **Passing the lists as one argument** — `map(sing_verse_3, [nums, drinks, containers])` → `TypeError:
+  sing_verse_3() missing 2 required positional arguments`.
+- Expecting (c) to error or to recycle the containers (R-style recycling does not happen in Python).
+- Forgetting `list()` and printing the map object itself: `<map object at 0x...>`.
+"""),
+]
+
+PA62_Q5 = [
+    md("""
+### Solution 5 — a lambda to hold two arguments fixed
+
+**Approach.** Only the number should change; drink and container stay "milk" and "glasses". A lambda wraps
+`sing_verse_3` into a one-argument function for `map()`, so no throw-away `sing_verse_milk_glasses()` is needed.
+"""),
+    code("""
+song = map(lambda i: sing_verse_3(i, "milk", "glasses"), range(100, 97, -1))
+print("".join(list(song)))
+"""),
+    md("""
+**What the code does.**
+- `lambda i: sing_verse_3(i, "milk", "glasses")` is an anonymous function with **one** parameter, `i`. Each time
+  `map` calls it with a number, it calls `sing_verse_3` with that number and the two fixed strings.
+- Because the lambda takes one argument, `map` needs only **one** iterable — the numbers.
+
+**Expected output.** Three verses: 100, 99, and 98 glasses of milk on the wall.
+
+**Common mistakes.**
+- `map(sing_verse_3, nums, "milk", "glasses")` — strings *are* iterables (of characters), so this runs and
+  produces verses about `"m"` in `"g"`, then stops after 4 characters. A memorable bug to show in class.
+- `map(lambda i: sing_verse_3(i, "milk", "glasses")(nums))` or calling the lambda immediately — the function
+  must be *passed* to `map`, not called (Topic 6.1, Debug (c)).
+- Writing `lambda i: return sing_verse_3(...)` → `SyntaxError`; a lambda's body is an expression, no `return`.
+- Listing the fixed arguments in the wrong order: `sing_verse_3(i, "glasses", "milk")` sings about "milk of
+  glasses".
+"""),
+]
+
+PA62_Q6 = [
+    md("""
+### Solution 6 — a function that labels one penguin
+
+**Approach.** Write a function for **one penguin** — the pieces of information it needs become the parameters —
+and check the categories **in order**, returning as soon as one matches. The order matters only for the last two:
+"Average Adelie" is defined as an Adelie that is *not* a Billy or a Daisy, so those are tested first.
+"""),
+    code("""
+from palmerpenguins import load_penguins
+
+penguins = load_penguins()
+penguins.head()
+"""),
+    code("""
+def penguin_category(species, sex, bill_length, bill_depth, flipper_length, body_mass):
+  \"\"\"
+  Label one penguin.
+
+  Parameters
+  ----------
+  species, sex : str
+    From the penguins data ("Adelie", ...; "male"/"female").
+  bill_length, bill_depth, flipper_length : float
+    Measurements in mm.
+  body_mass : float
+    Body mass in grams.
+
+  Returns
+  -------
+  str
+    "Big Mouth Billy", "Dainty Daisy", "Average Adelie", or "Other".
+  \"\"\"
+  if sex == "male" and bill_length * bill_depth > 800:
+    return "Big Mouth Billy"
+  if sex == "female" and flipper_length < 0.05 * body_mass:
+    return "Dainty Daisy"
+  if species == "Adelie":
+    return "Average Adelie"
+  return "Other"
+"""),
+    code("""
+# Unit tests: one hand-made penguin per category
+print(penguin_category("Gentoo", "male", 50.0, 17.0, 230, 6000))     # 50*17 = 850 > 800 -> Billy
+print(penguin_category("Adelie", "female", 36.0, 17.0, 180, 3800))    # 180 < 0.05*3800 = 190 -> Daisy
+print(penguin_category("Adelie", "male", 39.0, 18.0, 190, 3700))      # 39*18 = 702 -> not Billy; Adelie -> Average
+print(penguin_category("Chinstrap", "female", 46.0, 17.0, 195, 3500)) # 195 > 175 -> not Daisy; not Adelie -> Other
+"""),
+    code("""
+# ... and the first real penguin in the data
+first = penguins.iloc[0]
+first["species"], first["sex"], penguin_category(first["species"], first["sex"], first["bill_length_mm"],
+                                                 first["bill_depth_mm"], first["flipper_length_mm"], first["body_mass_g"])
+"""),
+    md("""
+**What the code does.**
+- Each parameter is one piece of "information about a penguin"; naming them after the columns keeps Question 7
+  easy to write.
+- `sex == "male" and bill_length * bill_depth > 800` — both conditions in one `if`; the first `return` that fires
+  ends the function, so later tests are skipped.
+- The two sexes make Billy and Daisy mutually exclusive, so their order does not matter; "Average Adelie" must
+  come **after** them, and the final `return "Other"` catches everything else.
+- A penguin with a **missing sex** (`NaN`, 11 of them) fails both `==` tests and lands in Adelie/Other —
+  reasonable, and worth saying out loud.
+
+**Expected output.** `Big Mouth Billy`, `Dainty Daisy`, `Average Adelie`, `Other` for the four test penguins; the
+first real penguin (an Adelie male, 39.1 × 18.7 = 731) is an `Average Adelie`.
+
+**Common mistakes.**
+- **Writing the function for the whole column** — `if penguins["sex"] == "male"` → the ambiguous-truth-value
+  error from Question 3. This function is deliberately *un*vectorized; that is why Question 7 needs `.apply`.
+- **Testing `species == "Adelie"` first** — then every Adelie is "Average", including the 19 Billys and 6 Daisys.
+- **Capitalization** — the data has `"male"`/`"female"` and `"Adelie"`; `"Male"` matches nothing.
+- **Body-mass units** — 5% of body mass in *grams* (e.g. 190) is compared with flipper length in *mm*; that is
+  the definition as given, even though the units differ. Students who "fix" the units get different counts.
+- Returning the labels with inconsistent spelling/spaces, which splits the counts in Question 8.
+"""),
+]
+
+PA62_Q7 = [
+    md("""
+### Solution 7 — `.apply()` across rows
+
+**Approach.** Section 7.5: `.apply(..., axis=1)` hands the function **one row at a time** as a Series. Since
+`penguin_category` wants six separate arguments, a lambda unpacks the row's columns into them.
+"""),
+    code("""
+penguins["category_name"] = penguins.apply(
+  lambda row: penguin_category(row["species"], row["sex"], row["bill_length_mm"], row["bill_depth_mm"],
+                               row["flipper_length_mm"], row["body_mass_g"]),
+  axis = 1)
+
+penguins[["species", "sex", "bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g", "category_name"]].head(8)
+"""),
+    md("""
+**What the code does.**
+- `axis=1` — apply across **rows** (the default, `axis=0`, would hand the function a whole column).
+- `lambda row: penguin_category(row["species"], ...)` — `row` is one row as a pandas Series; `row["species"]`
+  picks a value out of it. The lambda does the same job as in Question 5: it adapts the function's signature to
+  what `.apply` supplies.
+- The result has one label per row, in order, so it can be assigned straight into a new column.
+
+**Expected output.** A `category_name` column of strings. In the first eight rows: row 1 is a `Dainty Daisy`
+(female, flipper 186 < 0.05 × 3800 = 190), row 5 a `Big Mouth Billy` (male, 39.3 × 20.6 = 809.6 > 800), row 6
+another `Dainty Daisy` (181 < 181.25), and the rest — including row 3, whose measurements are all missing — are
+`Average Adelie`.
+
+**Common mistakes.**
+- **`penguins.apply(penguin_category, axis=1)`** → `TypeError: penguin_category() missing 5 required positional
+  arguments` — the textbook's exact error; `.apply` passes the row as *one* argument.
+- **Forgetting `axis=1`** → the lambda receives a column, `row["species"]` raises `KeyError: 'species'`.
+- **Looping over the data frame** with `for i in range(len(penguins))` and `.loc[i, ...]` — works, but slow and
+  verbose; the question asks for an *iterable function*.
+- **`penguins.category_name = ...`** on a column that does not exist yet creates an attribute, not a column
+  (pandas warns). Use `penguins["category_name"] = ...`.
+""" ),
+]
+
+PA62_Q8 = [
+    md("""
+### Solution 8 — counts per category
+
+**Approach.** Counting the values of one column is `value_counts()`. A cross-tab by species is a useful check
+that the definitions behaved as intended.
+"""),
+    code("""
+penguins["category_name"].value_counts()
+"""),
+    code("""
+pd.crosstab(penguins["species"], penguins["category_name"])
+"""),
+    md("""
+**What the code does.** `value_counts()` tabulates a column, largest group first. `pd.crosstab` counts
+species × category — it shows that every "Average Adelie" is an Adelie (by construction) and that Gentoos
+dominate the Daisys (long flippers but heavy bodies).
+
+**Expected output.** **Average Adelie 127, Other 84, Big Mouth Billy 71, Dainty Daisy 62** (344 total). By
+species: Adelie 127 / 19 / 6 / 0; Chinstrap 0 / 34 / 2 / 32; Gentoo 0 / 18 / 54 / 52 (Average · Billy · Daisy ·
+Other).
+
+**Common mistakes.**
+- `penguins.groupby("category_name").count()` — counts every column (and under-counts where values are
+  missing); `.size()` or `value_counts()` is what is meant.
+- Counts that do not sum to 344 → the `.apply` was run on a filtered or `dropna()`'d copy.
+- Different counts from the key usually trace back to Question 6: test order (Adelie first), units, or a typo in
+  a label — `value_counts()` will show the stray label as its own row.
+"""),
+]
+
+PA62_ANSWERS = [PA62_Q1, PA62_Q2, PA62_Q3, PA62_Q4, PA62_Q5, PA62_Q6, PA62_Q7, PA62_Q8]
+
+
+# ============================================================================ #
 #  Build
 # ============================================================================ #
 
@@ -501,7 +937,7 @@ def source(cell: dict) -> str:
 
 
 # (cell type, test on the source, "replace" the cell or insert "after" it, answer cells) — each must match once
-RULES = [
+PA61_RULES = [
     ("code", lambda s: s.strip() == "", "replace", PA61_Q0),
     ("code", lambda s: "def times_seven(x):" in s and "____" in s, "replace", PA61_Q1),
     ("markdown", lambda s: "unit tests" in s and "times_seven" in s, "after", PA61_Q2),
@@ -510,22 +946,39 @@ RULES = [
 ]
 
 
-def build_solution(src_path: Path) -> dict:
+def empty_code_rules(groups: list[list[dict]]) -> list:
+    """One rule per answer group: the n-th empty code cell of the source is replaced by the n-th group."""
+    counter = {"n": 0}
+
+    def make(k: int):
+        def test(s: str) -> bool:
+            if s.strip() != "":
+                return False
+            hit = counter["n"] == k
+            if hit:
+                counter["n"] += 1
+            return hit
+        return test
+
+    return [("code", make(k), "replace", group) for k, group in enumerate(groups)]
+
+
+def build_solution(src_path: Path, header: list[dict], rules: list) -> dict:
     nb = json.loads(src_path.read_text())
-    out = copy.deepcopy(PA61_HEADER)
-    used = [0] * len(RULES)
+    out = copy.deepcopy(header)
+    used = [0] * len(rules)
     for cell in nb["cells"]:
         src = source(cell)
-        hit = next((i for i, (kind, test, _, _) in enumerate(RULES) if cell["cell_type"] == kind and test(src)), None)
+        hit = next((i for i, (kind, test, _, _) in enumerate(rules) if cell["cell_type"] == kind and test(src)), None)
         if hit is None:
             out.append(copy.deepcopy(cell))
             continue
         used[hit] += 1
-        _, _, how, cells = RULES[hit]
+        _, _, how, cells = rules[hit]
         if how == "after":
             out.append(copy.deepcopy(cell))
         out.extend(copy.deepcopy(cells))
-    if used != [1] * len(RULES):
+    if used != [1] * len(rules):
         raise SystemExit(f"{src_path.name}: each rule must match exactly one cell, got {used}")
     for i, c in enumerate(out):
         c["id"] = f"cell-{i:03d}"
@@ -558,11 +1011,16 @@ def execute(path: Path) -> None:
 
 
 def main() -> None:
-    dest = PA61_SRC.with_name(PA61_SRC.stem + "-solution.ipynb")
-    save(dest, build_solution(PA61_SRC))
-    print(f"wrote {dest.relative_to(ROOT)}")
-    if "--no-exec" not in sys.argv:
-        execute(dest)
+    jobs = [
+        (PA61_SRC, PA61_HEADER, PA61_RULES),
+        (PA62_SRC, PA62_HEADER, empty_code_rules(PA62_ANSWERS)),
+    ]
+    for src, header, rules in jobs:
+        dest = src.with_name(src.stem + "-solution.ipynb")
+        save(dest, build_solution(src, header, rules))
+        print(f"wrote {dest.relative_to(ROOT)}")
+        if "--no-exec" not in sys.argv:
+            execute(dest)
 
 
 if __name__ == "__main__":

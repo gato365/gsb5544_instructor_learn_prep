@@ -6,6 +6,8 @@
 | `GSB5544_Topic_6_1_Functions_Lambda_Map-solution.ipynb` | The same notebook, completed and executed. | `tools/build_week6_topics.py` |
 | `Practice_Activity_6_1_Writing_Functions.ipynb` | PA 6.1 student notebook (penguins check-in, `times_seven`, `add_or_subtract`, scope). Kept as received. | — |
 | `Practice_Activity_6_1_Writing_Functions-solution.ipynb` | Instructor key: approach, code, what each piece does, expected output, common mistakes. Executed. | `tools/build_week6_pas.py` |
+| `GSB_5544_Practice_Activity_6_2_Iteration.ipynb` | PA 6.2 student notebook (textbook Chapter 7 check-ins: *99 Bottles* verses as a list, `sqrt_pos_unvec`/`sqrt_pos_vec`, `sing_verse_3` with `map()` and a lambda, penguin categories with `.apply`). Kept as received. | — |
+| `GSB_5544_Practice_Activity_6_2_Iteration-solution.ipynb` | Instructor key, same five beats. Executed (Python 3.14 kernel: the `map(..., strict=True)` demo needs 3.14+). | `tools/build_week6_pas.py` |
 
 Edit the generators, not the `.ipynb` files, and re-run them. Cells that demonstrate an error on purpose are
 tagged `raises-exception`; every other cell must run cleanly or the build stops.
@@ -73,6 +75,6 @@ three complete public-domain songs.
 ```bash
 /opt/anaconda3/bin/python -m pip install palmerpenguins   # once: the PA 6.1 solution needs it
 python3 tools/build_week6_topics.py    # regenerate + execute Topic 6.1 (-empty and -solution)
-python3 tools/build_week6_pas.py       # rebuild + execute the PA 6.1 instructor solution
+python3 tools/build_week6_pas.py       # rebuild + execute the PA 6.1 and PA 6.2 instructor solutions
 python3 tools/build_site.py            # rebuild docs/index.html
 ```
