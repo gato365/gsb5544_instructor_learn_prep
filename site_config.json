@@ -182,6 +182,23 @@
           "publish_solution": true
         }
       ]
+    },
+    {
+      "label": "Week 7 — Association Rules",
+      "items": [
+        {
+          "title": "Topic 7.1 — Association Rules (Who gets played together? Latin & hip-hop playlists)",
+          "student": "assignments/practice_activities/week_7/GSB5544_Topic_7_1_Association_Rules-empty.ipynb",
+          "solution": "assignments/practice_activities/week_7/GSB5544_Topic_7_1_Association_Rules-solution.ipynb",
+          "publish_solution": true
+        },
+        {
+          "title": "PA 7.1 — Association Rules Mining (Groceries)",
+          "student": "assignments/practice_activities/week_7/GSB5544_PA_7_1_Association_Rules.ipynb",
+          "solution": "assignments/practice_activities/week_7/GSB5544_PA_7_1_Association_Rules-solution.ipynb",
+          "publish_solution": true
+        }
+      ]
     }
   ]
 }

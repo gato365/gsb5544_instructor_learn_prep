@@ -30,6 +30,9 @@ Teaching materials for GSB 5544 (Cal Poly).
 - `assignments/practice_activities/week_6/`
   - Topic 6.1 (Functions, lambda, and map(): *How repetitive is a song?*, public-domain lyrics) — built by `tools/build_week6_topics.py`
   - `Practice_Activity_6_1_Writing_Functions.ipynb` and `GSB_5544_Practice_Activity_6_2_Iteration.ipynb` — student notebooks, kept as received; the `-solution.ipynb` instructor keys are built by `tools/build_week6_pas.py` (needs `palmerpenguins`), which also writes `GSB_5544_Week_6_Iteration_Keys-solution.ipynb` — the PA 6.2 key and the short *Practice Activity: Iteration* key together in one notebook. `week_6/README.md` has the optional LyricsGenius instructor prep
+- `assignments/practice_activities/week_7/`
+  - Topic 7.1 (Association Rules: *Who gets played together?* — simulated playlists of Latin and hip-hop artists; support, confidence, lift, `apriori`) — built by `tools/build_week7_topics.py`
+  - `GSB5544_PA_7_1_Association_Rules.ipynb` — student notebook (Groceries data), kept as received; the `-solution.ipynb` instructor key is built by `tools/build_week7_pas.py` (needs `mlxtend` and a network connection). See `week_7/README.md`
 - `assignments/labs/`, `assignments/quizzes/`
 
 `*-empty.ipynb` notebooks contain `____` blanks for students; `*-solution.ipynb` files are completed **and executed**, so GitHub renders them with outputs.
