@@ -4,9 +4,12 @@
 Usage:  python3 tools/build_week8_topics.py            # write -empty and -solution, execute the solution
         python3 tools/build_week8_topics.py --no-exec  # write both notebooks without executing
 
-Topic 8.2 — Regression: "Does advertising move sales?"  (scikit-learn + plotnine)
-  A business question -> summary statistics -> scatterplot -> simple linear regression (one quantitative
-  feature) -> predict and explain -> multiple linear regression with two quantitative features -> what changed.
+Topic 8.2 — Regression in Python, and the first ideas of machine learning  (scikit-learn + plotnine)
+  Students already know regression (assumptions, coefficients, polynomials, interactions) from other courses, so
+  nothing is re-taught. The notebook (1) shows the scikit-learn recipe: X as a DataFrame, fit, coef_, predict,
+  score; more features / interactions / polynomial terms as more columns; (2) uses the linear model to introduce
+  ML vocabulary: features and target, parameters vs hyperparameters, train/test split, RMSE, overfitting via a
+  polynomial-degree loop in a scaled pipeline.
   Data: the Advertising data set (200 markets; TV, radio and newspaper budgets in $1,000s; sales in 1,000s of
   units), read from its home at statlearning.com. A copy sits in assignments/Data/advertising.csv.
   Needs scikit-learn and plotnine in the kernel.
@@ -45,56 +48,55 @@ def answer(cells: list[dict], text: str) -> None:
 
 
 # ============================================================================ #
-#  Topic 8.2 — Regression (scikit-learn + plotnine)
+#  Topic 8.2 — Regression in Python, and the first ideas of machine learning
 # ============================================================================ #
 
 t82: list[dict] = []
 
 md(t82, """
-# GSB 5544 — Topic 8.2: Regression — SOLUTION
-*Does advertising move sales? Fitting a line with scikit-learn, reading it with plotnine*
+# GSB 5544 — Topic 8.2: Regression in Python — SOLUTION
+*You already know regression. This is how to run it in Python, and how it introduces machine learning.*
 """)
 
 md(t82, """
 ## The next 20 minutes
 
-| | Question | New tools | |
-|---|---|---|---|
-| **1. The question and the data** | Which advertising channel moves sales, and by how much? | `read_csv`, `describe` | the business question comes first |
-| **2. Summary statistics** | How big are the budgets, and which one *moves with* sales? | `.corr()` | one number per pair |
-| **3. Visualisation** | What does the relationship look like? | `geom_point`, `geom_smooth(method="lm")` | a scatterplot before any model |
-| **4. Analysis: simple linear regression** | What line best describes sales as a function of TV spend? | `LinearRegression().fit`, `.intercept_`, `.coef_`, `.predict`, `.score` | **predict** and **explain** |
-| **5. Multiple linear regression** | What happens when we add a second feature? | the same four calls, two columns in `X` | coefficients that "hold the other constant" |
+You have fit linear models before: assumptions, reading coefficients, polynomial terms, interactions.
+None of that is re-taught here. Two things are new:
 
-Every method so far in this course has answered *what is there*: counts, means, joins, nearest neighbours,
-rules. **Regression** answers *how does one thing change with another* — and, once we have that, *what
-would we expect if...*. Those two uses have names:
+1. **How to do it in Python** with scikit-learn: one recipe that every model in this course will follow.
+2. **Machine-learning vocabulary**, introduced on the familiar ground of a linear model: features and
+   target, fit and predict, training and test data, overfitting.
 
-- **Predict**: given a new TV budget, what sales should we expect?
-- **Explain**: for every extra \\$1,000 of TV spend, how much do sales move?
-
-Same model, two readings. Keep both in mind as we go.
+| | | tools |
+|---|---|---|
+| **1. Data** | 200 markets, ad budgets and sales | `read_csv`, `corr`, `geom_smooth(method="lm")` |
+| **2. The scikit-learn recipe** | fit a line, read it, predict with it | `LinearRegression`, `.fit`, `.coef_`, `.predict`, `.score` |
+| **3. More terms** | more features, interactions, polynomials are all just more columns | `PolynomialFeatures` |
+| **4. The machine-learning turn** | how well does the model predict data it has not seen? | `train_test_split`, `root_mean_squared_error`, `make_pipeline` |
 """)
 
 code(t82, """
 import numpy as np
 import pandas as pd
-from plotnine import ggplot, aes, geom_point, geom_smooth, geom_abline, geom_hline, labs, theme_minimal
+from plotnine import ggplot, aes, geom_point, geom_smooth, geom_line, labs, theme_minimal
 from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.metrics import root_mean_squared_error
 """)
 
 md(t82, """
 ---
-## 1. The question and the data
+## 1. Data
 
-**The business question.** A company advertises a product in 200 different markets. In each market it
-spends some budget on **TV**, **radio** and **newspaper** ads, and records the product's **sales**.
-The marketing team wants to know: *which channel is worth the money, and what sales should we expect
-from a given budget?*
+**Question.** A product is advertised in 200 markets with different **TV**, **radio** and **newspaper**
+budgets (in \\$1,000s). Which budgets move **sales** (1,000s of units), and what sales should a new budget
+produce?
 
-**The data.** One row per market. The budgets are in thousands of dollars; `sales` is in thousands of
-units. (This is the Advertising data set from *An Introduction to Statistical Learning*; it is read from
-the book's website, and a copy sits in the course repository as `assignments/Data/advertising.csv`.)
+One row per market. (The Advertising data from *An Introduction to Statistical Learning*; a copy is in the
+course repo as `assignments/Data/advertising.csv`.)
 """)
 
 code(t82, """
@@ -104,128 +106,42 @@ ads.head()
 """ % DATA_URL)
 
 md(t82, """
-✅ **Checkpoint 1.** What is the **observational unit** (what does one row represent)? Which column is the
-**outcome** we want to predict or explain, and which columns are candidate **features** (explanatory
-variables)? Are they quantitative or categorical?
-""")
-
-answer(t82, """
-One row is one **market** (200 of them). The outcome is **`sales`** (thousands of units). The candidate
-features are **`TV`**, **`radio`** and **`newspaper`** — all three are **quantitative** (budgets in
-thousands of dollars), which is what today's regression needs. Nothing here is categorical.
-""")
-
-md(t82, """
----
-## 2. Summary statistics
-
-Before any model: how big are the numbers, and which feature *moves with* sales?
+The usual quick look: correlations, and the outcome against the strongest feature with a least-squares
+line (`method="lm"`).
 """)
 
 code(t82, """
-ads.«describe»().round(2)
-""")
-
-md(t82, """
-A **correlation** is one number per pair of columns, between −1 and 1: how tightly the two move together
-along a straight line. `.corr()` gives every pair at once.
-""")
-
-code(t82, """
-ads.«corr»().round(3)
-""")
-
-md(t82, """
-✅ **Checkpoint 2.** (a) Which feature has the strongest correlation with `sales`? Which the weakest?
-(b) `TV` and `radio` have a correlation of about 0.05. What does that tell you about how the company
-*allocates* its budgets across the two channels? (c) The average TV budget is about \\$147,000 and the
-average sales figure is about 14,000 units. Can a correlation tell you *how many units* an extra
-\\$1,000 of TV buys? Why or why not?
-""")
-
-answer(t82, """
-(a) **TV** is strongest (0.78), then radio (0.58); **newspaper** is weakest (0.23). (b) Close to zero: markets
-with big TV budgets are not systematically markets with big radio budgets — the two are allocated more or
-less independently. That matters in section 5, because it means each channel's effect can be separated
-cleanly. (c) **No.** Correlation is unit-free: it says how *tight* the straight-line relationship is, not how
-*steep*. "Units of sales per \\$1,000 of TV" is a slope, and a slope is what regression gives us.
-""")
-
-md(t82, """
----
-## 3. Visualisation: look before you fit
-
-Two quantitative variables → a **scatterplot** (Topic 2.1). Put the feature on *x* and the outcome on *y*:
-the plot should read "as TV spend goes up, what happens to sales?"
+ads.«corr»().round(2)
 """)
 
 code(t82, """
 (ggplot(ads, aes(x=«"TV"», y=«"sales"»))
  + geom_point(alpha=0.6)
- + labs(x="TV budget ($1,000s)", y="Sales (1,000s of units)", title="200 markets")
+ + geom_smooth(method="lm", se=False, color="firebrick")
+ + labs(x="TV budget ($1,000s)", y="Sales (1,000s of units)")
  + theme_minimal())
-""")
-
-md(t82, """
-`geom_smooth(method="lm")` draws the **least-squares line** (lm = linear model) through the cloud. It is a
-preview of what we are about to compute by hand: plotnine fits the same line scikit-learn will.
-""")
-
-code(t82, """
-(ggplot(ads, aes(x="TV", y="sales"))
- + geom_point(alpha=0.6)
- + «geom_smooth»(method="lm", se=False, color="firebrick")
- + labs(x="TV budget ($1,000s)", y="Sales (1,000s of units)", title="Sales vs TV with the least-squares line")
- + theme_minimal())
-""")
-
-md(t82, """
-✅ **Checkpoint 3.** (a) Describe the relationship in one sentence: direction, roughly linear or not,
-tight or loose. (b) Look at the *spread* of the points around the line at TV ≈ 25 and at TV ≈ 275. Is it the
-same? What would that mean for how confident you are in a prediction at each end?
-""")
-
-answer(t82, """
-(a) **Positive, roughly linear, moderately tight**: markets that spend more on TV sell more, and a straight
-line is a reasonable summary, though the points scatter a few thousand units either side of it. (b) **No** —
-the cloud is narrow at low TV budgets and fans out at high ones. A prediction for a \\$25,000 market will
-usually be closer to the truth than one for a \\$275,000 market; the line is equally *unbiased* at both ends
-but the *uncertainty* is larger on the right. (The textbook name for this is *heteroscedasticity*; today the
-point is just to notice it.)
 """)
 
 md(t82, """
 ---
-## 4. Analysis: simple linear regression
+## 2. The scikit-learn recipe
 
-### The model
+Every scikit-learn model works the same way. Learn it once:
 
-A straight line has two numbers: where it crosses the *y*-axis and how steep it is.
-
-$$\\text{sales} \\approx \\beta_0 + \\beta_1 \\cdot \\text{TV}$$
-
-**Least squares** picks the $\\beta_0$ (intercept) and $\\beta_1$ (slope) that make the vertical gaps
-between the points and the line — the **residuals** — as small as possible in total (squared). That is all
-`LinearRegression` does.
-
-### The four calls
-
-Every scikit-learn model follows the same pattern — learn it once, reuse it for every model in the rest of
-the course:
-
-| step | code | what it does |
+| step | code | |
 |---|---|---|
-| 1. choose | `model = LinearRegression()` | an empty model, nothing learned yet |
-| 2. fit | `model.fit(X, y)` | find the best $\\beta$s for features `X` and outcome `y` |
-| 3. read | `model.intercept_`, `model.coef_` | the fitted numbers (the trailing `_` means "learned from data") |
-| 4. use | `model.predict(X_new)`, `model.score(X, y)` | predictions for new rows; $R^2$ on the data |
+| choose | `model = LinearRegression()` | an empty model |
+| fit | `model.fit(X, y)` | learn the coefficients from data |
+| read | `model.intercept_`, `model.coef_` | the trailing `_` means "learned from data" |
+| use | `model.predict(X_new)`, `model.score(X, y)` | predictions; $R^2$ |
 
-**One rule to remember:** `X` must be **two-dimensional** — a DataFrame, even with one column — because
-scikit-learn always thinks of features as a *table* with one column per feature. `y` is a Series.
+**Vocabulary.** `X` is the table of **features** (explanatory variables), `y` is the **target** (response).
+`X` must be **2-D** — a DataFrame, even with one column — because features are always a table with one
+column per feature. `y` is a Series.
 """)
 
 code(t82, """
-X = ads[[«"TV"»]]          # double brackets -> DataFrame (2-D), one feature column
+X = ads[[«"TV"»]]          # double brackets -> DataFrame (2-D)
 y = ads[«"sales"»]         # single brackets -> Series (1-D)
 print(type(X).__name__, X.shape, "|", type(y).__name__, y.shape)
 """)
@@ -234,227 +150,194 @@ code(t82, """
 model_tv = «LinearRegression»()
 model_tv.«fit»(X, y)
 print("intercept:", round(model_tv.intercept_, 4))
-print("slope:    ", model_tv.coef_.round(4))
+print("coef:     ", model_tv.coef_.round(4))
+print("R²:       ", round(model_tv.score(X, y), 3))
 """)
 
 md(t82, """
-Here is what happens when you forget the double brackets. The error message is long; the important words
-are *2D array* and *reshape*.
+The error everyone hits once — single brackets give a 1-D Series. The key words in the message are
+*2-dimensional* and *DataFrame*.
 """)
 
 code(t82, """
-LinearRegression().fit(ads["TV"], ads["sales"])     # 1-D feature -> error
+LinearRegression().fit(ads["TV"], ads["sales"])     # 1-D -> error
 """, raises=True)
 
 md(t82, """
-### Explain: reading the two numbers
-
-$$\\widehat{\\text{sales}} = 7.03 + 0.0475 \\cdot \\text{TV}$$
-
-- **Slope 0.0475**: every extra **\\$1,000** of TV budget is associated with about **0.0475 thousand = 47.5
-  more units** sold, on average. (Or: \\$1,000 of TV buys 47.5 units; \\$21,000 buys about 1,000 units.)
-- **Intercept 7.03**: a market with **zero** TV spend is predicted to sell about **7,030 units**. Here the
-  intercept is meaningful because some markets really do spend close to nothing on TV (min 0.7). When
-  *x* = 0 is far outside the data, the intercept is just where the line happens to cross and should not be
-  read as a prediction.
-""")
-
-md(t82, """
-### Predict: new budgets in, expected sales out
-
-`predict` takes a table with the **same columns** as `X` and returns one prediction per row. Build the new
-table with a dictionary so the column name matches.
+**Predict** takes a DataFrame with the **same column names** as `X`, one row per new case.
 """)
 
 code(t82, """
-new_markets = pd.DataFrame({"TV": [0, 100, 200, 300]})
-new_markets["predicted_sales"] = model_tv.«predict»(new_markets[["TV"]])
-new_markets
+new = pd.DataFrame({"TV": [0, 100, 200, 300]})
+new["pred_sales"] = model_tv.«predict»(new[["TV"]])
+new
 """)
 
 md(t82, """
-✅ **Checkpoint 4.** (a) Check the prediction for TV = 100 by hand from the intercept and slope. (b) The
-predictions go up by the same amount from 100 to 200 as from 200 to 300. Why must that be true for this
-model? (c) The largest TV budget in the data is about \\$296,000. Should you trust the prediction at
-TV = 300? At TV = 1,000?
+✅ **Checkpoint 1.** (a) Write the fitted equation and check the prediction at TV = 100 by hand.
+(b) In one sentence, read the TV coefficient in the data's units.
 """)
 
 answer(t82, """
-(a) 7.03 + 0.0475 × 100 = **11.79** thousand units — matches the table. (b) A straight line has one slope,
-so every extra \\$100,000 adds the same 4.75 thousand units no matter where you start. That is the model's
-*assumption*, not a fact about advertising — real returns usually diminish. (c) TV = 300 is just beyond the
-data, so the prediction is a mild **extrapolation** — plausible but unverified. TV = 1,000 is three times the
-largest budget ever observed; the line will happily return 54.6 thousand units, but nothing in the data
-supports that number. Predictions are only as good as the range of *x* the line was fitted on.
-""")
-
-md(t82, """
-### How good is the line? Residuals and $R^2$
-
-A **residual** is actual minus predicted: how far a market's real sales sit above (+) or below (−) the line.
-""")
-
-code(t82, """
-ads["pred_tv"] = model_tv.predict(X)
-ads["resid_tv"] = ads[«"sales"»] - ads[«"pred_tv"»]
-ads[["TV", "sales", "pred_tv", "resid_tv"]].head().round(2)
-""")
-
-code(t82, """
-(ggplot(ads, aes(x="TV", y="resid_tv"))
- + geom_point(alpha=0.6)
- + geom_hline(yintercept=0, color="firebrick")
- + labs(x="TV budget ($1,000s)", y="Residual (actual − predicted)", title="Residuals: what the TV line misses")
- + theme_minimal())
-""")
-
-md(t82, """
-`score(X, y)` returns **$R^2$**: the share of the variation in `sales` that the line accounts for, between 0
-(the line explains nothing — you might as well predict the mean) and 1 (every point sits on the line).
-""")
-
-code(t82, """
-r2_tv = model_tv.«score»(X, y)
-rmse_tv = np.sqrt((ads["resid_tv"] ** 2).mean())
-print(f"R² = {r2_tv:.3f}   typical miss (RMSE) = {rmse_tv:.2f} thousand units   (sd of sales = {ads['sales'].std():.2f})")
-""")
-
-md(t82, """
-✅ **Checkpoint 5.** (a) In one sentence, what does $R^2 = 0.61$ say to the marketing team? (b) The typical
-miss is about 3,200 units while sales average 14,000 — is this line useful? (c) What is left in the
-residuals — pure noise, or something the model has not used yet? (Hint: there are two other columns.)
-""")
-
-answer(t82, """
-(a) "TV spend alone accounts for about **61%** of the market-to-market variation in sales; the other 39%
-comes from things this line does not know about." (b) **Useful but rough**: a miss of ±3,200 on an
-average of 14,000 is about ±23%. Good enough to rank markets, not good enough to set a budget to the
-nearest thousand. (c) Some of the residual is noise, but some is **radio and newspaper**: a market that
-also spends heavily on radio should sit *above* the TV line, and one that spends nothing *below* it. The
-TV model lumps all of that into the residual. That is exactly what section 5 fixes.
+(a) sales ≈ 7.03 + 0.0475 · TV; at TV = 100: 7.03 + 4.75 = **11.79** thousand units (matches the table).
+(b) Each extra \\$1,000 of TV budget is associated with about 47.5 more units sold.
 """)
 
 md(t82, """
 ---
-## 5. Multiple linear regression: two quantitative features
+## 3. More terms are just more columns
 
-### The model
-
-Add a second slope:
-
-$$\\text{sales} \\approx \\beta_0 + \\beta_1 \\cdot \\text{TV} + \\beta_2 \\cdot \\text{radio}$$
-
-In code the **only change** is that `X` has two columns. Same four calls.
+A second feature, an interaction, a squared term: in scikit-learn these are all the same move — **put
+another column in `X`**. Nothing else in the recipe changes.
 """)
 
 code(t82, """
 X2 = ads[[«"TV", "radio"»]]
-model_tv_radio = LinearRegression().fit(X2, y)
-print("intercept:", round(model_tv_radio.intercept_, 3))
-print(pd.Series(model_tv_radio.coef_, index=X2.columns).round(4))
+model_2 = LinearRegression().fit(X2, y)
+print(pd.Series(model_2.coef_, index=X2.columns).round(4))
+print("R²:", round(model_2.score(X2, y), 3))
 """)
 
 md(t82, """
-### Explain: a slope now means "holding the other feature fixed"
-
-$$\\widehat{\\text{sales}} = 2.92 + 0.0458 \\cdot \\text{TV} + 0.188 \\cdot \\text{radio}$$
-
-- **TV 0.0458**: among markets with the *same* radio budget, each extra \\$1,000 of TV is associated with
-  about 46 more units.
-- **radio 0.188**: among markets with the *same* TV budget, each extra \\$1,000 of radio is associated with
-  about **188** more units — four times the TV effect per dollar.
-- **Intercept 2.92**: predicted sales with no TV and no radio. Smaller than before (7.03) because the old
-  intercept was quietly absorbing the average radio effect.
-
-That phrase — *holding the other feature constant* — is what multiple regression adds. The TV slope barely
-moved (0.0475 → 0.0458) because TV and radio budgets are nearly uncorrelated (Checkpoint 2b), so there was
-little to disentangle.
-""")
-
-md(t82, """
-### Predict: the new table needs both columns, in the same order
+An **interaction** is a column you make yourself:
 """)
 
 code(t82, """
-plan = pd.DataFrame({"TV": [100, 100, 200, 0], "radio": [20, 40, 0, 200]})
-plan["predicted_sales"] = model_tv_radio.predict(plan[[«"TV", "radio"»]])
-plan.round(2)
-""")
-
-code(t82, """
-r2_2 = model_tv_radio.«score»(X2, y)
-ads["resid_tv_radio"] = y - model_tv_radio.predict(X2)
-rmse_2 = np.sqrt((ads["resid_tv_radio"] ** 2).mean())
-print(f"TV only:     R² = {r2_tv:.3f}   RMSE = {rmse_tv:.2f}")
-print(f"TV + radio:  R² = {r2_2:.3f}   RMSE = {rmse_2:.2f}")
+ads["TV_x_radio"] = ads[«"TV"»] * ads[«"radio"»]
+X3 = ads[["TV", "radio", "TV_x_radio"]]
+model_3 = LinearRegression().fit(X3, y)
+print(pd.Series(model_3.coef_, index=X3.columns).round(5))
+print("R²:", round(model_3.score(X3, y), 3))
 """)
 
 md(t82, """
-✅ **Checkpoint 6.** (a) Rows 1 and 2 of `plan` have the same TV budget and differ by \\$20,000 of radio.
-Check the difference in predicted sales by hand from the radio slope. (b) Row 3 (all TV) and row 4 (all
-radio) spend the same \\$200,000. The model prefers radio by a mile — should the company move its entire
-budget to radio? Name one reason to be careful. (c) $R^2$ went from 0.61 to 0.90 and the typical miss
-halved. In plain words, what did adding radio buy us?
+**Polynomial terms** can be made the same way (`ads["TV"] ** 2`), or generated: `PolynomialFeatures(degree=2)`
+builds every term up to that degree — squares *and* cross-products — from the columns you give it.
+`fit_transform` returns a NumPy array; `get_feature_names_out()` tells you which column is which.
+""")
+
+code(t82, """
+poly = «PolynomialFeatures»(degree=2, include_bias=False)
+X_poly = poly.fit_transform(ads[["TV", "radio"]])
+print(X_poly.shape)
+print(poly.get_feature_names_out())
+""")
+
+code(t82, """
+model_poly = LinearRegression().fit(X_poly, y)
+print(pd.Series(model_poly.coef_, index=poly.get_feature_names_out()).round(5))
+print("R²:", round(model_poly.score(X_poly, y), 3))
+""")
+
+md(t82, """
+✅ **Checkpoint 2.** $R^2$ went 0.61 → 0.90 → 0.97 → 0.99 as terms were added. Can $R^2$ on the fitted data
+ever go *down* when you add a column? What does that imply about using it to choose between models?
 """)
 
 answer(t82, """
-(a) 0.188 × 20 = **3.76** thousand units: 11.26 → 15.02 in the table. (b) **Not on this evidence alone.**
-The data contain no market that spends \\$200,000 on radio (the maximum is about \\$50,000), so row 4 is a
-wild **extrapolation** — the line is straight, reality probably is not (radio audiences saturate). And this
-is observational data: markets *chose* their budgets, so the slope is an association, not a guaranteed
-return on a budget *we* set. A sensible reading is "radio looks under-used relative to TV; test a modest
-shift." (c) About **29 percentage points** of the variation that the TV line called "noise" was really the
-radio budget. Knowing both budgets lets us predict a market's sales to within about ±1,700 units instead
-of ±3,200 — a prediction the team could plan around.
-""")
-
-md(t82, """
-### What about newspaper?
-
-Add the third feature the same way and look at its slope.
-""")
-
-code(t82, """
-X3 = ads[["TV", "radio", "newspaper"]]
-model_all = LinearRegression().fit(X3, y)
-print(pd.Series(model_all.coef_, index=X3.columns).round(4))
-print(f"R² = {model_all.score(X3, y):.3f}")
-""")
-
-md(t82, """
-✅ **Checkpoint 7.** Newspaper's correlation with sales was 0.23 (Checkpoint 2), yet its slope *holding TV
-and radio fixed* is about zero and $R^2$ does not move. How can both be true? (Hint: newspaper and radio
-have correlation 0.35.)
-""")
-
-answer(t82, """
-Newspaper spend tends to travel **with radio spend** (correlation 0.35). On its own, newspaper looks mildly
-related to sales only because the markets that buy newspaper ads also buy radio ads, and *radio* sells. Once
-radio is in the model, newspaper has nothing left to explain: its slope (−0.001) is zero for practical
-purposes and $R^2$ stays at 0.897. The lesson: a feature's slope in a multiple regression is its effect
-**after** the other features have had their say, which can be very different from its correlation alone.
+No — a new column can be given a coefficient of zero, so the fit can only stay the same or improve. Fitted
+$R^2$ therefore always favours the bigger model and cannot tell you when you have gone too far. That is the
+problem section 4 solves.
 """)
 
 md(t82, """
 ---
-## Predict vs explain: the same line, two jobs
+## 4. The machine-learning turn
 
-| | Predict | Explain |
-|---|---|---|
-| **Question** | What sales should we expect for *this* budget? | How much does sales move per \\$1,000 of *this* channel? |
-| **Looks at** | `model.predict(new_X)` | `model.coef_` (and `intercept_`) |
-| **Judged by** | $R^2$, typical miss (RMSE), honest range of *x* | sign, size and units of each slope; what is held constant |
-| **Main danger** | extrapolating beyond the data | reading an association as a cause |
+Up to now the model was judged on the **same rows it was fitted on**. Machine learning asks a different
+question: *how well does the model predict rows it has never seen?* The vocabulary:
 
+| statistics says | machine learning says |
+|---|---|
+| explanatory variables, response | **features** `X`, **target** `y` |
+| estimate the coefficients | **fit** / **train** the model |
+| coefficients | **parameters** (learned by `.fit`) |
+| model specification (which terms, which degree) | **hyperparameters** (chosen by *you*, before fitting) |
+| goodness of fit | **training error** vs **test error** |
+
+### Train / test split
+
+Hold some rows back. Fit on the **training** rows; measure error on the **test** rows the model never saw.
+`random_state` fixes the shuffle so everyone gets the same split.
+""")
+
+code(t82, """
+train, test = «train_test_split»(ads, test_size=0.25, random_state=5544)
+print(train.shape, test.shape)
+""")
+
+md(t82, """
+The error measure is **RMSE** (root mean squared error): the typical size of a miss, in the units of `y`.
+""")
+
+code(t82, """
+features = ["TV", "radio"]
+model = LinearRegression().fit(train[features], train[«"sales"»])
+
+rmse_train = root_mean_squared_error(train["sales"], model.predict(train[features]))
+rmse_test = root_mean_squared_error(«test»["sales"], model.predict(«test»[features]))
+print(f"train RMSE = {rmse_train:.3f}   test RMSE = {rmse_test:.3f}   (thousand units)")
+""")
+
+md(t82, """
+### Overfitting: turn the degree up and watch both errors
+
+`make_pipeline` chains steps into one model object that still has `.fit` and `.predict`: scale the
+features (polynomials of raw budgets in the hundreds are numerically unstable), build the polynomial
+terms, fit the line. The **degree is a hyperparameter**: we loop over it and record training and test
+RMSE for each.
+""")
+
+code(t82, """
+rows = []
+for degree in range(1, 11):
+    pipe = make_pipeline(StandardScaler(), PolynomialFeatures(degree=degree), LinearRegression())
+    pipe.«fit»(train[features], train["sales"])
+    rows.append({"degree": degree,
+                 "n_terms": pipe[-1].coef_.size,
+                 "train": root_mean_squared_error(train["sales"], pipe.predict(train[features])),
+                 "test": root_mean_squared_error(test["sales"], pipe.predict(«test»[features]))})
+errors = pd.DataFrame(rows)
+errors.round(3)
+""")
+
+code(t82, """
+errors_long = errors.melt(id_vars="degree", value_vars=["train", "test"], var_name="data", value_name="rmse")
+(ggplot(errors_long, aes(x="degree", y="rmse", color="data"))
+ + geom_line() + geom_point()
+ + labs(x="Polynomial degree (hyperparameter)", y="RMSE (thousand units)", color="")
+ + theme_minimal())
+""")
+
+md(t82, """
+✅ **Checkpoint 3.** (a) Describe the two curves. (b) Which degree would you choose, and why is that not
+the degree with the lowest *training* error? (c) Name the phenomenon on the right-hand side of the plot.
+""")
+
+answer(t82, """
+(a) Training RMSE falls at every step (0.25 by degree 10): more terms always fit the fitted rows better.
+Test RMSE drops sharply from degree 1 to 2, bottoms out around **degree 3** (≈ 0.37), then climbs back to
+≈ 0.71 by degree 10. (b) Degree 2 or 3 — the lowest **test** error, with the simpler model preferred when
+they are close. Training error keeps rewarding complexity, so it cannot be used to choose; that was
+Checkpoint 2. (c) **Overfitting**: past degree 3 the model is fitting the noise in the 150 training rows
+(66 terms for 150 rows by degree 10), and that does not carry over to new markets.
+""")
+
+md(t82, """
+*One test split is one random draw.* The standard fix is **cross-validation** — several splits, averaged —
+which is where the next topic starts.
+
+---
 ## The lines to keep
 
 | | |
 |---|---|
-| **Before the model** | `ads.corr()` for *which* features; a scatterplot with `geom_smooth(method="lm")` for *what shape* |
-| **Fit** | `model = LinearRegression().fit(X, y)` — `X` is a DataFrame (double brackets), `y` a Series |
-| **Explain** | `model.intercept_`, `model.coef_` — "per one-unit increase in *x*, holding the others fixed" |
-| **Predict** | `model.predict(new_df[same_columns])`; `model.score(X, y)` is $R^2$; residual = actual − predicted |
-| **Add a feature** | one more column in `X`; everything else is identical |
+| **Recipe** | `model = LinearRegression().fit(X, y)` → `model.intercept_`, `model.coef_` → `model.predict(new_df)`, `model.score(X, y)` |
+| **`X` is a DataFrame** | double brackets, even for one feature; `predict` needs the same column names |
+| **More terms** | more columns in `X`: a second feature, `ads["a"] * ads["b"]`, or `PolynomialFeatures(degree=d)` |
+| **Train / test** | `train_test_split(df, test_size=0.25, random_state=…)`; fit on train, measure on test |
+| **Choose a hyperparameter** | loop over it, compare **test** error; the fitted-data error only ever goes down |
+| **Pipeline** | `make_pipeline(StandardScaler(), PolynomialFeatures(d), LinearRegression())` is one model with `.fit` / `.predict` |
 
 Course site: [%s](%s).
 """ % (SITE, SITE))
@@ -525,8 +408,8 @@ def execute(path: Path) -> None:
 
 TOPICS = [
     (t82, WEEK / "GSB5544_Topic_8_2_Regression",
-     "# GSB 5544 — Topic 8.2: Regression  \n"
-     "*Does advertising move sales? Fill each `____` blank as you work; the ✅ checks ask for a sentence or two.*"),
+     "# GSB 5544 — Topic 8.2: Regression in Python  \n"
+     "*How to run regression in Python, and how it introduces machine learning. Fill each `____` blank as you work; the ✅ checks ask for a sentence or two.*"),
 ]
 
 

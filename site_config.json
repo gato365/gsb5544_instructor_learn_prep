@@ -201,10 +201,10 @@
       ]
     },
     {
-      "label": "Week 8 — Regression",
+      "label": "Week 8 — Regression in Python and the First Ideas of Machine Learning",
       "items": [
         {
-          "title": "Topic 8.2 — Regression with scikit-learn (Does advertising move sales? simple → multiple linear regression)",
+          "title": "Topic 8.2 — Regression in Python (scikit-learn recipe, more terms as more columns, train/test split, overfitting)",
           "student": "assignments/practice_activities/week_8/GSB5544_Topic_8_2_Regression-empty.ipynb",
           "solution": "assignments/practice_activities/week_8/GSB5544_Topic_8_2_Regression-solution.ipynb",
           "publish_solution": true

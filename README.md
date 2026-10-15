@@ -35,7 +35,7 @@ Teaching materials for GSB 5544 (Cal Poly).
   - Topic 7.1 (Association Rules: *Who gets played together?* — simulated playlists of Latin and hip-hop artists; support, confidence, lift, `apriori`) — built by `tools/build_week7_topics.py`
   - `GSB5544_PA_7_1_Association_Rules.ipynb` — student notebook (Groceries data), kept as received; the `-solution.ipynb` instructor key is built by `tools/build_week7_pas.py` (needs `mlxtend` and a network connection). See `week_7/README.md`
 - `assignments/practice_activities/week_8/`
-  - Topic 8.2 (Regression: *Does advertising move sales?* — summary stats, scatterplot, simple linear regression with scikit-learn, predict vs explain, multiple linear regression with TV + radio) — built by `tools/build_week8_topics.py`. See `week_8/README.md`
+  - Topic 8.2 (Regression in Python: the scikit-learn recipe on the Advertising data, more terms as more columns, then ML vocabulary — train/test split, RMSE, overfitting via polynomial degree). No regression review by design; see the scope note in `week_8/README.md`. Built by `tools/build_week8_topics.py`
 - `assignments/labs/`, `assignments/quizzes/`
 
 `*-empty.ipynb` notebooks contain `____` blanks for students; `*-solution.ipynb` files are completed **and executed**, so GitHub renders them with outputs.
