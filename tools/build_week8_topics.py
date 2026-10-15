@@ -79,7 +79,7 @@ None of that is re-taught here. Two things are new:
 code(t82, """
 import numpy as np
 import pandas as pd
-from plotnine import ggplot, aes, geom_point, geom_smooth, geom_line, labs, theme_minimal
+from plotnine import ggplot, aes, geom_point, geom_smooth, geom_line, labs, scale_x_continuous, theme_minimal
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
@@ -305,6 +305,7 @@ code(t82, """
 errors_long = errors.melt(id_vars="degree", value_vars=["train", "test"], var_name="data", value_name="rmse")
 (ggplot(errors_long, aes(x="degree", y="rmse", color="data"))
  + geom_line() + geom_point()
+ + scale_x_continuous(breaks=range(1, 11))
  + labs(x="Polynomial degree (hyperparameter)", y="RMSE (thousand units)", color="")
  + theme_minimal())
 """)
