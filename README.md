@@ -10,6 +10,7 @@ Teaching materials for GSB 5544 (Cal Poly).
   - `sc_crime_by_year_wide.csv` — offenses by `crime_cat` × year from the full SC file, in *wide* (untidy) form for the tidy-data lesson
   - `nba_teams.csv` — the 30 current NBA teams (abbreviation, name, city, conference, division); lookup table for the Week 3 joins
   - `franchise_moves.csv` — retired abbreviations in the Kobe game log (SEA, NJN, VAN, …) mapped to the current franchise; used to fix join keys
+  - `advertising.csv` — the ISLR Advertising data (200 markets; TV, radio, newspaper budgets in $1,000s; sales in 1,000s of units); backup copy for Topic 8.2, which reads it from statlearning.com
 - `assignments/practice_activities/week_1/`
   - `pandas_practice_activity/` — pandas notebooks
   - `numpy_practice_activity/` — numpy notebooks
@@ -33,6 +34,8 @@ Teaching materials for GSB 5544 (Cal Poly).
 - `assignments/practice_activities/week_7/`
   - Topic 7.1 (Association Rules: *Who gets played together?* — simulated playlists of Latin and hip-hop artists; support, confidence, lift, `apriori`) — built by `tools/build_week7_topics.py`
   - `GSB5544_PA_7_1_Association_Rules.ipynb` — student notebook (Groceries data), kept as received; the `-solution.ipynb` instructor key is built by `tools/build_week7_pas.py` (needs `mlxtend` and a network connection). See `week_7/README.md`
+- `assignments/practice_activities/week_8/`
+  - Topic 8.2 (Regression: *Does advertising move sales?* — summary stats, scatterplot, simple linear regression with scikit-learn, predict vs explain, multiple linear regression with TV + radio) — built by `tools/build_week8_topics.py`. See `week_8/README.md`
 - `assignments/labs/`, `assignments/quizzes/`
 
 `*-empty.ipynb` notebooks contain `____` blanks for students; `*-solution.ipynb` files are completed **and executed**, so GitHub renders them with outputs.
