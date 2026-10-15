@@ -208,6 +208,12 @@
           "student": "assignments/practice_activities/week_8/GSB5544_Topic_8_2_Regression-empty.ipynb",
           "solution": "assignments/practice_activities/week_8/GSB5544_Topic_8_2_Regression-solution.ipynb",
           "publish_solution": true
+        },
+        {
+          "title": "PA 8.2 — Linear Regression Models (90s song recognition: linear, log, quadratic; FEV: dummies and interactions)",
+          "student": "assignments/practice_activities/week_8/GSB_5544_PA_8_2_Linear_Regression_Models.ipynb",
+          "solution": "assignments/practice_activities/week_8/GSB_5544_PA_8_2_Linear_Regression_Models-solution.ipynb",
+          "publish_solution": true
         }
       ]
     }
