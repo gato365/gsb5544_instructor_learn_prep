@@ -216,6 +216,28 @@
           "publish_solution": true
         }
       ]
+    },
+    {
+      "label": "Week 9 — K-Nearest Neighbors and Decision Trees for Regression",
+      "items": [
+        {
+          "title": "Algorithms in motion — animated linear regression, KNN and decision trees on eight houses (pairs with Topic 9.1)",
+          "page": "assignments/practice_activities/week_9/algorithms.html",
+          "page_dest": "week_9/algorithms.html"
+        },
+        {
+          "title": "Topic 9.1 — KNN and Decision Trees for Regression (animations, the scikit-learn recipe, pipelines, review questions)",
+          "student": "assignments/practice_activities/week_9/GSB5544_Topic_9_1_KNN_and_Decision_Trees-empty.ipynb",
+          "solution": "assignments/practice_activities/week_9/GSB5544_Topic_9_1_KNN_and_Decision_Trees-solution.ipynb",
+          "publish_solution": true
+        },
+        {
+          "title": "PA 9.1 — K-Nearest Neighbors and Decision Trees for Regression (Bordeaux wine, Ames housing)",
+          "student": "assignments/practice_activities/week_9/GSB_5544_PA_9_1_K_Nearest_Neighbors_for_Regression.ipynb",
+          "solution": "assignments/practice_activities/week_9/GSB_5544_PA_9_1_K_Nearest_Neighbors_for_Regression-solution.ipynb",
+          "publish_solution": true
+        }
+      ]
     }
   ]
 }

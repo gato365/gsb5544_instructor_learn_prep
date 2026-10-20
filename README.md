@@ -37,6 +37,9 @@ Teaching materials for GSB 5544 (Cal Poly).
 - `assignments/practice_activities/week_8/`
   - Topic 8.2 (Regression in Python: the scikit-learn recipe on the Advertising data, more terms as more columns, then ML vocabulary — train/test split, RMSE, overfitting via polynomial degree). No regression review by design; see the scope note in `week_8/README.md`. Built by `tools/build_week8_topics.py`
   - `GSB_5544_PA_8_2_Linear_Regression_Models.ipynb` — student notebook (90s song recognition: linear, log, quadratic models; FEV: dummies and an interaction), kept as received; the `-solution.ipynb` instructor key is built by `tools/build_week8_pas.py` against the live data
+- `assignments/practice_activities/week_9/`
+  - Topic 9.1 (KNN and Decision Trees for Regression: animations of the fitted line, the k nearest neighbors and the SSE-scored splits on eight houses, the scikit-learn recipe compared across the three models, a Pipeline definition box, review questions) — built by `tools/build_week9_topics.py`; pairs with `algorithms.html` (**Algorithms in motion**, an interactive page served by GitHub Pages at `week_9/algorithms.html`, checked against scikit-learn by `tools/check_week9_page.py`)
+  - `GSB_5544_PA_9_1_K_Nearest_Neighbors_for_Regression.ipynb` — student notebook (wine and Ames data), kept untouched as received; the `-solution.ipynb` instructor key (sketches drawn by code, five-beat answers for the coding parts) is built by `tools/build_week9_pas.py`. See `week_9/README.md`
 - `assignments/labs/`, `assignments/quizzes/`
 
 `*-empty.ipynb` notebooks contain `____` blanks for students; `*-solution.ipynb` files are completed **and executed**, so GitHub renders them with outputs.

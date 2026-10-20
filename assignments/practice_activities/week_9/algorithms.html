@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Algorithms in motion</title>
+<meta name="description" content="Step-by-step animations of linear regression, k-nearest neighbors and decision-tree regression on eight houses, with the matching scikit-learn code.">
+<style>
+:root{color-scheme:light;--bg:#f5f6f9;--panel:#fff;--fg:#192538;--line:#ccd4df;--accent:#225ab5;--active:#e1edff;--muted:#5d6a7e;--ok:#1d7a3e;--okbg:#e6f5ea;--bad:#b3261e;--badbg:#fbe9e7;--warn:#7a5b00;--warnbg:#fff3b0;--pt:#1f4e9c;--new:#b84e00;--fit:#b3261e;--resid:#5b2a86;--nb:#1d7a3e;--region1:#dbe9ff;--region2:#ffe0c2;--region3:#d9f2d9;--region4:#fff3b0;--grid:#e6eaf0}
+:root[data-theme=dark]{color-scheme:dark;--bg:#151b25;--panel:#202938;--fg:#edf2fa;--line:#465369;--accent:#92baff;--active:#304768;--muted:#a3b0c4;--ok:#7fd49a;--okbg:#1d3a28;--bad:#ff9b93;--badbg:#4a2622;--warn:#ffe27a;--warnbg:#5a4d12;--pt:#9cc0ff;--new:#ffb46e;--fit:#ff9b93;--resid:#d2a8ff;--nb:#7fd49a;--region1:#23395a;--region2:#5b3a1c;--region3:#1f4a2c;--region4:#5a4d12;--grid:#2b3648}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#151b25;--panel:#202938;--fg:#edf2fa;--line:#465369;--accent:#92baff;--active:#304768;--muted:#a3b0c4;--ok:#7fd49a;--okbg:#1d3a28;--bad:#ff9b93;--badbg:#4a2622;--warn:#ffe27a;--warnbg:#5a4d12;--pt:#9cc0ff;--new:#ffb46e;--fit:#ff9b93;--resid:#d2a8ff;--nb:#7fd49a;--region1:#23395a;--region2:#5b3a1c;--region3:#1f4a2c;--region4:#5a4d12;--grid:#2b3648}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif}main{max-width:1120px;margin:auto;padding:28px}h1{font-size:32px;margin:0}h2{font-size:20px;margin:0 0 10px}h3{font-size:16px;margin:14px 0 6px}p{margin:8px 0 16px}header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}header small{letter-spacing:.12em;color:var(--accent)}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:22px 0}button,select{font:inherit;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--fg);padding:10px 14px;min-height:44px}button{cursor:pointer}button:disabled{opacity:.4;cursor:default}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}.primary{background:var(--accent);color:var(--bg);font-weight:600}#play{min-width:96px}.hint{font-size:13px;color:var(--muted);margin-left:auto}.small{font-size:13px;color:var(--muted)}
+.opt{display:flex;gap:8px;align-items:center}.opt.hidden{display:none}input[type=range]{width:150px;accent-color:var(--accent)}output{font-variant-numeric:tabular-nums;min-width:34px;font-weight:600}
+.stage{display:grid;grid-template-columns:3fr 2fr;gap:22px;align-items:start}.panel{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}th{font-weight:600}tr.active{background:var(--active);outline:2px solid var(--accent);outline-offset:-2px}tr.nb td{color:var(--nb);font-weight:600}tr.dim td{opacity:.45}
+.status{min-height:84px;padding:12px 0 0;color:var(--accent);font-weight:600}.progress{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin:4px 0 12px}.progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.why{border-left:3px solid var(--accent);padding-left:14px;margin:0 0 18px}
+svg{width:100%;height:auto;display:block}svg text{font:13px system-ui,sans-serif;fill:var(--fg)}svg .axis{stroke:var(--fg);stroke-width:1.2}svg .tick{stroke:var(--fg)}svg .gridline{stroke:var(--grid)}svg .lbl{font-size:12px;fill:var(--muted)}
+svg .pt{fill:var(--pt);stroke:var(--panel);stroke-width:1.5;transition:opacity .4s,r .3s}svg .pt.dim{opacity:.25}svg .pt.hi{fill:var(--nb);r:8}svg .ring{fill:none;stroke:var(--nb);stroke-width:2.5}
+svg .cand{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:6 5;opacity:.6}svg .fit{stroke:var(--fit);stroke-width:2.5;stroke-dasharray:900;stroke-dashoffset:900;animation:draw .9s ease-out forwards}svg .fit.quiet{animation:none;stroke-dashoffset:0}
+svg .resid{stroke:var(--resid);stroke-width:2.5}svg .resid.enter{stroke-dasharray:200;stroke-dashoffset:200;animation:draw .5s ease-out forwards}svg .rlbl{fill:var(--resid);font-weight:600;font-size:12px}
+svg .newpt{fill:var(--new);stroke:var(--panel);stroke-width:1.5}svg .newpt.enter{animation:drop .6s ease-out}svg .guide{stroke:var(--new);stroke-width:2;stroke-dasharray:5 4}svg .guide.enter{stroke-dasharray:600;stroke-dashoffset:600;animation:draw .7s ease-out forwards}svg .newlbl{fill:var(--new);font-weight:700}
+svg .dist{stroke:var(--nb);stroke-width:2}svg .dist.enter{stroke-dasharray:500;stroke-dashoffset:500;animation:draw .45s ease-out forwards}svg .dlbl{fill:var(--nb);font-size:11px;font-weight:600}svg .dist.far{stroke:var(--muted);opacity:.6}svg .dlbl.far{fill:var(--muted)}
+svg .step{fill:none;stroke:var(--fit);stroke-width:2.5}svg .step.enter{stroke-dasharray:2000;stroke-dashoffset:2000;animation:draw 1.4s ease-out forwards}
+svg .split{stroke:var(--fit);stroke-width:2;stroke-dasharray:6 4}svg .split.try{stroke:var(--muted)}svg .meanseg{stroke:var(--fit);stroke-width:3}svg .meanseg.try{stroke:var(--muted);stroke-dasharray:4 3}svg .region{opacity:.55}svg .region.on{stroke:var(--new);stroke-width:2;fill-opacity:1}
+svg .eq{font-weight:700;fill:var(--fit)}svg .sselbl{font-weight:700;fill:var(--muted)}svg .sselbl.best{fill:var(--fit)}
+.tree{margin-top:12px}.tree .node rect{fill:var(--panel);stroke:var(--line);stroke-width:1.5;rx:8}.tree .node.leaf rect{fill:var(--okbg);stroke:var(--ok)}.tree .node.on rect{stroke:var(--new);stroke-width:3}.tree .edge{stroke:var(--line);stroke-width:2}.tree .edge.on{stroke:var(--new);stroke-width:3}.tree text{font-size:12px;text-anchor:middle}.tree .elbl{fill:var(--muted);font-size:11px}
+.sselist{list-style:none;padding:0;margin:8px 0;font-size:14px;font-variant-numeric:tabular-nums}.sselist li{padding:3px 8px;border-radius:6px}.sselist li.best{background:var(--active);font-weight:700}.sselist li.cur{outline:2px solid var(--accent)}
+.code{margin-top:22px}pre{white-space:pre;overflow-x:auto;font:14px/1.65 ui-monospace,monospace;margin:12px 0}pre .ln{display:block;padding:0 8px;border-radius:4px}pre .ln.hl{background:var(--active);outline:2px solid var(--accent);outline-offset:-2px}pre .cm{color:var(--muted)}
+details{margin-top:14px}summary{cursor:pointer;min-height:40px;font-weight:600}footer{font-size:13px;margin-top:22px}a{color:var(--accent)}
+.recipe{margin-top:22px}.recipe table{font-size:13px}.recipe td,.recipe th{white-space:normal;vertical-align:top}.recipe code{font:13px ui-monospace,monospace;white-space:pre}.recipe td.same{color:var(--muted)}.recipe td.diff{background:var(--warnbg);color:var(--fg)}.recipe .legend{font-size:13px;color:var(--muted);margin:6px 0 10px}.recipe .legend i{display:inline-block;width:12px;height:12px;background:var(--warnbg);border:1px solid var(--line);vertical-align:-1px;margin-right:6px}
+.defbox{margin-top:22px;border:2px solid var(--accent);background:var(--active)}.defbox h2{display:flex;align-items:center;gap:10px}.defbox .tag{font-size:12px;letter-spacing:.08em;text-transform:uppercase;background:var(--accent);color:var(--bg);border-radius:4px;padding:2px 8px}.defbox ol{margin:6px 0 10px 20px}.defbox code{font:14px ui-monospace,monospace}
+.notice{display:grid;gap:8px;margin:12px 0 0}.notice div{padding:10px 12px;border-radius:8px;background:var(--active);font-size:14px}
+@keyframes draw{to{stroke-dashoffset:0}}@keyframes drop{from{transform:translateY(-40px);opacity:0}to{transform:none;opacity:1}}
+@media(max-width:760px){main{padding:16px}.stage{grid-template-columns:1fr}h1{font-size:26px}.toolbar{gap:8px}.panel{padding:12px}th,td{padding:7px 6px}.hint{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}svg .fit,svg .resid.enter,svg .guide.enter,svg .dist.enter,svg .step.enter{stroke-dashoffset:0!important}}
+</style></head><body><main>
+<header><div><small>PYTHON / SCIKIT-LEARN • EIGHT HOUSES</small><h1>Algorithms in motion</h1><p>Three ways to turn a house's size into a predicted price. Press <b>Play</b> and watch each algorithm make its prediction one step at a time; the Python panel highlights the line of scikit-learn code that does what you are watching. Drag the slider to move the new house, or change <code>k</code> and <code>max_depth</code>, and the whole demonstration recomputes.</p></div><button id="theme" aria-label="Switch color theme">Theme: Auto</button></header>
+
+<div class="toolbar"><label for="algo">Algorithm</label><select id="algo"><option value="linear-regression">Linear regression</option><option value="knn">K-nearest neighbors</option><option value="decision-tree">Decision tree</option></select>
+<span class="opt" id="opt-k"><label for="k">k</label><select id="k"><option>1</option><option>2</option><option selected>3</option><option>5</option><option>8</option></select></span>
+<span class="opt" id="opt-depth"><label for="depth">max_depth</label><select id="depth"><option>1</option><option selected>2</option><option>3</option></select></span>
+<span class="opt"><label for="newx">New house size</label><input type="range" id="newx" min="8" max="34" step="0.5" value="22.5" aria-label="Size of the new house, hundreds of square feet"><output id="newxv" for="newx">22.5</output></span>
+<button id="prev" aria-label="Previous step">← Back</button><button id="play" class="primary">Play</button><button id="next">Step →</button><button id="restart">Restart</button><label for="speed" class="small">Speed</label><select id="speed" aria-label="Playback speed"><option value="3400">Slow</option><option value="2200" selected>Normal</option><option value="1100">Fast</option></select><span class="hint">Keys: ← → step · Space play/pause · R restart</span></div>
+
+<h2 id="title"></h2><p id="why" class="why"></p>
+<div class="stage"><section class="panel"><h2>Size → price</h2><div class="progress" aria-hidden="true"><i id="bar"></i></div><svg id="plot" viewBox="0 0 560 392" role="img" aria-label="Scatter plot of price against size"></svg><div id="status" class="status" aria-live="polite"></div></section>
+<section class="panel"><h2>The data <span class="small">8 houses · size in 100s of sq ft · price in $1,000s</span></h2><div class="scroll"><table id="data"><thead></thead><tbody></tbody></table></div><div id="side"></div></section></div>
+
+<section class="panel code"><h2>Python: the same thing in scikit-learn</h2><p class="small">The highlighted line is what the current step shows. Every number on the plot comes out of this code.</p><pre id="code"></pre><details><summary>Sample data setup — copy before running the code</summary><pre id="setup"></pre></details></section>
+
+<section class="panel recipe" id="same-recipe"><h2>Same recipe, different model</h2>
+<p>Every scikit-learn model follows the workflow you learned with linear regression: <b>define <code>X</code> and <code>y</code> → split → create the model → <code>.fit()</code> → <code>.predict()</code> → evaluate</b>. Read down the columns: only the shaded cells change.</p>
+<div class="legend"><i></i>shaded = what changes between algorithms; grey = identical in all three</div>
+<div class="scroll"><table>
+<thead><tr><th>Step</th><th>Linear regression</th><th>K-nearest neighbors</th><th>Decision tree</th></tr></thead>
+<tbody>
+<tr><th>import</th><td class="diff"><code>from sklearn.linear_model import LinearRegression</code></td><td class="diff"><code>from sklearn.neighbors import KNeighborsRegressor</code></td><td class="diff"><code>from sklearn.tree import DecisionTreeRegressor</code></td></tr>
+<tr><th>define X, y</th><td class="same"><code>X = df[["size"]]
+y = df["price"]</code></td><td class="same"><code>X = df[["size"]]
+y = df["price"]</code></td><td class="same"><code>X = df[["size"]]
+y = df["price"]</code></td></tr>
+<tr><th>split</th><td class="same"><code>train_test_split(X, y, test_size=0.25, random_state=5544)</code></td><td class="same"><code>train_test_split(X, y, test_size=0.25, random_state=5544)</code></td><td class="same"><code>train_test_split(X, y, test_size=0.25, random_state=5544)</code></td></tr>
+<tr><th>create</th><td class="diff"><code>model = LinearRegression()</code><br><span class="small">no hyperparameters</span></td><td class="diff"><code>model = KNeighborsRegressor(n_neighbors=3)</code><br><span class="small">hyperparameter: k</span></td><td class="diff"><code>model = DecisionTreeRegressor(max_depth=2)</code><br><span class="small">hyperparameter: depth</span></td></tr>
+<tr><th>fit</th><td class="same"><code>model.fit(X_train, y_train)</code></td><td class="same"><code>model.fit(X_train, y_train)</code></td><td class="same"><code>model.fit(X_train, y_train)</code></td></tr>
+<tr><th>what .fit() learns</th><td class="diff">an intercept and a slope (<code>intercept_</code>, <code>coef_</code>)</td><td class="diff">nothing to compute: it stores the training rows</td><td class="diff">the thresholds and the mean price in each leaf</td></tr>
+<tr><th>predict</th><td class="same"><code>model.predict(X_test)</code></td><td class="same"><code>model.predict(X_test)</code></td><td class="same"><code>model.predict(X_test)</code></td></tr>
+<tr><th>evaluate</th><td class="same"><code>root_mean_squared_error(y_test, model.predict(X_test))</code></td><td class="same"><code>root_mean_squared_error(y_test, model.predict(X_test))</code></td><td class="same"><code>root_mean_squared_error(y_test, model.predict(X_test))</code></td></tr>
+<tr><th>scale numeric features?</th><td class="diff">not needed (coefficients adjust)</td><td class="diff"><b>yes</b> when there is more than one feature: distances mix the units otherwise</td><td class="diff">not needed (each threshold is on one feature)</td></tr>
+<tr><th>categorical features?</th><td class="same">one-hot encode (<code>OneHotEncoder</code>)</td><td class="same">one-hot encode (<code>OneHotEncoder</code>)</td><td class="same">one-hot encode (<code>OneHotEncoder</code>)</td></tr>
+<tr><th>shape of the prediction function</th><td class="diff">a straight line</td><td class="diff">a staircase that follows the local average</td><td class="diff">a staircase with one flat value per leaf</td></tr>
+</tbody></table></div>
+<p class="small">Preprocessing goes in a pipeline (next box) so that <code>.fit()</code> and <code>.predict()</code> stay the same two calls.</p>
+</section>
+
+<!-- EDITABLE DEFINITION BOX: change the wording below as you like; nothing else on the page depends on it. -->
+<section class="panel defbox" id="pipeline"><h2><span class="tag">Definition</span> Pipeline</h2>
+<p>A scikit-learn <b>Pipeline</b> combines <b>preprocessing steps and a model into one ordered workflow</b> that behaves like a single model: it has <code>.fit()</code> and <code>.predict()</code>, and that is all you call.</p>
+<ol>
+<li><code>pipe.fit(X_train, y_train)</code> runs the steps in order: each preprocessing step learns what it needs from the <em>training</em> data (the mean and standard deviation for a scaler, the list of categories for a one-hot encoder), transforms the data, and passes it on; the model at the end is fitted on the transformed data.</li>
+<li><code>pipe.predict(X_new)</code> applies the <em>same fitted</em> preprocessing to the new observations — the training mean and standard deviation, the training categories, nothing is re-learned from the new rows — and then asks the model.</li>
+</ol>
+<p>A pipeline is <b>not a prediction algorithm</b>. It makes no predictions of its own; it organizes the steps so the right preprocessing always travels with the model, which is what makes "fit on training data, predict on new data" safe.</p>
+<p><code>Pipeline([("preprocessing", ColumnTransformer([...])), ("model", KNeighborsRegressor(n_neighbors=3))])</code></p>
+</section>
+
+<footer>Everything on this page is computed in the browser from the eight houses with a small engine that mirrors scikit-learn's <code>LinearRegression</code>, <code>KNeighborsRegressor</code> and <code>DecisionTreeRegressor</code> (checked against scikit-learn 1.9 by <code>tools/check_week9_page.py</code>). Link to an algorithm with the address bar: <code>#linear-regression</code>, <code>#knn</code>, <code>#decision-tree</code>; sections: <code>#same-recipe</code>, <code>#pipeline</code>.<br>Reference: <a href="https://scikit-learn.org/stable/modules/neighbors.html#regression" target="_blank" rel="noreferrer">Nearest-neighbors regression</a> · <a href="https://scikit-learn.org/stable/modules/tree.html#regression" target="_blank" rel="noreferrer">Decision-tree regression</a> · <a href="https://scikit-learn.org/stable/modules/compose.html#pipeline" target="_blank" rel="noreferrer">Pipeline</a></footer>
+</main><script>
+/* ENGINE START — pure functions; tools/check_week9_page.py runs this block under node and compares it with scikit-learn */
+const DATA={size:[10,12,15,18,20,24,28,32],price:[150,180,200,260,250,320,360,410]};
+const mean=v=>v.reduce((s,x)=>s+x,0)/v.length;
+const sse=v=>{if(!v.length)return 0;const m=mean(v);return v.reduce((s,y)=>s+(y-m)*(y-m),0)};
+function fitLine(xs,ys){const mx=mean(xs),my=mean(ys);let sxy=0,sxx=0;for(let i=0;i<xs.length;i++){sxy+=(xs[i]-mx)*(ys[i]-my);sxx+=(xs[i]-mx)*(xs[i]-mx)}const slope=sxy/sxx,intercept=my-slope*mx;const predict=x=>intercept+slope*x;const resid=ys.map((y,i)=>y-predict(xs[i]));return{slope,intercept,predict,resid,sse:resid.reduce((s,r)=>s+r*r,0)}}
+function knn(xs,ys,x0,k){const order=xs.map((x,i)=>({i,d:Math.abs(x-x0)})).sort((a,b)=>a.d-b.d||a.i-b.i);const nb=order.slice(0,k);return{order,neighbors:nb.map(o=>o.i),pred:mean(nb.map(o=>ys[o.i])),tie:order.length>k&&Math.abs(order[k-1].d-order[k].d)<1e-12}}
+function candidates(vals){const u=[...new Set(vals)].sort((a,b)=>a-b);return u.slice(0,-1).map((x,i)=>(x+u[i+1])/2)}
+function bestSplit(idx,xs,ys){const tried=[];let best=null;for(const t of candidates(idx.map(i=>xs[i]))){const L=idx.filter(i=>xs[i]<=t),R=idx.filter(i=>xs[i]>t);const c={t,L,R,mL:mean(L.map(i=>ys[i])),mR:mean(R.map(i=>ys[i]))};c.s=sse(L.map(i=>ys[i]))+sse(R.map(i=>ys[i]));tried.push(c);if(!best||c.s<best.s-1e-9)best=c}return{tried,best}}
+function growTree(xs,ys,maxDepth){let id=0;const build=(idx,depth)=>{const node={id:id++,idx,depth,n:idx.length,mean:mean(idx.map(i=>ys[i])),sse:sse(idx.map(i=>ys[i])),leaf:false};if(depth>=maxDepth){node.leaf=true;node.reason='max_depth reached';return node}if(idx.length<2){node.leaf=true;node.reason='only one house';return node}if(node.sse<1e-9){node.leaf=true;node.reason='all prices equal';return node}const{tried,best}=bestSplit(idx,xs,ys);if(!best){node.leaf=true;node.reason='all sizes equal';return node}node.tried=tried;node.split=best;node.left=build(best.L,depth+1);node.right=build(best.R,depth+1);return node};return build(xs.map((_,i)=>i),0)}
+function treePredict(root,x0){const path=[];let n=root;while(!n.leaf){const go=x0<=n.split.t;path.push({node:n,go});n=go?n.left:n.right}return{leaf:n,path,pred:n.mean}}
+function treeLeaves(root){const out=[];(function walk(n,lo,hi){if(n.leaf){out.push({node:n,lo,hi});return}walk(n.left,lo,n.split.t);walk(n.right,n.split.t,hi)})(root,-Infinity,Infinity);return out}
+function knnCurve(xs,ys,k,grid){return grid.map(x=>knn(xs,ys,x,k).pred)}
+function treeCurve(root,grid){return grid.map(x=>treePredict(root,x).pred)}
+if(typeof module!=='undefined')module.exports={DATA,fitLine,knn,growTree,treePredict,treeLeaves,knnCurve,treeCurve,candidates};
+/* ENGINE END */
+
+if(typeof document!=='undefined'){
+const $=id=>document.getElementById(id);
+const xs=DATA.size,ys=DATA.price,N=xs.length;
+const f=(v,d=1)=>Number(v).toFixed(d).replace(/\.0+$|(\.\d*?)0+$/,'$1');
+const fmtList=a=>a.join(', ');
+/* ---------- plot geometry ---------- */
+const W=560,H=392,ML=58,MR=16,MT=18,MB=60,X0=8,X1=34,Y0=100,Y1=450;
+const sx=x=>ML+(x-X0)/(X1-X0)*(W-ML-MR),sy=y=>H-MB-(y-Y0)/(Y1-Y0)*(H-MT-MB);
+const grid=Array.from({length:261},(_,i)=>X0+i*0.1);
+const SETUP=`import numpy as np\nimport pandas as pd\n\nhouses = pd.DataFrame({\n    "size":  [10, 12, 15, 18, 20, 24, 28, 32],        # hundreds of square feet\n    "price": [150, 180, 200, 260, 250, 320, 360, 410]  # thousands of dollars\n})\nX = houses[["size"]]   # features: a DataFrame, even with one column\ny = houses["price"]    # target: a Series`;
+const CODE={
+'linear-regression':[`from sklearn.linear_model import LinearRegression`,``,`X = houses[["size"]]`,`y = houses["price"]`,``,`model = LinearRegression()`,`model.fit(X, y)                     # learn intercept_ and coef_`,`print(model.intercept_, model.coef_)`,``,`residuals = y - model.predict(X)    # actual - predicted, one per house`,`print((residuals ** 2).sum())       # the smallest any line can get`,``,`new = pd.DataFrame({"size": [NEWX]})`,`model.predict(new)                  # intercept_ + coef_ * NEWX`],
+'knn':[`from sklearn.neighbors import KNeighborsRegressor`,``,`X = houses[["size"]]`,`y = houses["price"]`,``,`model = KNeighborsRegressor(n_neighbors=K)`,`model.fit(X, y)                     # stores the training rows`,``,`new = pd.DataFrame({"size": [NEWX]})`,`(houses["size"] - NEWX).abs().sort_values()   # distances, by hand`,`model.predict(new)                  # mean price of the K nearest`,``,`sizes = pd.DataFrame({"size": np.linspace(8, 34, 261)})`,`model.predict(sizes)                # the regression function`],
+'decision-tree':[`from sklearn.tree import DecisionTreeRegressor, plot_tree`,``,`X = houses[["size"]]`,`y = houses["price"]`,``,`model = DecisionTreeRegressor(max_depth=DEPTH)`,`model.fit(X, y)   # try every threshold, keep the smallest SSE, repeat`,`plot_tree(model, feature_names=["size"])`,``,`new = pd.DataFrame({"size": [NEWX]})`,`model.predict(new)                  # follow the questions to a leaf`,``,`sizes = pd.DataFrame({"size": np.linspace(8, 34, 261)})`,`model.predict(sizes)                # one flat value per leaf`]};
+const ALGOS={
+'linear-regression':{title:'Linear regression: one line, chosen by least squares',why:'The model is a straight line, price ≈ intercept + slope × size. Fitting means choosing the intercept and slope that make the residuals (actual − predicted) as small as possible in the squared sense. Predicting means reading a size off the line.'},
+'knn':{title:'K-nearest neighbors: ask the k most similar houses',why:'There is nothing to fit. To predict a new house, measure its distance to every training house, keep the k closest, and average their prices. Change k with the dropdown: k = 1 copies the nearest house, k = 8 (all of them) gives the overall mean.'},
+'decision-tree':{title:'Decision tree: split, then split again',why:'Fitting means asking "size ≤ threshold?" at the threshold that best separates cheap from expensive houses — the one that minimizes the sum of squared errors around the two group means — then repeating inside each group until max_depth. Predicting means answering the questions down to a leaf and reporting that leaf\'s mean price.'}};
+/* ---------- steps ---------- */
+function stepsLinear(x0){const L=fitLine(xs,ys),S=[];const pred=L.predict(x0);
+ S.push({cap:'The training data: 8 houses. Size (hundreds of square feet) on the x-axis, price (thousands of dollars) on the y-axis. X holds the sizes, y the prices.',code:[2,3],st:{}});
+ S.push({cap:'Any straight line is a candidate (three in grey). Least squares scores each line by the sum of its squared residuals and keeps the one with the smallest score. That is what .fit() computes.',code:[5,6],st:{cands:true}});
+ S.push({cap:`The winner: price ≈ ${f(L.intercept)} + ${f(L.slope,2)} × size. The intercept (${f(L.intercept)}) and slope (${f(L.slope,2)}) are the parameters .fit() learned; the trailing underscore marks "learned from data".`,code:[6,7],st:{line:true,eq:true}});
+ for(let i=0;i<N;i++)S.push({cap:`Residual for house ${i+1} (size ${xs[i]}): actual ${ys[i]} − predicted ${f(L.predict(xs[i]))} = ${f(L.resid[i])}. A residual is the vertical gap from the point to the line; ${L.resid[i]>=0?'positive means the house sold for more than the line says':'negative means the house sold for less than the line says'}.`,code:[9],st:{line:true,quiet:true,resid:i+1,row:i}});
+ S.push({cap:`Sum of squared residuals = ${f(L.sse)}. No other intercept and slope can make this sum smaller; that is the meaning of "least squares".`,code:[9,10],st:{line:true,quiet:true,resid:N}});
+ S.push({cap:`A new house of size ${f(x0)} arrives. We know its size but not its price, so it starts on the x-axis.`,code:[12],st:{line:true,quiet:true,newx:true}});
+ S.push({cap:`Go up to the line, then across to the price axis: predicted price = ${f(L.intercept)} + ${f(L.slope,2)} × ${f(x0)} = ${f(pred)} thousand dollars. That is model.predict(new).`,code:[13],st:{line:true,quiet:true,newx:true,newpred:pred}});
+ return S}
+function stepsKnn(x0,k){const K=knn(xs,ys,x0,k),S=[];
+ S.push({cap:'The training data: 8 houses. KNN keeps them exactly as they are.',code:[2,3],st:{}});
+ S.push({cap:`model = KNeighborsRegressor(n_neighbors=${k}). .fit(X, y) does not calculate anything: it stores the training rows so they can be searched later.`,code:[5,6],st:{}});
+ S.push({cap:`A new house of size ${f(x0)} arrives. With one feature, "distance" is just the gap along the size axis.`,code:[8],st:{newx:true}});
+ K.order.forEach((o,r)=>{S.push({cap:`${r+1}${['st','nd','rd'][r]||'th'} closest: house ${o.i+1} (size ${xs[o.i]}), distance |${f(x0)} − ${xs[o.i]}| = ${f(o.d)}.${r<k?' One of the k nearest.':' Too far to be one of the k nearest.'}`,code:[9],st:{newx:true,dist:r+1,row:o.i,k}})});
+ S.push({cap:`The ${k} nearest house${k>1?'s':''}: ${fmtList(K.neighbors.map(i=>`house ${i+1} (price ${ys[i]})`))}.${K.tie?' Note the tie for the last place: scikit-learn breaks it arbitrarily; this page keeps the earlier row.':''}`,code:[9],st:{newx:true,dist:N,hi:true,k}});
+ S.push({cap:`Prediction = mean of their prices = (${K.neighbors.map(i=>ys[i]).join(' + ')}) / ${k} = ${f(K.pred,2)} thousand dollars. That is model.predict(new).`,code:[10],st:{newx:true,hi:true,k,newpred:K.pred}});
+ S.push({cap:`Slide the new size across the whole range: the prediction only changes when the set of ${k} nearest houses changes, so the regression function is a staircase${k===N?' — and with k = 8 every size has the same 8 neighbors, so it is flat at the overall mean':''}. Each step is a local average.`,code:[12,13],st:{hi:true,k,newpred:K.pred,newx:true,curve:knnCurve(xs,ys,k,grid)}});
+ return S}
+function stepsTree(x0,depth){const root=growTree(xs,ys,depth),S=[];
+ S.push({cap:'The training data: 8 houses. A tree will ask yes/no questions about size.',code:[2,3],st:{}});
+ const cands=candidates(xs);
+ S.push({cap:`Candidate questions at the root: "size ≤ t?" for every midpoint between neighboring sizes: t = ${fmtList(cands)}. Each candidate splits the houses into a left group and a right group.`,code:[5,6],st:{tree:root,show:0}});
+ root.tried.forEach((c,j)=>{S.push({cap:`Try size ≤ ${c.t}: left mean ${f(c.mL)} (${c.L.length} house${c.L.length>1?'s':''}), right mean ${f(c.mR)} (${c.R.length}). SSE = sum of squared gaps to the two means = ${f(c.s,0)}.`,code:[6],st:{tree:root,show:0,trying:j}})});
+ S.push({cap:`Best root split: size ≤ ${root.split.t}, SSE ${f(root.split.s,0)}, the smallest of the ${root.tried.length} candidates. Left leaf mean ${f(root.split.mL)}, right ${f(root.split.mR)}.`,code:[6,7],st:{tree:root,show:1,bestOnly:true}});
+ const nodesAt=d=>{const out=[];(function w(n){if(n.leaf&&n.depth<d)return;if(n.depth===d)out.push(n);else if(!n.leaf){w(n.left);w(n.right)}})(root);return out};
+ for(let d=1;d<depth;d++){for(const n of nodesAt(d)){const where=n.idx.map(i=>`house ${i+1}`);if(n.leaf)S.push({cap:`Group {${fmtList(where)}} (${n.reason}) becomes a leaf: predict ${f(n.mean)}.`,code:[6],st:{tree:root,show:d+1,focus:n.id}});else S.push({cap:`Repeat inside the group {${fmtList(where)}}: try ${fmtList(n.tried.map(c=>c.t))}; best is size ≤ ${n.split.t} (SSE ${f(n.split.s,0)}). Left mean ${f(n.split.mL)}, right mean ${f(n.split.mR)}.`,code:[6],st:{tree:root,show:d+1,focus:n.id}})}}
+ S.push({cap:`Fitting is done at max_depth = ${depth}: ${treeLeaves(root).length} leaves, each with the mean price of its houses. This is the tree plot_tree() draws.`,code:[7],st:{tree:root,show:depth+1,curve:treeCurve(root,grid)}});
+ const P=treePredict(root,x0);
+ S.push({cap:`A new house of size ${f(x0)} arrives. Start at the root.`,code:[9],st:{tree:root,show:depth+1,curve:treeCurve(root,grid),newx:true,pathLen:0,P}});
+ P.path.forEach((p,j)=>{S.push({cap:`Question ${j+1}: size ≤ ${p.node.split.t}? ${f(x0)} ≤ ${p.node.split.t} is ${p.go?'true, go left':'false, go right'}.`,code:[10],st:{tree:root,show:depth+1,curve:treeCurve(root,grid),newx:true,pathLen:j+1,P}})});
+ S.push({cap:`Leaf reached: ${P.leaf.n} house${P.leaf.n>1?'s':''} (${fmtList(P.leaf.idx.map(i=>`house ${i+1}`))}), mean price ${f(P.pred)}. That is model.predict(new): every size in this leaf's interval gets the same ${f(P.pred)}.`,code:[10],st:{tree:root,show:depth+1,curve:treeCurve(root,grid),newx:true,pathLen:P.path.length,P,newpred:P.pred,done:true}});
+ S.push({cap:`The whole regression function: one flat value per leaf. More depth means more leaves and smaller steps; with enough depth every house gets its own leaf and the training error is zero, which is overfitting.`,code:[12,13],st:{tree:root,show:depth+1,curve:treeCurve(root,grid),newpred:P.pred,newx:true,P,pathLen:P.path.length,done:true}});
+ return S}
+/* ---------- rendering ---------- */
+const svgNS='http://www.w3.org/2000/svg';
+function el(tag,attrs,text){const e=document.createElementNS(svgNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;return e}
+let prevState={};
+function renderPlot(st,algo,x0){const svg=$('plot');svg.textContent='';const g=a=>svg.appendChild(el('g',a||{}));
+ const bg=g();
+ if(st.tree&&st.show>=1){const leaves=treeLeaves(st.tree);const tints=['region1','region2','region3','region4'];const depthShown=st.show-1;
+  const regions=[];(function w(n,lo,hi){if(n.leaf||n.depth>=depthShown){regions.push({lo,hi,n});return}w(n.left,lo,n.split.t);w(n.right,n.split.t,hi)})(st.tree,-Infinity,Infinity);
+  regions.forEach((r,i)=>{const a=Math.max(r.lo,X0),b=Math.min(r.hi,X1);const on=st.P&&st.done&&r.n===st.P.leaf;bg.appendChild(el('rect',{x:sx(a),y:MT,width:sx(b)-sx(a),height:H-MB-MT,class:'region'+(on?' on':''),fill:`var(--${tints[i%4]})`}))})}
+ const ax=g();for(let x=10;x<=34;x+=4){ax.appendChild(el('line',{x1:sx(x),y1:MT,x2:sx(x),y2:H-MB,class:'gridline'}));ax.appendChild(el('text',{x:sx(x),y:H-MB+18,'text-anchor':'middle',class:'lbl'},x))}
+ for(let y=100;y<=450;y+=50){ax.appendChild(el('line',{x1:ML,y1:sy(y),x2:W-MR,y2:sy(y),class:'gridline'}));ax.appendChild(el('text',{x:ML-8,y:sy(y)+4,'text-anchor':'end',class:'lbl'},y))}
+ ax.appendChild(el('line',{x1:ML,y1:H-MB,x2:W-MR,y2:H-MB,class:'axis'}));ax.appendChild(el('line',{x1:ML,y1:MT,x2:ML,y2:H-MB,class:'axis'}));
+ ax.appendChild(el('text',{x:(ML+W-MR)/2,y:H-8,'text-anchor':'middle'},'size (hundreds of sq ft)'));ax.appendChild(el('text',{x:14,y:(MT+H-MB)/2,transform:`rotate(-90 14 ${(MT+H-MB)/2})`,'text-anchor':'middle'},'price ($1,000s)'));
+ const L=fitLine(xs,ys);const mx=mean(xs),my=mean(ys);
+ if(st.cands){[0,L.slope*2.2,L.slope*0.45].forEach(s=>{bg.appendChild(el('line',{x1:sx(X0),y1:sy(my+s*(X0-mx)),x2:sx(X1),y2:sy(my+s*(X1-mx)),class:'cand'}))})}
+ if(st.tree&&st.show>=1){const dShown=st.show-1;const mg=g();(function w(n,lo,hi){if(n.leaf||n.depth>=dShown){mg.appendChild(el('line',{x1:sx(Math.max(lo,X0)),y1:sy(n.mean),x2:sx(Math.min(hi,X1)),y2:sy(n.mean),class:'meanseg'}));return}mg.appendChild(el('line',{x1:sx(n.split.t),y1:MT,x2:sx(n.split.t),y2:H-MB,class:'split'}));mg.appendChild(el('text',{x:sx(n.split.t)+4,y:MT+12+10*n.depth,class:'lbl'},`≤ ${n.split.t}`));w(n.left,lo,n.split.t);w(n.right,n.split.t,hi)})(st.tree,-Infinity,Infinity)}
+ if(st.tree&&st.show===0&&st.trying!=null){const c=st.tree.tried[st.trying];const tg=g();tg.appendChild(el('line',{x1:sx(c.t),y1:MT,x2:sx(c.t),y2:H-MB,class:'split try'}));tg.appendChild(el('line',{x1:sx(X0),y1:sy(c.mL),x2:sx(c.t),y2:sy(c.mL),class:'meanseg try'}));tg.appendChild(el('line',{x1:sx(c.t),y1:sy(c.mR),x2:sx(X1),y2:sy(c.mR),class:'meanseg try'}));
+  const rg=g();c.L.forEach(i=>rg.appendChild(el('line',{x1:sx(xs[i]),y1:sy(ys[i]),x2:sx(xs[i]),y2:sy(c.mL),class:'resid'})));c.R.forEach(i=>rg.appendChild(el('line',{x1:sx(xs[i]),y1:sy(ys[i]),x2:sx(xs[i]),y2:sy(c.mR),class:'resid'})));
+  tg.appendChild(el('text',{x:sx(c.t)+6,y:MT+14,class:'sselbl'},`size ≤ ${c.t}: SSE ${f(c.s,0)}`))}
+ if(st.tree&&st.show===0&&st.trying==null){candidates(xs).forEach(t=>bg.appendChild(el('line',{x1:sx(t),y1:MT,x2:sx(t),y2:H-MB,class:'split try'})))}
+ if(st.line){const lg=g();lg.appendChild(el('line',{x1:sx(X0),y1:sy(L.predict(X0)),x2:sx(X1),y2:sy(L.predict(X1)),class:'fit'+(st.quiet||prevState.line?' quiet':'')}));if(st.eq)lg.appendChild(el('text',{x:sx(9),y:sy(400),class:'eq'},`price ≈ ${f(L.intercept)} + ${f(L.slope,2)} × size`))}
+ if(st.resid){const rg=g();for(let i=0;i<st.resid;i++){const last=i===st.resid-1&&!prevState.resid||i>=(prevState.resid||0);rg.appendChild(el('line',{x1:sx(xs[i]),y1:sy(ys[i]),x2:sx(xs[i]),y2:sy(L.predict(xs[i])),class:'resid'+(last?' enter':'')}));if(i===st.resid-1&&st.row!=null)rg.appendChild(el('text',{x:sx(xs[i])+6,y:(sy(ys[i])+sy(L.predict(xs[i])))/2+4,class:'rlbl'},f(L.resid[i])))}}
+ if(st.curve){const d=st.curve.map((y,i)=>(i?'L':'M')+sx(grid[i]).toFixed(1)+' '+sy(y).toFixed(1)).join(' ');g().appendChild(el('path',{d,class:'step'+(prevState.curve?'':' enter')}))}
+ const pg=g();const K=st.k?knn(xs,ys,x0,st.k):null;
+ for(let i=0;i<N;i++){let cls='pt';if(st.hi&&K){cls+=K.neighbors.includes(i)?' hi':' dim'}pg.appendChild(el('circle',{cx:sx(xs[i]),cy:sy(ys[i]),r:6,class:cls}));if(st.hi&&K&&K.neighbors.includes(i))pg.appendChild(el('circle',{cx:sx(xs[i]),cy:sy(ys[i]),r:11,class:'ring'}))}
+ if(st.dist&&K){const dg=g();for(let r=0;r<st.dist;r++){const o=K.order[r];const yy=H-MB-10-11*r;const far=r>=st.k;const isNew=r>=(prevState.dist||0);dg.appendChild(el('line',{x1:sx(x0),y1:yy,x2:sx(xs[o.i]),y2:yy,class:'dist'+(far?' far':'')+(isNew?' enter':'')}));dg.appendChild(el('text',{x:(sx(x0)+sx(xs[o.i]))/2,y:yy-3,'text-anchor':'middle',class:'dlbl'+(far?' far':'')},f(o.d)))}}
+ if(st.newx){const ng=g();const fresh=!prevState.newx;if(st.newpred!=null){const freshPred=prevState.newpred==null;ng.appendChild(el('line',{x1:sx(x0),y1:H-MB,x2:sx(x0),y2:sy(st.newpred),class:'guide'+(freshPred?' enter':'')}));ng.appendChild(el('line',{x1:sx(x0),y1:sy(st.newpred),x2:ML,y2:sy(st.newpred),class:'guide'+(freshPred?' enter':'')}));ng.appendChild(el('circle',{cx:sx(x0),cy:sy(st.newpred),r:7,class:'newpt'}));ng.appendChild(el('text',{x:sx(x0)+10,y:sy(st.newpred)-10,class:'newlbl'},`predict ${f(st.newpred,2)}`));ng.appendChild(el('text',{x:ML+4,y:sy(st.newpred)-5,class:'newlbl'},f(st.newpred,1)))}
+  ng.appendChild(el('circle',{cx:sx(x0),cy:H-MB,r:7,class:'newpt'+(fresh?' enter':'')}));ng.appendChild(el('text',{x:sx(x0),y:H-MB+34,'text-anchor':'middle',class:'newlbl'},`new: ${f(x0)}`))}
+}
+function renderTable(st,algo,x0){const t=$('data');const extra=algo==='linear-regression'?['predicted','residual']:algo==='knn'?['distance','neighbor?']:['group'];t.tHead.innerHTML='<tr><th>house</th><th>size</th><th>price</th>'+extra.map(h=>`<th>${h}</th>`).join('')+'</tr>';
+ const L=fitLine(xs,ys);const K=st.k?knn(xs,ys,x0,st.k):null;const rank={};if(K)K.order.forEach((o,r)=>rank[o.i]=r);
+ t.tBodies[0].innerHTML=xs.map((x,i)=>{let cells='',cls='';if(algo==='linear-regression'){const show=st.resid&&i<st.resid;cells=`<td>${st.line?f(L.predict(x)):''}</td><td>${show?f(L.resid[i]):''}</td>`}
+  else if(algo==='knn'){const shown=st.dist!=null&&rank[i]<st.dist||st.hi;cells=`<td>${shown?f(Math.abs(x-x0)):''}</td><td>${(st.hi||shown)&&K?(K.neighbors.includes(i)?'✓':'–'):''}</td>`;if(st.hi&&K)cls=K.neighbors.includes(i)?'nb':'dim'}
+  else{let lab='';if(st.tree&&st.show>=1){const leaves=[];(function w(n,path){if(n.leaf||n.depth>=st.show-1){leaves.push({n,path});return}w(n.left,path+'L');w(n.right,path+'R')})(st.tree,'');const lf=leaves.find(l=>l.n.idx.includes(i));lab=lf?`leaf ${leaves.indexOf(lf)+1}: ${f(lf.n.mean)}`:''}cells=`<td>${lab}</td>`}
+  if(st.row===i)cls='active';return `<tr class="${cls}"><td>${i+1}</td><td>${x}</td><td>${ys[i]}</td>${cells}</tr>`}).join('')}
+function renderSide(st,algo,x0){const s=$('side');s.innerHTML='';
+ if(algo==='knn'&&st.k){const K=knn(xs,ys,x0,st.k);if(st.hi)s.innerHTML=`<p class="small">k = ${st.k}: prediction = (${K.neighbors.map(i=>ys[i]).join(' + ')}) / ${st.k} = <b>${f(K.pred,2)}</b></p>`;return}
+ if(algo==='decision-tree'&&st.tree){const root=st.tree;
+  if(st.show===0){const ul=document.createElement('ul');ul.className='sselist';root.tried.forEach((c,j)=>{if(st.trying==null||j<=st.trying){const li=document.createElement('li');li.textContent=`size ≤ ${c.t}: SSE ${f(c.s,0)}`;if(j===st.trying)li.className='cur';ul.appendChild(li)}});if(st.trying===root.tried.length-1){[...ul.children].forEach((li,j)=>{if(root.tried[j]===root.split)li.classList.add('best')})}s.appendChild(ul);return}
+  const nodes=[];let xpos=0;const depthShown=st.show-1;(function w(n,parent){const shownLeaf=n.leaf||n.depth>=depthShown;const node={n,parent,leaf:shownLeaf};if(!shownLeaf){w(n.left,node)}node.x=shownLeaf?xpos++:null;if(!shownLeaf){w(n.right,node);node.x=(node.lx+node.rx)/2}if(parent){if(parent.lx==null)parent.lx=node.x;else parent.rx=node.x}nodes.push(node)})(root,null);
+  const cols=xpos,w=Math.max(300,cols*104),h=60+78*depthShown;const svg=el('svg',{viewBox:`0 0 ${w} ${h}`,class:'tree','aria-label':'Tree diagram'});const px=node=>50+(node.x)*((w-100)/Math.max(1,cols-1)),py=node=>30+node.n.depth*78;
+  const onPath=new Set();if(st.P){const len=st.pathLen||0;st.P.path.slice(0,len).forEach((p,j)=>{onPath.add(p.node.id);const nxt=j+1<len?st.P.path[j+1].node:(len===st.P.path.length?st.P.leaf:null);if(nxt)onPath.add(nxt.id)});if(len===0&&st.pathLen!=null)onPath.add(root.id)}
+  nodes.forEach(node=>{if(node.parent){const on=onPath.has(node.parent.n.id)&&onPath.has(node.n.id);svg.appendChild(el('line',{x1:px(node.parent),y1:py(node.parent)+14,x2:px(node),y2:py(node)-14,class:'edge'+(on?' on':'')}));svg.appendChild(el('text',{x:(px(node.parent)+px(node))/2+(node===node.parent.leftNode?-10:10),y:(py(node.parent)+py(node))/2+4,class:'elbl'},node.n===node.parent.n.left?'yes':'no'))}});
+  nodes.forEach(node=>{const gN=el('g',{class:'node'+(node.leaf?' leaf':'')+(onPath.has(node.n.id)?' on':'')+(st.focus===node.n.id?' on':'')});gN.appendChild(el('rect',{x:px(node)-46,y:py(node)-14,width:92,height:28}));gN.appendChild(el('text',{x:px(node),y:py(node)+4},node.leaf?`${f(node.n.mean)} (n=${node.n.n})`:`size ≤ ${node.n.split.t}?`));svg.appendChild(gN)});
+  s.appendChild(svg);const p=document.createElement('p');p.className='small';p.textContent=st.P&&st.done?`Path for size ${f(x0)}: ${st.P.path.map(q=>`size ≤ ${q.node.split.t}? ${q.go?'yes':'no'}`).join(' → ')} → ${f(st.P.pred)}`:'Leaves show the mean price (n = houses in the leaf).';s.appendChild(p)}}
+function renderCode(lines,hl){$('code').innerHTML=lines.map((l,i)=>`<span class="ln${hl.includes(i)?' hl':''}">${l.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/(#.*)$/,'<span class="cm">$1</span>')||' '}</span>`).join('')}
+/* ---------- controller ---------- */
+let algo='linear-regression',steps=[],idx=0,timer=null;
+const params=()=>({x0:parseFloat($('newx').value),k:parseInt($('k').value,10),depth:parseInt($('depth').value,10)});
+function build(){const p=params();steps=algo==='linear-regression'?stepsLinear(p.x0):algo==='knn'?stepsKnn(p.x0,p.k):stepsTree(p.x0,p.depth);$('title').textContent=ALGOS[algo].title;$('why').textContent=ALGOS[algo].why;$('opt-k').classList.toggle('hidden',algo!=='knn');$('opt-depth').classList.toggle('hidden',algo!=='decision-tree');$('setup').textContent=SETUP;prevState={};idx=0;show()}
+function show(){const p=params();const s=steps[idx];renderPlot(s.st,algo,p.x0);renderTable(s.st,algo,p.x0);renderSide(s.st,algo,p.x0);const lines=CODE[algo].map(l=>l.replace(/NEWX/g,f(p.x0)).replace(/\bK\b/g,String(p.k)).replace(/DEPTH/g,String(p.depth)));renderCode(lines,s.code);$('status').textContent=`Step ${idx+1} of ${steps.length}. ${s.cap}`;$('bar').style.width=((idx+1)/steps.length*100)+'%';$('prev').disabled=idx===0;$('next').disabled=idx===steps.length-1;prevState=s.st;if(idx===steps.length-1)pause()}
+function go(i){idx=Math.max(0,Math.min(steps.length-1,i));show()}
+function play(){if(idx===steps.length-1)go(0);$('play').textContent='Pause';timer=setInterval(()=>{if(idx<steps.length-1)go(idx+1);else pause()},parseInt($('speed').value,10))}
+function pause(){clearInterval(timer);timer=null;$('play').textContent='Play'}
+$('play').onclick=()=>timer?pause():play();$('next').onclick=()=>{pause();go(idx+1)};$('prev').onclick=()=>{pause();go(idx-1)};$('restart').onclick=()=>{pause();go(0)};
+$('speed').onchange=()=>{if(timer){pause();play()}};
+$('algo').onchange=()=>{pause();algo=$('algo').value;history.replaceState(null,'','#'+algo);build()};
+$('k').onchange=$('depth').onchange=()=>{pause();build()};
+$('newx').oninput=()=>{$('newxv').value=f(parseFloat($('newx').value));pause();const keep=idx;build();go(Math.min(keep,steps.length-1))};
+addEventListener('keydown',e=>{if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName))return;if(e.key==='ArrowRight'){pause();go(idx+1)}else if(e.key==='ArrowLeft'){pause();go(idx-1)}else if(e.key===' '){e.preventDefault();timer?pause():play()}else if(e.key==='r'||e.key==='R'){pause();go(0)}});
+function fromHash(){const h=location.hash.replace('#','');if(ALGOS[h]&&h!==algo){algo=h;$('algo').value=h;pause();build()}}
+addEventListener('hashchange',fromHash);
+/* theme: Auto / Light / Dark, remembered per browser */
+const themes=['auto','light','dark'];let ti=0;try{ti=Math.max(0,themes.indexOf(localStorage.getItem('theme')||'auto'))}catch(e){}
+function applyTheme(){const t=themes[ti];if(t==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',t);$('theme').textContent='Theme: '+t[0].toUpperCase()+t.slice(1);try{localStorage.setItem('theme',t)}catch(e){}}
+$('theme').onclick=()=>{ti=(ti+1)%3;applyTheme()};applyTheme();
+const h0=location.hash.replace('#','');if(ALGOS[h0]){algo=h0;$('algo').value=h0}build();
+}
+</script></body></html>
