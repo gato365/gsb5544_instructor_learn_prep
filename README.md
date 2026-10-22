@@ -43,6 +43,7 @@ Teaching materials for GSB 5544 (Cal Poly).
   - `GSB_5544_Topic_9_2b_Cross_Validation.ipynb` — the pre-class reading for Topic 9.2 (*Estimating the Test Error*: validation error and K-fold cross-validation on the Bordeaux wines), kept as received
   - `instructor_walkthrough.html` — **phone-friendly instructor prep cards** for Topic 9.2 (what each model does, every number on the page, what to notice when changing a setting, how to explain train/validation/test and CV aloud, misconceptions and checks, a run of show). Served **unlisted** at `week_9/instructor_walkthrough.html` (no card on the index)
   - `GSB_5544_PA_9_1_K_Nearest_Neighbors_for_Regression.ipynb` — student notebook (wine and Ames data), kept untouched as received; the `-solution.ipynb` instructor key (sketches drawn by code, five-beat answers for the coding parts) is built by `tools/build_week9_pas.py`. See `week_9/README.md`
+  - `GSB_5544_PA_9_2_Cross_Validation.ipynb` — student notebook (Ames: training vs test RMSE, cross-validation, pipelines, a smallest-test-RMSE competition), kept untouched as received; the `-solution.ipynb` instructor key (every numbered question answered in words and checked by code, the failing `cross_val_score` cell explained and fixed, a worked competition leaderboard) is built by `tools/build_week9_pas.py --pa 9.2`
 - `assignments/labs/`, `assignments/quizzes/`
 
 `*-empty.ipynb` notebooks contain `____` blanks for students; `*-solution.ipynb` files are completed **and executed**, so GitHub renders them with outputs.

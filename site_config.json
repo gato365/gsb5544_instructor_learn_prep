@@ -248,6 +248,12 @@
           "publish_solution": true
         },
         {
+          "title": "PA 9.2 — Training and Test Errors, Cross-Validation, Pipelines (Ames housing: training vs test RMSE, cross_val_score, pipelines, a smallest-test-RMSE competition)",
+          "student": "assignments/practice_activities/week_9/GSB_5544_PA_9_2_Cross_Validation.ipynb",
+          "solution": "assignments/practice_activities/week_9/GSB_5544_PA_9_2_Cross_Validation-solution.ipynb",
+          "publish_solution": true
+        },
+        {
           "title": "Instructor walkthrough — Topic 9.2 prep cards (unlisted; served at week_9/instructor_walkthrough.html)",
           "page": "assignments/practice_activities/week_9/instructor_walkthrough.html",
           "page_dest": "week_9/instructor_walkthrough.html",

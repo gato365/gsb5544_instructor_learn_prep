@@ -27,7 +27,8 @@ the copy in `docs/`).
 | **Topic 9.2** (student) | `GSB5544_Topic_9_2_Model_Evaluation_and_Cross_Validation-empty.ipynb` — nine sections: (1) the three models and their scikit-learn syntax reviewed on the eight houses, (2) decision trees in depth (candidate splits and SSE, reading `plot_tree`'s `samples` / `value` / `squared_error`, `decision_path`, depth vs training RMSE), (3) training / validation / test data on the wines, (4) training vs validation RMSE (the 1-NN row), (5) K-fold CV written out as a loop — the page's numbers — plus the no-shuffle trap and the two-k's box, (6) `cross_val_score` / `cross_validate` and the negative-score convention, (7) model and hyperparameter selection on the Advertising data with a sealed test set, (8) pipelines and leakage, `GridSearchCV`, (9) review questions. `____` blanks, eight ✅ checkpoints, *Your answer* prompts, 🎬 deep links into the page. | `tools/build_week9_cv_topics.py` |
 | **Topic 9.2 Solutions** | `GSB5544_Topic_9_2_Model_Evaluation_and_Cross_Validation-solution.ipynb` — completed, every answer written out, **executed** (reads the wines from dlsun.github.io and Advertising from statlearning.com). | `tools/build_week9_cv_topics.py` |
 | **Instructor walkthrough** (phone) | `instructor_walkthrough.html` — 44 short cards, one at a time, big Back / Next buttons, position remembered: what each model does, every number on the page with its value, what to notice when changing each setting, *Say it aloud* scripts for train / validation / test and CV, misconceptions and tap-to-reveal checks per section, a 50-minute (or 20-minute) run of show, a rapid self-quiz. Each card's *Open on the site* link opens `algorithms.html` already set to the right state. Served **unlisted** (`"listed": false` in `site_config.json`): reachable at <https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/instructor_walkthrough.html>, no card on the index. | hand-written |
-| **Practice Activity 9.2** | **not yet provided** — no solutions written; nothing about it is assumed in the notebook or the walkthrough. | — |
+| **Practice Activity 9.2** (student) | `GSB_5544_PA_9_2_Cross_Validation.ipynb` — Ames housing: twelve conceptual questions (fit, training RMSE and its benchmark, adding features, 1-NN and k, why test RMSE cannot be computed, how CV estimates it, a `cross_val_score` cell that is meant to fail with a categorical feature, standardization inside CV), then a competition for the smallest cross-validated test RMSE. **Kept as received.** | — |
+| **Practice Activity 9.2 Solutions** | `GSB_5544_PA_9_2_Cross_Validation-solution.ipynb` — every numbered question answered in words *and* checked by code; the failing cell left in place (tagged `raises-exception`) and explained — missing import, then the unseen `Landmrk` category making fold 10 `nan` — and fixed with `handle_unknown="ignore"`; the competition worked in five beats: exploration (correlations, plotnine plots), a shared-folds `judge` helper, linear / polynomial / interaction / KNN / tree candidates, the leaderboard, common mistakes. **Executed** (reads Ames live, ~1 min). | `tools/build_week9_pas.py --pa 9.2` |
 
 ### The cross-validation section of the page (`#cross-validation`, short link `#cv`)
 
@@ -62,6 +63,24 @@ Wines (27 training vintages, `train_test_split(test_size=0.5, random_state=5544)
 0 / validation 0.606; 5-NN 0.514 / 0.502 (the validation RMSE comes out slightly *lower* — the notebook says so
 and uses it to motivate CV); 13-NN 0.713 / 0.508. 4-fold shuffled CV, scaled 5-NN: 0.645 / 0.374 / 0.587 /
 0.542, mean 0.537; scale-before-CV (leak) 0.5308 vs pipeline 0.5372.
+
+### PA 9.2 headline numbers (Ames, 2,930 houses, four numeric features unless stated)
+
+Training RMSE of the four-feature line **51,350**; sd of `SalePrice` 79,887 (RMSE of predicting the mean 79,873),
+median price 160,000, R² 0.587. Adding `TotRms AbvGrd`: training RMSE drops by well under a dollar, 10-fold CV
+RMSE *rises* 51,455 → 51,575. 1-NN training RMSE **21,659** unscaled (21,864 scaled), not 0: 1,197 houses share a feature row with a
+differently priced house (exactly 0 once those rows are dropped); scaled k = 1 / 5 / 20 / 100 / 2,930 → 21,864 /
+39,619 / 43,892 / 48,989 / 79,873. The student `cross_val_score(cv=10)` cell: `NameError` without the import; with it,
+fold 10 holds the only **Landmrk** house, `OneHotEncoder` cannot transform it, scikit-learn 1.9 records `nan`
+with a "Scoring failed" warning (older versions raise). Fixed with `handle_unknown="ignore"`: CV RMSE
+**39,438**. Standardized linear model: coefficients × feature sd, intercept = mean price 180,796, predictions
+identical (max difference 4e-7), training RMSE unchanged. Scaling before CV vs inside the pipeline, 10-NN: 46,133 vs
+46,106 — a few tens of dollars apart. Competition (`KFold(10, shuffle=True, random_state=5544)`): base 4 → 51,354; + Neighborhood
+39,567; 12 numeric 35,285; + 4 categoricals 29,706; + 6 categoricals 29,629; degree-2 polynomial on 12 numeric +
+6 categoricals **26,214** (winner; + 4 categoricals 26,395); degree-3 52,711; Area × Qual interaction 29,799;
+KNN (12 numeric scaled + Neighborhood) k = 3 / 5 / 8 / 10 / 15 / 25 → 28,920 / 28,851 / 28,899 / 29,327 /
+29,541 / 30,290; trees (12 numeric + 4 categoricals) depth 3 / 5 / 7 / 9 / 12 / None → 41,990 / 36,280 /
+35,209 / 32,579 / 35,302 / 36,879.
 
 Advertising (`TV` + `radio`, split 150 / 50 `random_state=5544`, `KFold(5, shuffle=True, random_state=5544)`):
 linear CV 1.732; scaled KNN best k = 2 (0.878; k = 1 0.978, k = 20 1.544); tree best depth 7 (0.928; depth 10
@@ -112,7 +131,7 @@ depth: 1 → 63,050, 4 → 49,104, 6 → 43,213, 10 → 39,593, 15 → 43,149, N
 /opt/anaconda3/bin/python tools/check_week9_page.py    # page engine vs scikit-learn, incl. the K-fold section (needs node)
 python3 tools/build_week9_topics.py                    # regenerate + execute Topic 9.1 (-empty and -solution; reads Advertising)
 python3 tools/build_week9_cv_topics.py                 # regenerate + execute Topic 9.2 (reads wines + Advertising; ~1 min)
-python3 tools/build_week9_pas.py                       # rebuild + execute the PA 9.1 solution (reads wine + Ames; ~1 min)
+python3 tools/build_week9_pas.py                       # rebuild + execute the PA 9.1 and PA 9.2 solutions (reads wine + Ames; ~2 min); --pa 9.1 or --pa 9.2 for one
 python3 tools/build_site.py                            # copy algorithms.html + instructor_walkthrough.html into docs/week_9/, rebuild docs/index.html
 ```
 
