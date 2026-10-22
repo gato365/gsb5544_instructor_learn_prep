@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Week 9 walkthrough</title>
+<meta name="description" content="Instructor walkthrough for Topic 9.2 (model evaluation and cross-validation): one short card at a time, phone-friendly, with every number on the Algorithms in motion page explained.">
+<meta name="robots" content="noindex">
+<style>
+:root{color-scheme:light;--bg:#f5f6f9;--panel:#fff;--fg:#192538;--line:#ccd4df;--accent:#225ab5;--active:#e1edff;--muted:#5d6a7e;--ok:#1d7a3e;--okbg:#e6f5ea;--warn:#7a5b00;--warnbg:#fff3b0;--new:#b84e00;--newbg:#ffe0c2;--s1:#1f4e9c;--s1bg:#dbe9ff}
+:root[data-theme=dark]{color-scheme:dark;--bg:#151b25;--panel:#202938;--fg:#edf2fa;--line:#465369;--accent:#92baff;--active:#304768;--muted:#a3b0c4;--ok:#7fd49a;--okbg:#1d3a28;--warn:#ffe27a;--warnbg:#5a4d12;--new:#ffb46e;--newbg:#5b3a1c;--s1:#5590e8;--s1bg:#23395a}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#151b25;--panel:#202938;--fg:#edf2fa;--line:#465369;--accent:#92baff;--active:#304768;--muted:#a3b0c4;--ok:#7fd49a;--okbg:#1d3a28;--warn:#ffe27a;--warnbg:#5a4d12;--new:#ffb46e;--newbg:#5b3a1c;--s1:#5590e8;--s1bg:#23395a}}
+*{box-sizing:border-box}html{font-size:19px}body{margin:0;background:var(--bg);color:var(--fg);font:1rem/1.55 system-ui,sans-serif;-webkit-text-size-adjust:100%}
+main{max-width:680px;margin:auto;padding:16px 16px 150px}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}header small{letter-spacing:.1em;color:var(--accent);font-size:.7rem}header h1{font-size:1.15rem;margin:0}
+button{font:inherit;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--fg);padding:12px 16px;min-height:52px;cursor:pointer}button:disabled{opacity:.35}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}.primary{background:var(--accent);color:var(--bg);font-weight:700}
+.kicker{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0 0 4px}
+.card{display:none;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 18px 14px;animation:fade .25s ease-out}.card.on{display:block}@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card h2{font-size:1.35rem;line-height:1.3;margin:0 0 12px}.card p{margin:0 0 12px}.card ul,.card ol{margin:0 0 12px;padding-left:22px}.card li{margin:4px 0}
+.say{border-left:4px solid var(--ok);background:var(--okbg);padding:10px 14px;border-radius:0 10px 10px 0;margin:12px 0;font-style:italic}.say b{font-style:normal;color:var(--ok);display:block;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.notice{border-left:4px solid var(--new);background:var(--newbg);padding:10px 14px;border-radius:0 10px 10px 0;margin:12px 0}.notice b.tag{display:block;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--new);margin-bottom:4px}
+.try{display:inline-block;margin:4px 0 12px;padding:12px 16px;border-radius:12px;background:var(--active);color:var(--accent);font-weight:700;text-decoration:none;min-height:52px;line-height:28px}.try::after{content:" ↗"}
+details{margin:12px 0;border:1px dashed var(--line);border-radius:12px;padding:0 14px}summary{cursor:pointer;min-height:52px;line-height:52px;font-weight:700;color:var(--accent)}details p{margin:0 0 12px}details ul{margin-top:0}
+table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums;margin:6px 0 12px}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}th{font-weight:700}tr.hi td{background:var(--okbg);font-weight:700}
+code{font:.88em ui-monospace,monospace;background:var(--active);padding:1px 5px;border-radius:5px}pre{font:.82rem/1.5 ui-monospace,monospace;background:var(--active);padding:12px;border-radius:10px;overflow-x:auto;margin:0 0 12px}
+.misc li{margin:8px 0}.misc b{color:var(--new)}
+nav.bar{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}nav.bar .pos{text-align:center;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}nav.bar .pos b{display:block;color:var(--fg);font-size:1rem}
+.progress{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin:0 0 12px}.progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+#menu{margin:0 0 12px}#menu summary{color:var(--fg)}#menu ol{padding-left:22px}#menu a{color:var(--accent);text-decoration:none;display:inline-block;padding:6px 0}#menu a.cur{font-weight:700}
+.small{font-size:.85rem;color:var(--muted)}
+@media(min-width:720px){html{font-size:18px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><main>
+<header><div><small>GSB 5544 · WEEK 9 · INSTRUCTOR PREP</small><h1>Model evaluation and cross-validation: the walkthrough</h1></div><button id="theme" aria-label="Switch color theme">Theme</button></header>
+<div class="progress" aria-hidden="true"><i id="bar"></i></div>
+<details id="menu"><summary>Jump to a section</summary><ol id="toc"></ol></details>
+<div id="cards">
+
+<!-- ===================== 0. BEFORE YOU START ===================== -->
+<section class="card" data-sec="Before you start"><p class="kicker">Before you start</p><h2>How to use this</h2>
+<p>One card at a time. Tap <b>Next</b> (or swipe nothing — the buttons are big on purpose). Every number from the <em>Algorithms in motion</em> page is quoted on these cards, so you can read the whole thing without opening the site. When you do want to see a demo, the orange-tinted <b>Open on the site</b> links open the page already set to the right algorithm, setting and step.</p>
+<p>Each section ends with a <b>Check</b> card: tap to reveal the answer, and a list of the misconceptions students bring.</p>
+<p class="small">Your position is remembered on this device. Reading time: about 35 minutes at a walking pace.</p>
+<div class="notice"><b class="tag">Task type</b>Everything this week is <b>regression</b>: the target (house price, wine log-price, sales) is a number, so errors are residuals, SSE and RMSE in the target's units. Say so early. Students who have heard "accuracy" will try to use it.</div></section>
+
+<section class="card" data-sec="Before you start"><p class="kicker">Before you start</p><h2>The eight houses</h2>
+<p>Every demo uses the same tiny data set so that every number can be checked by hand.</p>
+<table><tr><th>house</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+<tr><th>size (100s sq ft)</th><td>10</td><td>12</td><td>15</td><td>18</td><td>20</td><td>24</td><td>28</td><td>32</td></tr>
+<tr><th>price ($1,000s)</th><td>150</td><td>180</td><td>200</td><td>260</td><td>250</td><td>320</td><td>360</td><td>410</td></tr></table>
+<p>Mean price 266.25. The new house to predict is size 22.5. The prices are nearly linear in size (house 5 is the one dip), which decides who wins the cross-validation later: keep that in your pocket.</p>
+<a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#linear-regression" target="_blank" rel="noreferrer">Open on the site</a></section>
+
+<section class="card" data-sec="Before you start"><p class="kicker">Before you start</p><h2>The two k's</h2>
+<p>The one confusion to pre-empt. Write both on the board before cross-validation starts.</p>
+<ul><li><b>k in k-nearest neighbors</b> = <code>n_neighbors</code>: how many training houses are averaged for one prediction. A setting of the <em>model</em>.</li>
+<li><b>K in K-fold cross-validation</b> = <code>n_splits</code>: how many pieces the data is cut into. A setting of the <em>evaluation</em>.</li></ul>
+<div class="say"><b>Say it aloud</b>"We can cross-validate a 3-nearest-neighbor model with 4 folds. Little k is about the model, big K is about how we test it. They have nothing to do with each other."</div>
+<p>The page and the notebook write the folds one as a capital K throughout.</p></section>
+
+<!-- ===================== 1. LINEAR REGRESSION ===================== -->
+<section class="card" data-sec="Linear regression"><p class="kicker">1 · Linear regression</p><h2>What the model is doing</h2>
+<p>The model is a line: price ≈ intercept + slope × size. <code>.fit(X, y)</code> searches over every intercept and slope and keeps the pair with the smallest <b>sum of squared residuals</b>. <code>.predict(new)</code> reads the new size off the line.</p>
+<p>On the page: three grey candidate lines appear, then the red winner with its equation, then the eight purple residuals one by one, then the orange new house rises to the line and across to the price axis.</p>
+<div class="say"><b>Say it aloud</b>"Fitting means choosing. Out of every possible line, least squares picks the one whose squared vertical gaps add up to the least."</div>
+<a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#linear-regression" target="_blank" rel="noreferrer">Open on the site</a></section>
+
+<section class="card" data-sec="Linear regression"><p class="kicker">1 · Linear regression</p><h2>Every number on the page</h2>
+<table><tr><th>number</th><th>value</th><th>meaning</th></tr>
+<tr><td><code>intercept_</code></td><td>33.29</td><td>predicted price at size 0, in $1,000s; a learned parameter</td></tr>
+<tr><td><code>coef_</code> (slope)</td><td>11.72</td><td>$11,720 more per extra 100 sq ft, about $117 per sq ft; learned</td></tr>
+<tr><td>predicted</td><td>per house</td><td>intercept + slope × size</td></tr>
+<tr><td>residual</td><td>per house</td><td>actual − predicted; house 5 (size 20) is −17.7: sold for less than the line says</td></tr>
+<tr><td>SSE</td><td>715.1</td><td>sum of squared residuals; what least squares minimized</td></tr>
+<tr><td>training RMSE</td><td>9.45</td><td>√(715.1 ÷ 8); "off by about 9 thousand dollars on the houses it was fitted to"</td></tr>
+<tr><td>predict</td><td>297.0</td><td>33.29 + 11.72 × 22.5</td></tr></table>
+<p class="small">The trailing underscore in <code>intercept_</code> and <code>coef_</code> is scikit-learn's mark for "learned from data".</p></section>
+
+<section class="card" data-sec="Linear regression"><p class="kicker">1 · Linear regression</p><h2>What to notice when you change a setting</h2>
+<ul><li><b>Drag the slider</b>: the prediction slides along the line (size 30 gives 384.9) but the line, the residuals and the SSE do not move. The model was fitted to the eight houses; the new house has no vote.</li>
+<li>There is <b>no hyperparameter</b> to change. That is why the line cannot overfit eight houses: two parameters cannot memorize eight prices. It will matter in the cross-validation section.</li></ul>
+<a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#linear-regression&x=30" target="_blank" rel="noreferrer">Open on the site at size 30</a></section>
+
+<section class="card" data-sec="Linear regression"><p class="kicker">1 · Linear regression</p><h2>Check and misconceptions</h2>
+<details><summary>Check: "Could a cleverer line get an SSE below 715.1?"</summary><p>No. 715.1 is the minimum by construction: least squares already searched every intercept and slope. A different line could have a smaller residual for <em>one</em> house, never a smaller sum of squares.</p></details>
+<ul class="misc"><li><b>"The residuals tell us how the model does on new houses."</b> They are training errors: the line was chosen to make exactly these gaps small. The honest number for new houses comes in section 5.</li>
+<li><b>"A negative residual means the model is wrong."</b> Every point off the line has a non-zero residual. Negative only says the house sold for less than predicted.</li></ul></section>
+
+<!-- ===================== 2. KNN ===================== -->
+<section class="card" data-sec="K-nearest neighbors"><p class="kicker">2 · K-nearest neighbors</p><h2>What the model is doing</h2>
+<p>Nothing is fitted. <code>.fit(X, y)</code> stores the eight rows. <code>.predict(new)</code> measures the distance from the new size to every training size, keeps the <b>k</b> closest, and averages their prices.</p>
+<p>On the page: green brackets along the bottom measure the distances one at a time (grey once past k), rings mark the k neighbors, the prediction appears, then the red staircase sweeps across.</p>
+<div class="say"><b>Say it aloud</b>"KNN answers a question by asking the most similar houses what they sold for and averaging. With one feature, similar means close in size."</div>
+<a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#knn&k=3" target="_blank" rel="noreferrer">Open on the site (k = 3)</a></section>
+
+<section class="card" data-sec="K-nearest neighbors"><p class="kicker">2 · K-nearest neighbors</p><h2>Every number on the page (k = 3)</h2>
+<table><tr><th>number</th><th>value</th><th>meaning</th></tr>
+<tr><td><code>k</code> = <code>n_neighbors</code></td><td>3</td><td>a hyperparameter: chosen by you, learned by nothing</td></tr>
+<tr><td>distance</td><td>1.5, 2.5, 4.5, …</td><td>|training size − 22.5| in 100s of sq ft: house 6 (24) is 1.5 away, house 5 (20) 2.5, house 4 (18) 4.5</td></tr>
+<tr><td>neighbor? ✓</td><td>houses 6, 5, 4</td><td>the three smallest distances</td></tr>
+<tr><td>prediction</td><td>276.67</td><td>(320 + 250 + 260) ÷ 3</td></tr>
+<tr><td>training RMSE</td><td>23.57</td><td>the k = 3 staircase against the eight houses (shown in the last step)</td></tr></table>
+<p>The staircase <b>jumps at the midpoints</b> between training sizes (11, 13.5, 16.5, 19, 22, 26, 30 for k = 1) because that is where the nearest house changes.</p></section>
+
+<section class="card" data-sec="K-nearest neighbors"><p class="kicker">2 · K-nearest neighbors</p><h2>What to notice when you change k</h2>
+<table><tr><th>k</th><th>prediction at 22.5</th><th>training RMSE</th><th>shape</th></tr>
+<tr><td>1</td><td>320 (copies house 6)</td><td>0</td><td>passes through every point</td></tr>
+<tr><td>2</td><td>285</td><td>—</td><td></td></tr>
+<tr><td>3</td><td>276.67</td><td>23.57</td><td></td></tr>
+<tr><td>5</td><td>278</td><td>—</td><td>smoother</td></tr>
+<tr><td>8</td><td>266.25 (the mean)</td><td>—</td><td>flat: every size has the same 8 neighbors</td></tr></table>
+<p>Smaller k is <b>more flexible</b>: k = 1 reproduces the training prices exactly (training RMSE 0). Larger k is smoother and eventually ignores size entirely. Neither extreme is "right"; section 7 shows how to choose.</p>
+<a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#knn&k=1" target="_blank" rel="noreferrer">Open on the site (k = 1)</a> &nbsp; <a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#knn&k=8" target="_blank" rel="noreferrer">k = 8</a></section>
+
+<section class="card" data-sec="K-nearest neighbors"><p class="kicker">2 · K-nearest neighbors</p><h2>The slider, and a tie</h2>
+<p>Drag the new house to <b>22 with k = 1</b>: houses 5 (20) and 6 (24) are both 2 away. The page says so and keeps the earlier row, which is also what scikit-learn usually does; the honest teaching point is that the tie is <em>arbitrary</em>.</p>
+<p>Drag to <b>30 with k = 3</b>: the neighbors are now houses 6, 7, 8 and the prediction is 363.33. Everything recomputes; nothing was refitted, because there was nothing to fit.</p>
+<a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#knn&k=1&x=22" target="_blank" rel="noreferrer">Open on the site (k = 1, size 22)</a></section>
+
+<section class="card" data-sec="K-nearest neighbors"><p class="kicker">2 · K-nearest neighbors</p><h2>Check and misconceptions</h2>
+<details><summary>Check: "With k = 8 the prediction is 266.25 for every size. Why, and is that a bug?"</summary><p>With 8 houses, every size has the same 8 neighbors, so every prediction is the overall mean. Not a bug: it is the most-smoothed model possible, and it ignores the feature completely. (PA 9.1 asks the same about 27-NN on the 27 wines: flat at 3.158.)</p></details>
+<ul class="misc"><li><b>"KNN learns something during fit."</b> It stores rows. All the work happens at prediction time, which is also why it is slow on big data.</li>
+<li><b>"Nearest means closest in price."</b> Distance is measured in the <em>features</em> (size). The prices of the neighbors are what gets averaged.</li>
+<li><b>"Bigger k is always safer."</b> k = 8 here ignores size; it is as wrong in its way as k = 1.</li>
+<li><b>"k = 3 means three folds."</b> No: see the two k's card.</li></ul></section>
+
+<!-- ===================== 3. DECISION TREE ===================== -->
+<section class="card" data-sec="Decision tree"><p class="kicker">3 · Decision tree</p><h2>What the model is doing</h2>
+<p>A tree asks yes/no questions about size. <b>Fitting</b> = finding the best question: for every candidate threshold, split the houses into a left group (≤) and a right group (&gt;), score the split by its <b>SSE</b> (each house's squared gap to its own group's mean, both groups added), keep the smallest. Then repeat inside each group until <code>max_depth</code>.</p>
+<p><b>Predicting</b> = answering the questions for the new house down to a leaf and reporting that leaf's mean price.</p>
+<div class="say"><b>Say it aloud</b>"The tree is looking for the one cut that makes the two sides as internally similar in price as possible. Then it does it again on each side."</div>
+<a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#decision-tree&depth=2" target="_blank" rel="noreferrer">Open on the site (max_depth = 2)</a></section>
+
+<section class="card" data-sec="Decision tree"><p class="kicker">3 · Decision tree</p><h2>The candidate splits</h2>
+<p>Thresholds are the <b>midpoints</b> between neighboring training sizes: 11, 13.5, 16.5, 19, 22, 26, 30. Seven candidates, seven SSEs, listed on the right as they are tried.</p>
+<table><tr><th>size ≤</th><th>left mean (n)</th><th>right mean (n)</th><th>SSE</th></tr>
+<tr><td>11</td><td>150 (1)</td><td>282.9 (7)</td><td>42,543</td></tr>
+<tr><td>13.5</td><td>165 (2)</td><td>300 (6)</td><td>30,650</td></tr>
+<tr><td>16.5</td><td>176.7 (3)</td><td>320 (5)</td><td>19,467</td></tr>
+<tr><td>19</td><td>197.5 (4)</td><td>335 (4)</td><td>20,175</td></tr>
+<tr class="hi"><td>22</td><td>208 (5)</td><td>363.3 (3)</td><td>12,747</td></tr>
+<tr><td>26</td><td>226.7 (6)</td><td>385 (2)</td><td>20,383</td></tr>
+<tr><td>30</td><td>245.7 (7)</td><td>410 (1)</td><td>34,371</td></tr></table>
+<p>Before any split the SSE around the overall mean is <b>57,988</b>. The winner, size ≤ 22, brings it to 12,747. The page's caption shows SSE as left + right (here 8,680 + 4,067).</p></section>
+
+<section class="card" data-sec="Decision tree"><p class="kicker">3 · Decision tree</p><h2>Reading a node box</h2>
+<p>The diagram on the page prints the same three numbers <code>plot_tree</code> prints:</p>
+<table><tr><th>printed</th><th>root node</th><th>meaning</th></tr>
+<tr><td><code>samples</code></td><td>8</td><td>training houses that reach the node</td></tr>
+<tr><td><code>value</code></td><td>266.3</td><td>their mean price: the prediction if the node were a leaf</td></tr>
+<tr><td><code>squared_error</code></td><td>7,248.4</td><td>mean squared gap of those prices to <code>value</code>: SSE ÷ samples (57,988 ÷ 8)</td></tr></table>
+<p>Depth-2 tree, all boxes: root (8, 266.3, 7,248.4) → left "size ≤ 16.5?" (5, 208, 1,736) and right "size ≤ 30?" (3, 363.3, 1,355.6) → leaves 176.7 (3 houses, 422.2), 255 (2, 25), 340 (2, 400), 410 (1, 0).</p>
+<p class="small">Green boxes are leaves. "yes" goes left (≤), "no" goes right. The children's <code>samples</code> add up to the parent's.</p></section>
+
+<section class="card" data-sec="Decision tree"><p class="kicker">3 · Decision tree</p><h2>Following the new house</h2>
+<p>Size 22.5, max_depth = 2. The path is highlighted in orange on the page and listed under the diagram:</p>
+<ol><li>Root: 8 houses, value 266.3. <b>size ≤ 22?</b> 22.5 ≤ 22 is <b>no → right</b>.</li>
+<li>Node: 3 houses (6, 7, 8), value 363.3. <b>size ≤ 30?</b> 22.5 ≤ 30 is <b>yes → left</b>.</li>
+<li>Leaf: houses 6 and 7 (prices 320, 360), value <b>340</b>. Prediction = 340.</li></ol>
+<p>Every size between 22 and 30 lands in that leaf and gets 340: the orange-edged shaded band on the plot is the leaf's interval.</p>
+<a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#decision-tree&depth=2" target="_blank" rel="noreferrer">Open on the site and step to the path</a></section>
+
+<section class="card" data-sec="Decision tree"><p class="kicker">3 · Decision tree</p><h2>What to notice when you change max_depth</h2>
+<table><tr><th>max_depth</th><th>leaves</th><th>training RMSE</th><th>prediction at 22.5</th></tr>
+<tr><td>1</td><td>2</td><td>39.92</td><td>363.3</td></tr>
+<tr><td>2</td><td>4</td><td>16.27</td><td>340</td></tr>
+<tr><td>3</td><td>7</td><td>5.00</td><td>320</td></tr>
+<tr><td>None</td><td>8</td><td>0</td><td>320</td></tr></table>
+<p>Deeper → more leaves → narrower steps → training RMSE falls, all the way to <b>0</b> when every house has its own leaf. At depth 3 the tree stops early in one branch because a node has only one house (410), so 7 leaves, not 8.</p>
+<div class="say"><b>Say it aloud</b>"A leaf is a flat promise: every house in this interval gets this one price. More depth means more, narrower promises, each based on fewer houses."</div>
+<a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#decision-tree&depth=3" target="_blank" rel="noreferrer">Open on the site (max_depth = 3)</a></section>
+
+<section class="card" data-sec="Decision tree"><p class="kicker">3 · Decision tree</p><h2>Check and misconceptions</h2>
+<details><summary>Check: "A node reads samples = 5, value = 208, squared_error = 1,736. What is its SSE?"</summary><p>1,736 × 5 = 8,680. (This is the root's left child; its SSE is the "left" half of the 12,747.)</p></details>
+<details><summary>Check: "Depth 3 has training RMSE 5 and depth 2 has 16.3. So depth 3 is better?"</summary><p>Not on that evidence. Training RMSE must fall with depth; it rewards memorizing. Section 7's cross-validation shows depth 2 predicting held-out houses better (31.9 vs 36.2).</p></details>
+<ul class="misc"><li><b>"Thresholds sit on data points."</b> They are midpoints between neighboring training values; any cut between two houses gives the same split, and scikit-learn uses the middle.</li>
+<li><b>"squared_error is the error on new houses."</b> It is the within-node spread of <em>training</em> prices: how unsure the leaf is about its own houses.</li>
+<li><b>"A deeper tree knows more."</b> It has memorized more. Knowing is measured on houses it has not seen.</li></ul></section>
+
+<!-- ===================== 4. TRAIN / VALIDATION / TEST ===================== -->
+<section class="card" data-sec="Training, validation, test"><p class="kicker">4 · Training, validation, test</p><h2>Three sets, three jobs</h2>
+<table><tr><th>set</th><th>job</th><th>who sees the prices</th></tr>
+<tr><td><b>training</b></td><td>fit the model: <code>.fit(X_train, y_train)</code></td><td>the model, while fitting</td></tr>
+<tr><td><b>validation</b></td><td>choose between models and settings</td><td>you, repeatedly, while deciding</td></tr>
+<tr><td><b>test</b></td><td>one final honest report of the chosen model's error</td><td>nobody, until the end; then once</td></tr></table>
+<p>The rule that makes it work: the test set stays <b>sealed</b> while any choice is still open. Comparing twenty models on the test set and picking the best uses up the test set: its error is now an optimistic, chosen number.</p></section>
+
+<section class="card" data-sec="Training, validation, test"><p class="kicker">4 · Training, validation, test</p><h2>How to explain it aloud</h2>
+<div class="say"><b>Say it aloud</b>"Training data is the homework with the answers in the back: the model learns from it. Validation data is the practice exam you take to decide how to study: you can take it many times, and you use the results to make choices. The test set is the final exam: you sit it once, after every decision is made, and the grade is the grade."</div>
+<p>Then the twist students need: <b>validation data is carved out of the training data.</b> It is not a third delivery of data from somewhere; it is training rows you choose not to fit on, so they can stand in for unseen rows. Cross-validation (section 6) is just a disciplined way of doing that carving several times.</p></section>
+
+<section class="card" data-sec="Training, validation, test"><p class="kicker">4 · Training, validation, test</p><h2>The pre-class reading's data</h2>
+<p>The reading (<em>Estimating the Test Error</em>) uses the <b>Bordeaux wines</b>: 38 vintages, but prices are known only for the 27 vintages up to 1980. Target: log(price). Features: winter rain (<code>win</code>) and summer temperature (<code>summer</code>).</p>
+<ul><li>The 27 known vintages are the training data.</li><li>The 11 later vintages are test data in the truest sense: their prices are missing, so no test error can ever be computed. Prediction is blind.</li><li>So the reading carves a validation half out of the 27 (it used <code>.sample(frac=0.5)</code>; the notebook uses <code>train_test_split(test_size=0.5, random_state=5544)</code>: 13 training, 14 validation).</li></ul>
+<p class="small">The notebook's section 3 reproduces this; its section 7 switches to the Advertising data (200 markets) because there a real test set with known answers exists.</p></section>
+
+<section class="card" data-sec="Training, validation, test"><p class="kicker">4 · Training, validation, test</p><h2>Check and misconceptions</h2>
+<details><summary>Check: "I tried k = 1…20 and reported the test RMSE of the best one. What is wrong?"</summary><p>The test set made the choice, so its error is no longer an honest estimate: with twenty tries the smallest test error is partly luck, and nothing is left to report. Choose on validation data (or cross-validation), then test once.</p></details>
+<details><summary>Check: "After choosing k on the validation set, which rows do I fit the final model on?"</summary><p>All the rows with known answers (training + validation). The split was a device for choosing; the final model should use everything. The reading's "important note" says exactly this.</p></details>
+<ul class="misc"><li><b>"Validation and test are the same thing."</b> Validation is used many times to decide; test is used once to report.</li>
+<li><b>"We need more data to have a validation set."</b> It comes out of the training rows you already have.</li>
+<li><b>"scikit-learn's <code>test_score</code> is on the test set."</b> In <code>cross_validate</code> it is the held-out <em>fold</em>: our validation score.</li></ul></section>
+
+<!-- ===================== 5. TRAINING VS VALIDATION ERROR ===================== -->
+<section class="card" data-sec="Training vs validation error"><p class="kicker">5 · Training vs validation error</p><h2>Same formula, different rows</h2>
+<p><b>RMSE</b> = √(mean of squared errors), where error = actual − predicted. It is in the target's units, so you can say "off by about 9 thousand dollars".</p>
+<ul><li><b>Training RMSE</b>: computed on the rows the model was fitted on. Optimistic: the model has seen these answers.</li><li><b>Validation RMSE</b>: computed on rows it was <em>not</em> fitted on. The honest estimate of error on new rows.</li></ul>
+<p>Same function in both cases: <code>root_mean_squared_error(actual, predicted)</code>. Only the rows change.</p></section>
+
+<section class="card" data-sec="Training vs validation error"><p class="kicker">5 · Training vs validation error</p><h2>The numbers (wine, 13 training / 14 validation)</h2>
+<table><tr><th>k</th><th>training RMSE</th><th>validation RMSE</th></tr>
+<tr class="hi"><td>1</td><td>0.000</td><td>0.606</td></tr><tr><td>5</td><td>0.514</td><td>0.502</td></tr><tr><td>13</td><td>0.713</td><td>0.508</td></tr></table>
+<p>The 1-NN row is the whole argument: training RMSE <b>exactly 0</b> (every vintage is its own nearest neighbor), validation RMSE the <b>worst</b> of the three. Training error would have crowned the worst model.</p>
+<div class="notice"><b class="tag">Be ready for this</b>For k = 5 the validation RMSE (0.502) is slightly <em>lower</em> than the training RMSE (0.514). Say it before a student does: with 13 and 14 rows a single split is noisy, and another <code>random_state</code> flips it. "Usually higher" is not "always higher". That noise is exactly why we cross-validate next.</div></section>
+
+<section class="card" data-sec="Training vs validation error"><p class="kicker">5 · Training vs validation error</p><h2>On the page</h2>
+<p>The cross-validation table has both columns side by side. With <b>1-NN</b> selected, the training RMSE is 0 in every fold while the validation RMSEs are 60.8, 22.4, 25.5 and 36.1. With the <b>line</b> selected the two columns are close (9.11 vs 10.60 on average): two parameters cannot memorize eight houses.</p>
+<p>The settings chart below the table plots the two means against k or depth: training falls with flexibility, validation does not.</p>
+<a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#cv&model=knn&k=1&folds=4&shuffle=1" target="_blank" rel="noreferrer">Open on the site (1-NN, 4 folds)</a></section>
+
+<section class="card" data-sec="Training vs validation error"><p class="kicker">5 · Training vs validation error</p><h2>Check and misconceptions</h2>
+<details><summary>Check: "Why is 1-NN training error exactly zero? Name another model from today that gets zero."</summary><p>Each training row's nearest neighbor is itself, distance 0, so it predicts its own price. A tree with <code>max_depth=None</code> (one house per leaf) also gets 0.</p></details>
+<ul class="misc"><li><b>"Lower training error means a better model."</b> It means a more flexible model. Flexibility memorizes.</li>
+<li><b>"Validation error is always higher than training error."</b> Usually, not always; tiny data flips it by chance.</li>
+<li><b>"RMSE is a percentage."</b> It is in the target's units ($1,000s, log price, thousands of units sold).</li></ul></section>
+
+<!-- ===================== 6. K-FOLD CROSS-VALIDATION ===================== -->
+<section class="card" data-sec="K-fold cross-validation"><p class="kicker">6 · K-fold cross-validation</p><h2>The idea in four moves</h2>
+<ol><li><b>Partition</b> the rows into K folds (shuffle first unless the row order is already random).</li>
+<li>For fold 1: <b>hold it out</b>, fit a <em>fresh</em> model on the other K − 1 folds, score it on fold 1.</li>
+<li><b>Repeat</b> for every fold. Each row is held out exactly once; each model is scored only on rows it never saw.</li>
+<li><b>Summarize</b>: average the K validation errors. The spread shows how noisy the estimate is.</li></ol>
+<div class="say"><b>Say it aloud</b>"One validation split wastes half the data and depends on luck. Cross-validation takes turns: every house gets to be the held-out house once, and we average."</div>
+<a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#cv&model=knn&k=3&folds=4&shuffle=1" target="_blank" rel="noreferrer">Open on the site (3-NN, K = 4)</a></section>
+
+<section class="card" data-sec="K-fold cross-validation"><p class="kicker">6 · K-fold cross-validation</p><h2>The default demo: 3-NN, K = 4, shuffled</h2>
+<p><code>KFold(n_splits=4, shuffle=True, random_state=5544)</code> cuts the eight houses into four pairs. The grid at the top of the section shows them: blue = training, orange = validation, one row per fold.</p>
+<table><tr><th>fold</th><th>validation houses</th><th>training houses</th></tr>
+<tr><td>1</td><td>6, 7</td><td>1, 2, 3, 4, 5, 8</td></tr><tr><td>2</td><td>2, 5</td><td>1, 3, 4, 6, 7, 8</td></tr><tr><td>3</td><td>1, 3</td><td>2, 4, 5, 6, 7, 8</td></tr><tr><td>4</td><td>4, 8</td><td>1, 2, 3, 5, 6, 7</td></tr></table>
+<p>Each row of the grid is one iteration; the current row gets a blue frame. Point out that each house is orange in exactly one row.</p></section>
+
+<section class="card" data-sec="K-fold cross-validation"><p class="kicker">6 · K-fold cross-validation</p><h2>Fold 1 in detail</h2>
+<p><b>Fit</b>: a brand-new 3-NN is fitted on houses 1, 2, 3, 4, 5, 8. Its training RMSE on those six is 45.28. The red staircase on the plot is <em>this</em> fold's model, not the full-data one.</p>
+<p><b>Validate</b>: predict the held-out houses.</p>
+<table><tr><th>house</th><th>size</th><th>actual</th><th>predicted</th><th>error</th></tr>
+<tr><td>6</td><td>24</td><td>320</td><td>306.67</td><td>13.33</td></tr><tr><td>7</td><td>28</td><td>360</td><td>306.67</td><td>53.33</td></tr></table>
+<p>Both predictions are 306.67 because, with houses 6 and 7 removed, the three nearest training houses of either are 4, 5 and 8 (260, 250, 410). Validation RMSE = √((13.33² + 53.33²) ÷ 2) = <b>38.87</b>.</p>
+<p class="small">Orange dashed segments on the plot are the validation errors; the orange hollow dots are the held-out houses.</p></section>
+
+<section class="card" data-sec="K-fold cross-validation"><p class="kicker">6 · K-fold cross-validation</p><h2>All four folds, then the average</h2>
+<table><tr><th>fold</th><th>training RMSE</th><th>validation RMSE</th></tr>
+<tr><td>1</td><td>45.28</td><td>38.87</td></tr><tr><td>2</td><td>29.12</td><td>17.95</td></tr><tr><td>3</td><td>32.66</td><td>60.42</td></tr><tr><td>4</td><td>25.53</td><td>79.06</td></tr>
+<tr class="hi"><td>mean</td><td>33.15</td><td>49.07</td></tr></table>
+<p><b>49.07</b> is the cross-validation estimate: "a 3-NN model will be off by about 49 thousand dollars on new houses." The spread (18 to 79) says the estimate is rough, as it must be with eight houses.</p>
+<div class="say"><b>Say it aloud</b>"Four models were fitted. None of them is the final model. Cross-validation is for judging; once we have chosen, we refit on all eight houses." (The last step of the animation draws exactly that refit.)</div></section>
+
+<section class="card" data-sec="K-fold cross-validation"><p class="kicker">6 · K-fold cross-validation</p><h2>What to notice when you change the folds</h2>
+<ul><li><b>Shuffle off, K = 4</b>: folds are consecutive rows {1,2}, {3,4}, {5,6}, {7,8}. The rows are sorted by size, so folds 1 and 4 hold out the smallest or largest houses and the model must extrapolate: validation RMSEs 73.2, 8.5, 30.7, 111.2, mean 55.91. <b>Shuffle off, K = 2</b>: mean 127.24. The lesson: <code>KFold</code> does not shuffle unless told to, and that is a trap on sorted data.</li>
+<li><b>K = 8</b> (leave-one-out): eight fits on seven houses each; 3-NN mean 39.17. Training sets are bigger, so each fitted model is closer to the final one, but the eight scores are highly correlated.</li>
+<li><b>K = 2, shuffled</b>: two fits on four houses; 3-NN mean 60.66. Little data per fit, so pessimistic.</li></ul>
+<a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#cv&model=knn&k=3&folds=4&shuffle=0" target="_blank" rel="noreferrer">Open on the site (no shuffle)</a> &nbsp; <a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#cv&model=knn&k=3&folds=8&shuffle=1" target="_blank" rel="noreferrer">K = 8</a></section>
+
+<section class="card" data-sec="K-fold cross-validation"><p class="kicker">6 · K-fold cross-validation</p><h2>The code behind the animation</h2>
+<pre>kf = KFold(n_splits=4, shuffle=True, random_state=5544)
+scores = []
+for train_idx, val_idx in kf.split(X):           # one pass per fold
+    model = KNeighborsRegressor(n_neighbors=3)   # fresh model
+    model.fit(X.iloc[train_idx], y.iloc[train_idx])
+    pred = model.predict(X.iloc[val_idx])
+    scores.append(root_mean_squared_error(y.iloc[val_idx], pred))
+np.mean(scores)                                  # 49.07
+
+cross_val_score(KNeighborsRegressor(3), X, y, cv=kf,
+                scoring="neg_root_mean_squared_error")
+# array([-38.87, -17.95, -60.42, -79.06]) -> negate, average</pre>
+<p>The page highlights each line as the matching step plays. Two things to say out loud: <code>kf.split(X)</code> yields <em>row positions</em>, hence <code>.iloc</code>; and the scores are <b>negative</b> because scikit-learn treats every score as higher-is-better, so an error is reported as its negative.</p></section>
+
+<section class="card" data-sec="K-fold cross-validation"><p class="kicker">6 · K-fold cross-validation</p><h2>Check and misconceptions</h2>
+<details><summary>Check: "5-fold CV of a 10-NN model on 150 rows: how many models, fitted on how many rows, scored on how many? Which is k and which is K?"</summary><p>Five models, each fitted on 120 rows and scored on 30; the five RMSEs are averaged. k = 10 neighbors (model), K = 5 folds (evaluation).</p></details>
+<details><summary>Check: "<code>cross_val_score</code> returned [−0.9, −1.1, −0.8, −1.0, −1.2]. The estimate?"</summary><p>Negate and average: 1.0.</p></details>
+<ul class="misc"><li><b>"Cross-validation gives us the model."</b> It gives an error estimate. The final model is refitted on all the training rows afterwards.</li>
+<li><b>"k folds = k neighbors."</b> Two k's card.</li>
+<li><b>"The folds overlap."</b> Validation folds are disjoint: each row is held out once. Training sets overlap heavily (which is why many folds give correlated scores).</li>
+<li><b>"The scores are errors."</b> They are negative scores; negate them.</li>
+<li><b>"<code>cv=5</code> shuffles."</b> It does not. Pass a <code>KFold(5, shuffle=True, random_state=…)</code> when the rows are ordered.</li></ul></section>
+
+<!-- ===================== 7. MODEL COMPARISON ===================== -->
+<section class="card" data-sec="Comparing models and settings"><p class="kicker">7 · Comparing models and settings</p><h2>The comparison table on the page (K = 4, shuffled)</h2>
+<table><tr><th>candidate</th><th>mean training RMSE</th><th>mean validation RMSE</th></tr>
+<tr class="hi"><td>LinearRegression()</td><td>9.11</td><td>10.60</td></tr>
+<tr><td>KNeighborsRegressor(1)</td><td>0.00</td><td>36.18</td></tr><tr><td>KNeighborsRegressor(2)</td><td>27.20</td><td>46.49</td></tr><tr><td>KNeighborsRegressor(3)</td><td>33.15</td><td>49.07</td></tr><tr><td>KNeighborsRegressor(5)</td><td>63.61</td><td>87.11</td></tr>
+<tr><td>DecisionTreeRegressor(max_depth=1)</td><td>36.81</td><td>62.90</td></tr><tr><td>DecisionTreeRegressor(max_depth=2)</td><td>14.93</td><td>31.86</td></tr><tr><td>DecisionTreeRegressor(max_depth=3)</td><td>2.89</td><td>36.18</td></tr></table>
+<p>Same folds for every candidate, so the averages are comparable. The <b>line wins</b> by a mile because the eight prices are nearly linear. Point at the training column: 1-NN and the depth-3 tree have the smallest training errors and are nowhere near the best. Some numbers carry a † on the page: they depend on how a tie was broken.</p></section>
+
+<section class="card" data-sec="Comparing models and settings"><p class="kicker">7 · Comparing models and settings</p><h2>The settings chart: the U</h2>
+<p>Select the <b>tree</b> and look at the chart under the table. Validation RMSE by depth: <b>62.9 → 31.9 → 36.2</b> (depths 1, 2, 3). Training RMSE: 36.8 → 14.9 → 2.9. The validation curve has a bottom at depth 2; the training curve just falls. That picture is the whole course in one chart.</p>
+<p>Select <b>KNN</b>: validation RMSE rises with k (36.2, 46.5, 49.1 for k = 1, 2, 3, then 87.1 at k = 5). No U here: with nearly linear data, the most local model is the best KNN can do, and even that loses to the line. Say that honestly; a U is typical, not guaranteed.</p>
+<a class="try" href="https://gato365.github.io/gsb5544_instructor_learn_prep/week_9/algorithms.html#cv&model=tree&depth=2&folds=4&shuffle=1" target="_blank" rel="noreferrer">Open on the site (tree, depth 2)</a></section>
+
+<section class="card" data-sec="Comparing models and settings"><p class="kicker">7 · Comparing models and settings</p><h2>The real-size version (notebook, Advertising data)</h2>
+<p>200 markets; <code>TV</code> and <code>radio</code> → <code>sales</code>. Split 150 training / 50 sealed test (<code>random_state=5544</code>). 5-fold shuffled CV on the 150 for every candidate.</p>
+<table><tr><th>candidate</th><th>CV estimate</th><th>test RMSE (once)</th></tr>
+<tr><td>linear regression</td><td>1.73</td><td>1.62</td></tr><tr class="hi"><td>2-NN, scaled (best k of 1…20)</td><td>0.88</td><td>0.81</td></tr><tr><td>tree, max_depth = 7 (best of 1…10)</td><td>0.93</td><td>1.40</td></tr></table>
+<p>The ranking held on the sealed test set. The tree's test RMSE was noticeably worse than its CV estimate: a good moment to say that CV numbers are estimates, and the <em>ranking</em> is what we asked them for. The tree's training RMSE at depth 10 is 0.01 while its validation RMSE is 0.93: memorizing.</p></section>
+
+<section class="card" data-sec="Comparing models and settings"><p class="kicker">7 · Comparing models and settings</p><h2>How to say the protocol aloud</h2>
+<div class="say"><b>Say it aloud</b>"Step one: split off a test set and put it in a sealed envelope. Step two: cross-validate every candidate on the training set, using the same folds for all of them. Step three: pick the smallest mean validation error. Step four: refit the winner on the whole training set, open the envelope, and report one test error. Then stop."</div>
+<p>If a student asks "why not just use cross-validation on all the data and skip the test set?": the reading says you may, if you only need to compare models. The test set is for a number you can quote to someone else as honest, after all your choosing is done.</p></section>
+
+<section class="card" data-sec="Comparing models and settings"><p class="kicker">7 · Comparing models and settings</p><h2>Check and misconceptions</h2>
+<details><summary>Check: "The CV estimate for the tree was 0.93 and its test RMSE 1.40. Did cross-validation fail?"</summary><p>No. CV estimates the error from 30-market folds and 120-market fits; the 50 test markets are a different sample. The estimate was rough, the ranking was right. With more data both numbers settle down.</p></details>
+<ul class="misc"><li><b>"Pick the model with the best test error."</b> Pick on validation / CV; test once.</li>
+<li><b>"The CV estimate is the test error."</b> It is an estimate of it; expect them to differ.</li>
+<li><b>"Different candidates can use different folds."</b> Use the same <code>kf</code> for all, or the comparison mixes noise with signal.</li></ul></section>
+
+<!-- ===================== 8. PIPELINES ===================== -->
+<section class="card" data-sec="Pipelines and leakage"><p class="kicker">8 · Pipelines and leakage</p><h2>What a pipeline is</h2>
+<p>A <b>Pipeline</b> chains preprocessing steps and a model into one object with one <code>.fit()</code> and one <code>.predict()</code>. On fit, each step learns from the <em>training rows only</em> (a scaler: mean and sd; a one-hot encoder: the categories), transforms, passes on; the model at the end is fitted on the result. On predict, the <em>same fitted</em> preprocessing is applied; nothing is re-learned from the new rows.</p>
+<p>A pipeline is <b>not a prediction algorithm</b>. It makes no predictions of its own. (The definition box at the bottom of the page is editable.)</p>
+<pre>make_pipeline(StandardScaler(), KNeighborsRegressor(n_neighbors=5))</pre></section>
+
+<section class="card" data-sec="Pipelines and leakage"><p class="kicker">8 · Pipelines and leakage</p><h2>Why it belongs in this lesson: leakage</h2>
+<p>Cross-validation only tells the truth if each fold's model sees <em>nothing</em> from its validation rows. Scaling is fitting: <code>StandardScaler().fit(X)</code> learns a mean and sd from whatever rows it gets.</p>
+<ul><li>❌ Scale all 27 wines, then <code>cross_val_score</code>: the scaler already saw every fold's validation rows. Mean CV RMSE 0.5308.</li><li>✅ <code>cross_val_score(pipeline, …)</code>: the whole pipeline is refitted inside each fold, scaler included. Mean CV RMSE 0.5372.</li></ul>
+<div class="notice"><b class="tag">Be ready for this</b>The leak is <em>small</em> here, and the leaky number is even slightly better-looking. Say so. The point is procedural: the leaky version answers a question nobody asked. With imputation, feature selection or target encoding the leak can be large. <code>GridSearchCV</code> packages the section-7 loop and does the right thing automatically (it picked k = 2, test RMSE 0.81, same as by hand).</div></section>
+
+<section class="card" data-sec="Pipelines and leakage"><p class="kicker">8 · Pipelines and leakage</p><h2>Check and misconceptions</h2>
+<details><summary>Check: "A classmate scales the whole X, then cross-validates KNN. What is wrong and what is the fix?"</summary><p>The scaler saw the validation rows of every fold (their contribution to the mean and sd). Fix: hand <code>cross_val_score</code> the pipeline so the scaler is refitted on training rows inside each fold.</p></details>
+<ul class="misc"><li><b>"A pipeline is a kind of model."</b> It is a container; the last step is the model.</li>
+<li><b>"Scaling before splitting is harmless because it is just a formula."</b> The formula's constants come from the data. That is fitting.</li>
+<li><b>"Trees need scaling too."</b> Only distance-based models (KNN) do; all three need categoricals one-hot encoded.</li></ul></section>
+
+<!-- ===================== 9. RUN OF SHOW ===================== -->
+<section class="card" data-sec="Run of show"><p class="kicker">9 · Run of show</p><h2>A 50-minute plan (or a 20-minute one)</h2>
+<table><tr><th>min</th><th>beat</th><th>on the page</th></tr>
+<tr><td>0–5</td><td>three models, one recipe; the two k's on the board</td><td>#same-recipe</td></tr>
+<tr><td>5–12</td><td>trees: candidate SSEs, node boxes, follow the house, depth table</td><td>#decision-tree&amp;depth=2 → depth=3</td></tr>
+<tr><td>12–17</td><td>training / validation / test: the exam analogy; wines</td><td>—</td></tr>
+<tr><td>17–22</td><td>training vs validation RMSE; the 1-NN row</td><td>#cv&amp;model=knn&amp;k=1</td></tr>
+<tr><td>22–32</td><td>K-fold step by step; shuffle off; K = 8</td><td>#cv&amp;model=knn&amp;k=3&amp;folds=4</td></tr>
+<tr><td>32–38</td><td>compare table; the tree's U; the protocol</td><td>#cv&amp;model=tree&amp;depth=2</td></tr>
+<tr><td>38–43</td><td>pipelines and leakage</td><td>#pipeline</td></tr>
+<tr><td>43–50</td><td>review questions from the notebook</td><td>—</td></tr></table>
+<p><b>Only 20 minutes?</b> Do 0–5, then 17–32, then the compare table. Leave trees-in-depth and pipelines to the notebook.</p></section>
+
+<section class="card" data-sec="Run of show"><p class="kicker">9 · Run of show</p><h2>Still pending</h2>
+<ul><li><b>Pre-class reading.</b> The file <code>GSB_5544_Topic_9_2b_Cross_Validation.ipynb</code> (<em>Estimating the Test Error</em>) in the week 9 folder was treated as the reading: the notebook's section 3–6 reuse its wine data, its 2-fold → K-fold progression and its <code>cross_val_score</code> call, and extend them. If the actual reading differs, the cross-references in the notebook's intro and in section 4 are the places to adjust.</li>
+<li><b>Practice activity 9.2.</b> Not yet provided. No solutions or answer key were written, and nothing about its contents was assumed. The notebook mentions no PA 9.2.</li></ul></section>
+
+<section class="card" data-sec="Run of show"><p class="kicker">9 · Run of show</p><h2>Rapid self-quiz</h2>
+<details><summary>1. 3-NN prediction for size 22.5, and the three houses?</summary><p>276.67 from houses 6, 5, 4 (320, 250, 260).</p></details>
+<details><summary>2. Root split and its SSE; SSE before the split?</summary><p>size ≤ 22, SSE 12,747; before: 57,988.</p></details>
+<details><summary>3. squared_error of the root, and how it relates to SSE?</summary><p>7,248.4 = 57,988 ÷ 8 samples.</p></details>
+<details><summary>4. Default CV demo: the four validation RMSEs and their mean?</summary><p>38.87, 17.95, 60.42, 79.06; mean 49.07 (training mean 33.15).</p></details>
+<details><summary>5. Which candidate wins the K = 4 comparison, and why?</summary><p>The line (10.60): the eight prices are nearly linear.</p></details>
+<details><summary>6. Why are <code>cross_val_score</code> results negative?</summary><p>scikit-learn maximizes scores; errors are returned as their negatives.</p></details>
+<details><summary>7. Advertising: winner, CV estimate, test RMSE?</summary><p>2-NN scaled; 0.88; 0.81.</p></details>
+<p class="small">End of walkthrough. Tap <b>Back</b> to review, or use the section menu at the top.</p></section>
+
+</div>
+<nav class="bar" aria-label="Card navigation"><button id="prev">← Back</button><div class="pos"><b id="num"></b><span id="sec"></span></div><button id="next" class="primary">Next →</button></nav>
+</main><script>
+(function(){
+const $=id=>document.getElementById(id);const cards=[...document.querySelectorAll('.card')];let i=0;
+try{const s=parseInt(localStorage.getItem('wk9-walk')||'0',10);if(s>=0&&s<cards.length)i=s}catch(e){}
+const h=parseInt((location.hash.match(/^#c(\d+)$/)||[])[1],10);if(h>=1&&h<=cards.length)i=h-1;
+/* table of contents: first card of each section */
+const toc=$('toc');let last=null;cards.forEach((c,j)=>{const s=c.dataset.sec;if(s!==last){const li=document.createElement('li');const a=document.createElement('a');a.href='#c'+(j+1);a.textContent=s;a.dataset.idx=j;a.onclick=e=>{e.preventDefault();go(j);$('menu').open=false};li.appendChild(a);toc.appendChild(li);last=s}});
+function show(){cards.forEach((c,j)=>c.classList.toggle('on',j===i));$('num').textContent=`${i+1} / ${cards.length}`;$('sec').textContent=cards[i].dataset.sec;$('bar').style.width=((i+1)/cards.length*100)+'%';$('prev').disabled=i===0;$('next').disabled=i===cards.length-1;history.replaceState(null,'','#c'+(i+1));try{localStorage.setItem('wk9-walk',String(i))}catch(e){}
+ [...toc.querySelectorAll('a')].forEach(a=>a.classList.toggle('cur',cards[i].dataset.sec===a.textContent));window.scrollTo(0,0)}
+function go(j){i=Math.max(0,Math.min(cards.length-1,j));show()}
+$('prev').onclick=()=>go(i-1);$('next').onclick=()=>go(i+1);
+addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(i+1);else if(e.key==='ArrowLeft')go(i-1)});
+addEventListener('hashchange',()=>{const m=location.hash.match(/^#c(\d+)$/);if(m)go(parseInt(m[1],10)-1)});
+const themes=['auto','light','dark'];let ti=0;try{ti=Math.max(0,themes.indexOf(localStorage.getItem('theme')||'auto'))}catch(e){}
+function applyTheme(){const t=themes[ti];if(t==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',t);$('theme').textContent='Theme: '+t[0].toUpperCase()+t.slice(1);try{localStorage.setItem('theme',t)}catch(e){}}
+$('theme').onclick=()=>{ti=(ti+1)%3;applyTheme()};applyTheme();show();
+})();
+</script></body></html>

@@ -10,6 +10,8 @@ Publishing rules, per item in site_config.json:
   "page": <repo path to an .html file> -> the file is copied into docs/ (at "page_dest",
       default: its path relative to assignments/practice_activities/) and linked as an
       interactive page served by GitHub Pages, next to any student/solution notebooks.
+  "listed": false           -> (pages only) the file is still copied into docs/ and served at its
+      URL, but no card is shown on the index page; for instructor-facing pages.
 Files always stay in the repository; this only controls what the website links to.
 NOTE: the repo itself is public, so hiding here hides from the *page*, not from
 someone browsing the repository directly.
@@ -43,6 +45,9 @@ for wk in cfg["weeks"]:
             dest = ROOT / "docs" / dest_rel
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(src, dest)
+            if not it.get("listed", True):
+                print(f"copied unlisted page {it['page']} -> docs/{dest_rel}")
+                continue
             view = f"https://github.com/{REPO}/blob/{BR}/{it['page']}"
             body += (f'<div class="row"><span class="tag page">Interactive</span>'
                      f'<a class="btn colab" href="{dest_rel}">Open page</a>'

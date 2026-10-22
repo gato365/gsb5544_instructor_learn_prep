@@ -39,6 +39,9 @@ Teaching materials for GSB 5544 (Cal Poly).
   - `GSB_5544_PA_8_2_Linear_Regression_Models.ipynb` — student notebook (90s song recognition: linear, log, quadratic models; FEV: dummies and an interaction), kept as received; the `-solution.ipynb` instructor key is built by `tools/build_week8_pas.py` against the live data
 - `assignments/practice_activities/week_9/`
   - Topic 9.1 (KNN and Decision Trees for Regression: animations of the fitted line, the k nearest neighbors and the SSE-scored splits on eight houses, the scikit-learn recipe compared across the three models, a Pipeline definition box, review questions) — built by `tools/build_week9_topics.py`; pairs with `algorithms.html` (**Algorithms in motion**, an interactive page served by GitHub Pages at `week_9/algorithms.html`, checked against scikit-learn by `tools/check_week9_page.py`)
+  - Topic 9.2 (Model Evaluation and Cross-Validation: the three models reviewed, decision trees in depth, training / validation / test data, training vs validation error, K-fold CV step by step on the eight houses, `cross_val_score` / `cross_validate`, model and hyperparameter selection with a sealed test set on the Advertising data, pipelines and leakage, review questions) — built by `tools/build_week9_cv_topics.py`; pairs with the **Cross-validation in motion** section of `algorithms.html` (`#cv`) and the glossary of every number on the page (`#numbers`)
+  - `GSB_5544_Topic_9_2b_Cross_Validation.ipynb` — the pre-class reading for Topic 9.2 (*Estimating the Test Error*: validation error and K-fold cross-validation on the Bordeaux wines), kept as received
+  - `instructor_walkthrough.html` — **phone-friendly instructor prep cards** for Topic 9.2 (what each model does, every number on the page, what to notice when changing a setting, how to explain train/validation/test and CV aloud, misconceptions and checks, a run of show). Served **unlisted** at `week_9/instructor_walkthrough.html` (no card on the index)
   - `GSB_5544_PA_9_1_K_Nearest_Neighbors_for_Regression.ipynb` — student notebook (wine and Ames data), kept untouched as received; the `-solution.ipynb` instructor key (sketches drawn by code, five-beat answers for the coding parts) is built by `tools/build_week9_pas.py`. See `week_9/README.md`
 - `assignments/labs/`, `assignments/quizzes/`
 
@@ -59,6 +62,8 @@ The site is a single generated page, `docs/index.html`, served by GitHub Pages.
 - **Interactive HTML pages** (not notebooks) use a `"page"` key; `build_site.py` copies the file into
   `docs/` so GitHub Pages serves it and adds an *Interactive → Open page* button. Edit the source
   under `assignments/`, never the copy in `docs/`.
+- **Unlisted pages**: add `"listed": false` to a `"page"` item and `build_site.py` still copies it into
+  `docs/` (so it is served at its URL) but shows no card on the index; used for the instructor walkthrough.
 - **Hide material** with `"publish": false` + a `"placeholder"` line (the page shows the
   placeholder, e.g. "Coming Thursday: ..."), or hide just a solution with
   `"publish_solution": false` + `"solution_placeholder"`. Files stay in the repo either way.

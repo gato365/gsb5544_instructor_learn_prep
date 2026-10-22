@@ -218,10 +218,10 @@
       ]
     },
     {
-      "label": "Week 9 — K-Nearest Neighbors and Decision Trees for Regression",
+      "label": "Week 9 — K-Nearest Neighbors, Decision Trees, and Cross-Validation",
       "items": [
         {
-          "title": "Algorithms in motion — animated linear regression, KNN and decision trees on eight houses (pairs with Topic 9.1)",
+          "title": "Algorithms in motion — animated linear regression, KNN, decision trees and K-fold cross-validation on eight houses (pairs with Topics 9.1 and 9.2)",
           "page": "assignments/practice_activities/week_9/algorithms.html",
           "page_dest": "week_9/algorithms.html"
         },
@@ -236,6 +236,22 @@
           "student": "assignments/practice_activities/week_9/GSB_5544_PA_9_1_K_Nearest_Neighbors_for_Regression.ipynb",
           "solution": "assignments/practice_activities/week_9/GSB_5544_PA_9_1_K_Nearest_Neighbors_for_Regression-solution.ipynb",
           "publish_solution": true
+        },
+        {
+          "title": "Pre-class reading — Estimating the Test Error (Bordeaux wines: validation error, cross-validation, K-fold; read before Topic 9.2)",
+          "student": "assignments/practice_activities/week_9/GSB_5544_Topic_9_2b_Cross_Validation.ipynb"
+        },
+        {
+          "title": "Topic 9.2 — Model Evaluation and Cross-Validation (three models reviewed, trees in depth, train/validation/test, K-fold CV step by step, cross_val_score, model selection with a sealed test set, pipelines)",
+          "student": "assignments/practice_activities/week_9/GSB5544_Topic_9_2_Model_Evaluation_and_Cross_Validation-empty.ipynb",
+          "solution": "assignments/practice_activities/week_9/GSB5544_Topic_9_2_Model_Evaluation_and_Cross_Validation-solution.ipynb",
+          "publish_solution": true
+        },
+        {
+          "title": "Instructor walkthrough — Topic 9.2 prep cards (unlisted; served at week_9/instructor_walkthrough.html)",
+          "page": "assignments/practice_activities/week_9/instructor_walkthrough.html",
+          "page_dest": "week_9/instructor_walkthrough.html",
+          "listed": false
         }
       ]
     }
