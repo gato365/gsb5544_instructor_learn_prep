@@ -260,6 +260,23 @@
           "listed": false
         }
       ]
+    },
+    {
+      "label": "Week 10 — Model Selection and Hyperparameter Tuning",
+      "items": [
+        {
+          "title": "Topic 10.1 — Model Selection and Hyperparameter Tuning (feature sets, GridSearchCV over k / metric / weights, cv_results_, comparing model families, best_estimator_)",
+          "student": "assignments/practice_activities/week_10/GSB5544_Topic_10_1_Model_Selection_and_Hyperparameter_Tuning-empty.ipynb",
+          "solution": "assignments/practice_activities/week_10/GSB5544_Topic_10_1_Model_Selection_and_Hyperparameter_Tuning-solution.ipynb",
+          "publish_solution": true
+        },
+        {
+          "title": "PA 10.1 — Model Selection and Hyperparameter Tuning (Ames: feature sets, grid search over k and metric, best KNN vs linear; Lending Club loans competition)",
+          "student": "assignments/practice_activities/week_10/GSB5544_PA_10_1_Model_Section_and_Hyperparameter_Tuning.ipynb",
+          "solution": "assignments/practice_activities/week_10/GSB5544_PA_10_1_Model_Section_and_Hyperparameter_Tuning-solution.ipynb",
+          "publish_solution": true
+        }
+      ]
     }
   ]
 }
