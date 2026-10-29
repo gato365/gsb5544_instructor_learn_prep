@@ -7,12 +7,12 @@ Usage:  python3 tools/build_week10_reg_topics.py            # write -empty and -
 
 Topic 10.2 — Regularization: Ridge, LASSO, Tuning Parameters and Cross-Validation
   A short conceptual opener (15-20 minutes) placed before the penalized-regression code walkthrough and PA 10.2.
-  Thirteen scaffolded think-and-discuss questions on one running example (forecasting a coffee shop's weekly
+  Five scaffolded think-and-discuss questions on one running example (forecasting a coffee shop's weekly
   sales from ten store characteristics, the example of the interactive page "Shrink to Fit"), each with a 2-4
   sentence answer / instructor note, the least-squares / ridge / LASSO objectives with their terms labelled, a
   table of candidate penalty strengths with hypothetical CV MSEs, the misconceptions to name out loud, one tiny
   simulated code demo, and a transition into the Ames walkthrough and the loans PA.
-  The same 13 questions are exported (--questions-js) and pasted into the page's Think-Discuss-Reveal widget.
+  The same 5 questions are exported (--questions-js) and pasted into the page's Think-Discuss-Reveal widget.
   Needs scikit-learn, pandas and numpy; nothing is read from the web.
 Same markers as the earlier builders:
   «text»            inside a code cell  -> "text" in the solution, "____" in the student version
@@ -56,156 +56,88 @@ def answer(cells: list[dict], text: str) -> None:
 
 QUESTIONS: list[tuple[str, str, str | None]] = [
     (
-        "Plain linear regression. We fit a line (well, a plane) to the 60 training stores: weekly sales ≈ intercept + "
-        "coefficients × the ten store characteristics. What exactly does least squares minimize, and why might a "
-        "model that fits those 60 stores very well still forecast a *new* store poorly?",
+        "Plain linear regression first. We fit weekly sales ≈ intercept + coefficients × the ten store characteristics "
+        "to the 60 training stores. What does least squares minimize — and why can a model that fits those 60 stores "
+        "very well still forecast a *new* store poorly? (Three of the ten predictors — seats, parking, store size — all "
+        "measure how big the store is, and two may be pure noise.)",
         "Least squares picks the intercept and coefficients that make the **sum of squared training errors** as small as "
-        "possible. It is judged only on the 60 stores it saw, so it will happily bend to whatever is peculiar about "
-        "them — a few unusual stores, a lucky correlation — and those peculiarities do not repeat in the next store. Low "
-        "training error is a fact about the past sample; forecasting is a claim about new stores.",
-        "Which number did we trust last week instead of training error? (Cross-validated test error.)",
-    ),
-    (
-        "Overfitting through the coefficients. Three of our ten predictors — seats, parking spaces and store size — "
-        "all describe how big the store is, and two others may be pure noise. How can coefficients become overly "
-        "sensitive to the particular 60 stores we happened to sample?",
-        "When predictors overlap, many different combinations of coefficients give almost the same fitted values: a "
-        "large positive coefficient on seats and a large negative one on store size can cancel. Least squares picks "
-        "whichever combination fits *this* sample best, so a different 60 stores can flip the signs and sizes "
-        "completely. Noise predictors get non-zero coefficients for the same reason — there is always some chance "
-        "pattern to fit. Many predictors relative to rows makes all of this worse.",
+        "possible, judged only on the 60 stores it saw. So it bends to whatever is peculiar about them: when predictors "
+        "overlap, many coefficient combinations fit almost equally well (a big positive coefficient on seats cancelling "
+        "a big negative one on store size), and least squares picks whichever suits *this* sample — a different 60 stores "
+        "can flip the signs. Noise predictors get coefficients for the same reason. Low training error is a fact about the "
+        "past sample; forecasting is a claim about new stores, and last week's cross-validated test error is the number "
+        "that speaks to that.",
         None,
     ),
     (
-        "Why accept a worse fit? Suppose we deliberately pull the coefficients back toward zero, so training error "
-        "goes *up* a little. Why could that make the forecasts for new stores *better*?",
-        "Part of what the unconstrained coefficients capture is signal and part is sample noise. Pulling them toward "
-        "zero gives up a little of the signal (a bit more training error) but throws away a lot of the noise, so the "
-        "model's predictions vary less from sample to sample. For new stores the trade is usually favourable — up to a "
-        "point. Last week's picture applies: training error can only get worse as we restrain the model, while "
-        "validation error falls first and rises later.",
-        "Does it *guarantee* better forecasts? No — it is a bet that the noise outweighs the lost signal, and "
-        "cross-validation is how we check the bet.",
+        "The penalty. Regularization changes what we minimize to **training error + a penalty on coefficient size**. "
+        "Why would deliberately accepting a slightly *worse* fit to the 60 stores make forecasts for new stores *better*, "
+        "and what decides how the two terms trade off?",
+        "Part of what unrestrained coefficients capture is signal and part is sample noise; pulling them toward zero gives "
+        "up a little signal (more training error) but throws away a lot of noise, so predictions vary less from sample "
+        "to sample — usually a favourable trade, though never a guaranteed one. The exchange rate is the tuning parameter "
+        "$\\lambda$ (`alpha` in scikit-learn): a larger $\\lambda$ makes coefficient size more expensive, so the solution "
+        "shrinks. The intercept is left out of the penalty — it only sets the overall level of sales, and shrinking it would "
+        "bias every forecast.",
+        "Training error can only get worse as $\\lambda$ grows; validation error falls first and rises later. That shape "
+        "is the whole argument.",
     ),
     (
-        "The penalty. Regularization turns that idea into a single thing to minimize: training error **plus** a "
-        "penalty on coefficient size. In words, what are the two terms fighting over, and what decides who wins?",
-        "The first term rewards fitting the 60 stores closely; the second charges a price for large coefficients. "
-        "Minimizing their sum finds coefficients that fit well *for their size*. The exchange rate between the two is "
-        "the tuning parameter $\\lambda$ (scikit-learn calls it `alpha`): a larger $\\lambda$ makes coefficient size "
-        "more expensive, so the solution shrinks. The intercept is left out of the penalty — it just sets the overall "
-        "level of sales and shrinking it would bias every forecast.",
-        None,
+        "Two penalties. Ridge charges $\\lambda \\sum_j \\beta_j^2$ (squares); LASSO charges $\\lambda \\sum_j |\\beta_j|$ "
+        "(absolute values). Why does ridge shrink every coefficient but almost never reach zero, while LASSO can set some "
+        "coefficients to *exactly* zero? And why must the predictors be standardized before either penalty is applied?",
+        "Squaring makes big coefficients very expensive and small ones nearly free, so ridge trims the largest hardest and "
+        "the last step from 0.1 to 0 saves only 0.01 — almost never worth taking. Under absolute values that last step "
+        "saves as much as any other, so a predictor that is not earning its keep lands on exactly zero and leaves the model: "
+        "LASSO shrinks *and* selects, which gives a smaller, cheaper, more explainable model, though among overlapping "
+        "predictors it keeps one somewhat arbitrarily (ridge shares the effect across the group). Both penalties treat a "
+        "coefficient of 500 as \"big\" whatever the variable, yet sales per square foot and sales per year of tenure live "
+        "on different scales; **standardizing** each predictor puts every coefficient in dollars per standard deviation so "
+        "the penalty is fair — fitted inside each cross-validation training fold, or the validation rows leak into it.",
+        "A LASSO zero on `store size` while `seats` is kept does **not** mean size is irrelevant, let alone causally "
+        "inert: LASSO chose a stand-in. Regularization is a forecasting tool, not a hypothesis test. Large coefficients "
+        "are not automatically a problem either; their size depends on units until the predictors are standardized.",
     ),
     (
-        "Ridge regression penalizes the **sum of squared coefficients**, $\\lambda \\sum_j \\beta_j^2$. Why does that "
-        "pull every coefficient toward zero, and why does it pull the biggest ones hardest?",
-        "Squaring makes a coefficient of 4 cost sixteen times a coefficient of 1, so the cheapest way to lower the "
-        "penalty is to trim the largest coefficients first. Every coefficient is shrunk somewhat, and the trimming of a "
-        "coefficient that is already small buys almost nothing, so ridge rarely drives anything exactly to zero — it "
-        "approaches zero smoothly. With overlapping predictors like seats, parking and size, ridge tends to spread the "
-        "shared effect across the group instead of letting one coefficient balloon and another go negative.",
-        None,
-    ),
-    (
-        "LASSO penalizes the **sum of absolute coefficients**, $\\lambda \\sum_j |\\beta_j|$. How is the effect "
-        "different, and why can LASSO set a coefficient to *exactly* zero when ridge does not?",
-        "With absolute values, moving a coefficient from 0.1 to 0 saves the same amount of penalty as moving it from "
-        "4.1 to 4 — the last step to zero is never cheaper than the others. If a predictor is not earning its keep in "
-        "the fit, the penalty wins and the coefficient lands on zero and stays there. (Under ridge that last step from "
-        "0.1 to 0 saves only 0.01, so it is almost never worth taking.) Predictors with a zero coefficient are out of "
-        "the model, which is why LASSO is described as doing variable selection.",
-        None,
-    ),
-    (
-        "Compare them. What do ridge and LASSO share, and what is the practical difference between *shrinking* a "
-        "coefficient and *zeroing* it?",
-        "Both minimize training error plus a $\\lambda$-weighted penalty on coefficient size, both need standardized "
-        "predictors, both have $\\lambda$ chosen by cross-validation, and neither penalizes the intercept. A shrunk "
-        "coefficient keeps the predictor in the forecast with a muted effect; a zeroed one removes it, which gives a "
-        "smaller model that is easier to explain and cheaper to feed with data. Among overlapping predictors LASSO "
-        "often keeps one and drops the rest somewhat arbitrarily; ridge keeps them all with smaller coefficients. "
-        "Which forecasts better depends on the data and is settled by cross-validation, not by preference.",
-        "A LASSO zero on `store size` while `seats` is kept does **not** mean store size is irrelevant or has no "
-        "effect — LASSO chose a stand-in. Regularization is a forecasting tool, not a hypothesis test. (A mixture of "
-        "the two penalties, elastic net, exists for exactly this correlated-group situation; the walkthrough shows it.)",
-    ),
-    (
-        "Units. Store size is measured in square feet (hundreds to thousands); manager tenure in years (0 to 20). "
-        "Why does that matter once we start penalizing coefficient size, and what do we do about it?",
-        "A coefficient's size depends on its predictor's units: sales per square foot is a tiny number, sales per year "
-        "of tenure a large one, and neither says which predictor matters more. A penalty that treats every "
-        "coefficient alike would therefore punish tenure heavily and square footage hardly at all. **Standardizing** "
-        "each predictor (subtract its mean, divide by its standard deviation) puts every coefficient in the same "
-        "units — dollars of sales per one standard deviation — so the penalty is fair and the coefficients are "
-        "comparable. Large coefficients are not automatically a problem; they are only meaningful after this step.",
-        "Inside cross-validation the scaler must be fitted on each training fold alone (a pipeline does this); "
-        "scaling all the rows first leaks the validation rows into the fit.",
-    ),
-    (
-        "The tuning parameter. What does the model become when $\\lambda = 0$, when $\\lambda$ is small, and when "
-        "$\\lambda$ is enormous? And how is $\\lambda$ different in kind from the coefficients?",
-        "At $\\lambda = 0$ the penalty vanishes and we are back to ordinary least squares. For small $\\lambda$ the "
-        "coefficients are gently shrunk and predictions barely change. As $\\lambda$ grows the coefficients head to "
-        "zero (LASSO drops predictors one by one) and the forecast collapses toward the average sales of the training "
-        "stores — a model that ignores the store. The coefficients are **learned** by fitting, given a $\\lambda$; "
-        "$\\lambda$ itself is not learned from the fit — it is a **tuning parameter**, set from outside and chosen by "
-        "comparing candidate values on validation data.",
-        "Software scales the error term differently (scikit-learn's `Lasso` divides it by $2n$, `Ridge` does not), "
-        "so `alpha = 1` is not the same strength of penalty for ridge and LASSO, nor the same across data sets. The "
-        "value is meaningless on its own; the cross-validation curve is what matters.",
-    ),
-    (
-        "Choosing $\\lambda$ by cross-validation. Here are six candidate penalty strengths and the 5-fold "
-        "cross-validation MSE each produced on the 60 training stores (hypothetical numbers, in millions of "
-        "dollars²):\n\n"
+        "The tuning parameter. What does the model become when $\\lambda = 0$, when it is small, and when it is enormous? "
+        "Here are six candidates and the 5-fold cross-validation MSE each produced on the 60 training stores "
+        "(hypothetical, millions of dollars²):\n\n"
         "| $\\lambda$ | 0 | 0.1 | 1 | 10 | 100 | 1000 |\n|---|---|---|---|---|---|---|\n"
         "| CV MSE | 9.8 | 9.1 | 8.4 | 8.2 | 9.6 | 15.0 |\n\n"
-        "Which would you pick, and why? Why could training MSE not have made this choice?",
-        "Pick $\\lambda = 10$: it has the lowest cross-validated error, and the curve has the expected shape — "
-        "unpenalized at 9.8, improving as the penalty bites, then collapsing (15.0) when the penalty crushes the useful "
-        "coefficients too. The strongest penalty is clearly not the best. Training MSE would have chosen $\\lambda = "
-        "0$ every time, because any penalty can only make the fit to the training stores worse. One caution: 8.4 and "
-        "8.2 are close, and five folds give a noisy average, so $\\lambda = 1$ would also be defensible; some analysts "
-        "take the most penalized value whose error is within the noise of the minimum.",
-        None,
+        "Which would you choose, and why could training MSE not have made this choice?",
+        "At $\\lambda = 0$ the penalty vanishes and we have ordinary least squares; small $\\lambda$ shrinks gently; as it "
+        "grows the coefficients head to zero (LASSO drops predictors one by one) and the forecast collapses toward the "
+        "average sales of the training stores — a model that ignores the store. The coefficients are **learned** by "
+        "fitting for a given $\\lambda$; $\\lambda$ itself is **tuned** from outside by comparing candidates on validation "
+        "data. Pick $\\lambda = 10$: lowest CV error, and the curve has the expected shape — the strongest penalty (15.0) "
+        "is clearly not the best. Training MSE would have chosen 0 every time, since any penalty worsens the fit to the "
+        "training stores; and because 8.4 and 8.2 are within the noise of five folds, $\\lambda = 1$ is defensible too.",
+        "scikit-learn scales the error term differently across models (`Lasso` divides by $2n$, `Ridge` does not), so "
+        "`alpha = 1` is not the same penalty for ridge and LASSO, nor across data sets. The number means nothing on its "
+        "own; the CV curve does.",
     ),
     (
-        "Grid search. We just compared six values of $\\lambda$ by hand. Describe what `GridSearchCV` does with "
-        "that list, in one or two sentences.",
-        "It takes the list of candidate values (the grid), and for each one runs the *same* K-fold cross-validation — "
-        "same folds for every candidate — records the mean validation score, picks the candidate with the best mean, "
-        "and refits that model on all the training rows. It is the table above, automated, with the bookkeeping "
-        "(`cv_results_`, `best_params_`, `best_estimator_`) kept for you. Two tuning parameters (as in elastic net) "
-        "just make the grid two-dimensional.",
-        None,
-    ),
-    (
-        "Validation versus test. The chain locked 40 stores away before we started. If cross-validation already tells "
-        "us how well each $\\lambda$ forecasts unseen stores, why keep those 40 untouched until the very end?",
-        "Because we *used* the validation scores to choose. The best of six candidates is partly the luckiest of six, "
-        "so its cross-validated error is a little optimistic — and if we also chose features, methods and $\\lambda$ "
-        "on it, more so. The 40 held-out stores took no part in any decision, so the one error we compute on them "
-        "after refitting the chosen model is an honest estimate of performance on genuinely new stores. Open the test "
-        "set once, report the number, and do not go back and re-tune.",
-        None,
-    ),
-    (
-        "Put it together. In four or five sentences, explain to a manager how regularization, ridge/LASSO, the "
-        "tuning parameter and cross-validation work together to produce a sales forecast for a store the chain has "
-        "never seen.",
-        "We fit a linear model to the training stores but charge a price for large coefficients, which stops the model "
-        "from memorizing quirks of our sample (regularization). Ridge charges by squared size and shrinks everything a "
-        "little; LASSO charges by absolute size and can drop predictors entirely, giving a simpler model. How heavy the "
-        "charge should be — the tuning parameter — is not something the fit can tell us, so we try a grid of values and "
-        "let cross-validation on the training stores vote for the one that forecasts held-out stores best. We refit "
-        "with that value on all the training stores, check it once on the stores we locked away, and that model, with "
-        "standardized inputs, is what forecasts the new store.",
+        "Grid search, the test set, and the whole picture. `GridSearchCV` is handed a list of candidate $\\lambda$ values. "
+        "What does it do with them? The chain locked 40 stores away before we began — if cross-validation already "
+        "scores each candidate on unseen stores, why keep those 40 untouched until the end? Finish by explaining to a "
+        "manager how regularization, ridge/LASSO, the tuning parameter and cross-validation work together to forecast a "
+        "store the chain has never seen.",
+        "Grid search runs the *same* K-fold cross-validation — same folds — for every candidate, records each mean "
+        "validation score, keeps the best, and refits it on all the training rows; it is the table above, automated. "
+        "The best of several candidates is partly the luckiest, so its validation score is a little optimistic — the 40 "
+        "stores took no part in any decision, so the one error computed on them after refitting is the honest estimate; "
+        "open them once, report, and do not re-tune. To the manager: we fit a linear model but charge a price for large "
+        "coefficients, so it stops memorizing quirks of our sample (regularization); ridge charges by squared size and "
+        "shrinks everything a little, LASSO charges by absolute size and can drop predictors, giving a simpler model; how "
+        "heavy the charge should be is a tuning parameter the fit cannot tell us, so we try a grid of values and let "
+        "cross-validation on the training stores vote for the one that forecasts held-out stores best; we refit with that "
+        "value, check it once on the stores we locked away, and that model — with standardized inputs — forecasts the new "
+        "store.",
         None,
     ),
 ]
 
-TABLE_Q_INDEX = 9  # the question that contains the markdown table (needs HTML conversion for the page)
+TABLE_Q_INDEX = 3  # the question that contains the markdown table (needs HTML conversion for the page)
 
 
 def to_html(text: str) -> str:
@@ -274,7 +206,7 @@ t: list[dict] = []
 md(t, """
 # GSB 5544 — Topic 10.2: Regularization — Ridge, LASSO, Tuning Parameters and Cross-Validation — SOLUTION
 *A 15–20 minute think-and-discuss opener before the penalized-regression walkthrough and PA 10.2. One running
-example, thirteen short questions, no derivations.*
+example, five questions, no derivations.*
 """)
 
 md(t, f"""
@@ -289,7 +221,7 @@ training data; 40 are locked away as a test set. (This is the example on the int
 also in the page's *Think · Discuss · Reveal* box.)
 
 **The rhythm.** For each question: think for a minute, discuss with a neighbour for two, then the instructor
-reveals the answer. Thirteen questions, roughly 90 seconds each.
+reveals the answer. Five questions, three to four minutes each.
 
 **The three objectives**, so they are in front of us the whole time. Each adds a term to the one before it.
 
@@ -388,7 +320,7 @@ md(t, f"""
    the Ames houses with *all* 67 predictors, where plain least squares with polynomial terms falls apart under
    cross-validation; then `Ridge`, `Lasso` and `ElasticNet` in a pipeline, counting zero coefficients, and
    `GridSearchCV` over `alpha` (and `l1_ratio`). Its twelve **DISCUSS** prompts are the questions above in Ames
-   clothing — Q4–Q9 of this notebook answer them.
+   clothing — Q2–Q4 of this notebook answer them.
 3. **PA 10.2.** The loans data again, predicting `interest_rate` — this time with ridge, LASSO and elastic net on
    many predictors, at least one parameter tuned with `GridSearchCV`. Bring the ideas: standardize inside the
    pipeline, choose `alpha` by cross-validation, read a zero coefficient as "not needed given the others", and
@@ -461,7 +393,7 @@ STEM = WEEK / "GSB5544_Topic_10_2_Regularization_Ridge_LASSO"
 STUDENT_TITLE = (
     "# GSB 5544 — Topic 10.2: Regularization — Ridge, LASSO, Tuning Parameters and Cross-Validation  \n"
     "*A 15–20 minute think-and-discuss opener before the penalized-regression walkthrough and PA 10.2. One running "
-    "example, thirteen short questions, no derivations. Think about each question for a minute, discuss it with a "
+    "example, five questions, no derivations. Think about each question for a minute, discuss it with a "
     "neighbour, and jot a sentence; the answers are revealed in class.*"
 )
 

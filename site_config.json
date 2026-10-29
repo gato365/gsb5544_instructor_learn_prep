@@ -282,7 +282,7 @@
           "page_dest": "week_10/shrink_to_fit.html"
         },
         {
-          "title": "Topic 10.2 — Regularization: Ridge, LASSO, Tuning Parameters and Cross-Validation (13 think-and-discuss questions, 15–20 minutes; the answers are the instructor notes)",
+          "title": "Topic 10.2 — Regularization: Ridge, LASSO, Tuning Parameters and Cross-Validation (5 think-and-discuss questions, 15–20 minutes; the answers are the instructor notes)",
           "student": "assignments/practice_activities/week_10/GSB5544_Topic_10_2_Regularization_Ridge_LASSO-empty.ipynb",
           "solution": "assignments/practice_activities/week_10/GSB5544_Topic_10_2_Regularization_Ridge_LASSO-solution.ipynb",
           "publish_solution": true
