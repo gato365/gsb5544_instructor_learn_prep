@@ -262,7 +262,7 @@
       ]
     },
     {
-      "label": "Week 10 — Model Selection and Hyperparameter Tuning",
+      "label": "Week 10 — Model Selection, Hyperparameter Tuning, and Regularization",
       "items": [
         {
           "title": "Topic 10.1 — Model Selection and Hyperparameter Tuning (feature sets, GridSearchCV over k / metric / weights, cv_results_, comparing model families, best_estimator_)",
@@ -275,6 +275,21 @@
           "student": "assignments/practice_activities/week_10/GSB5544_PA_10_1_Model_Section_and_Hyperparameter_Tuning.ipynb",
           "solution": "assignments/practice_activities/week_10/GSB5544_PA_10_1_Model_Section_and_Hyperparameter_Tuning-solution.ipynb",
           "publish_solution": true
+        },
+        {
+          "title": "Shrink to Fit — interactive regularization: penalty slider, ridge vs LASSO coefficient paths, grid search fold by fold, elastic net (coffee-shop sales example; pairs with Topic 10.2)",
+          "page": "assignments/practice_activities/week_10/Shrink to Fit.html",
+          "page_dest": "week_10/shrink_to_fit.html"
+        },
+        {
+          "title": "Topic 10.2 — Regularization: Ridge, LASSO, Tuning Parameters and Cross-Validation (13 think-and-discuss questions, 15–20 minutes; the answers are the instructor notes)",
+          "student": "assignments/practice_activities/week_10/GSB5544_Topic_10_2_Regularization_Ridge_LASSO-empty.ipynb",
+          "solution": "assignments/practice_activities/week_10/GSB5544_Topic_10_2_Regularization_Ridge_LASSO-solution.ipynb",
+          "publish_solution": true
+        },
+        {
+          "title": "Penalized Regression walkthrough + PA 10.2 — Ridge, LASSO and elastic net on all Ames predictors, GridSearchCV over alpha; then the loans competition with penalized models",
+          "student": "assignments/practice_activities/week_10/GSB_5544_PA_10_2_penalized_regression_solutions.ipynb"
         }
       ]
     }

@@ -1,0 +1,1237 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><style id="mini-table">table.mini{border-collapse:collapse;margin:8px 0;font-size:.92em}table.mini th,table.mini td{padding:4px 10px;border-bottom:1px solid currentColor;text-align:left}</style>
+</head><body>
+<title>Shrink to Fit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,500;100,700;125,800&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one column of teaching "beats"; a sticky step rail across the top; charts sit beside their controls on wide screens, stack on laptops in portrait or phones. */
+:root{
+  --bg:#f3f5f7;            /* cool paper */
+  --panel:#ffffff;
+  --panel-2:#e9edf1;
+  --fg:#15202b;
+  --fg-2:#4a5866;
+  --line:#cfd7de;
+  --accent:#0b5fa5;        /* signal blue: coefficients, links */
+  --accent-soft:#d9e8f6;
+  --train:#d9741c;         /* training error */
+  --cv:#0b5fa5;            /* cross-validation error */
+  --test:#6a3fb3;          /* held-out test */
+  --ridge:#0f8b7a;         /* ridge */
+  --lasso:#b8386f;         /* LASSO */
+  --ok:#2d7f3a;
+  --warn:#b2651b;
+  --ghost:#b9c3cc;
+  --f1:#0b5fa5;--f2:#0f8b7a;--f3:#d9741c;--f4:#b8386f;--f5:#6a3fb3;
+  --display:"Archivo",system-ui,sans-serif;
+  --body:"Source Sans 3",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --radius:10px;
+  --base:17px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#101820;--panel:#182230;--panel-2:#1f2b3a;--fg:#e9eef3;--fg-2:#a7b4c0;--line:#2f3d4c;
+  --accent:#6fb1ec;--accent-soft:#1d3550;--train:#f2994a;--cv:#6fb1ec;--test:#b79af0;--ridge:#4fc5b2;--lasso:#ef7fab;
+  --ok:#6fcf7d;--warn:#f0b36b;--ghost:#4a5868;--f1:#6fb1ec;--f2:#4fc5b2;--f3:#f2994a;--f4:#ef7fab;--f5:#b79af0;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101820;--panel:#182230;--panel-2:#1f2b3a;--fg:#e9eef3;--fg-2:#a7b4c0;--line:#2f3d4c;
+  --accent:#6fb1ec;--accent-soft:#1d3550;--train:#f2994a;--cv:#6fb1ec;--test:#b79af0;--ridge:#4fc5b2;--lasso:#ef7fab;
+  --ok:#6fcf7d;--warn:#f0b36b;--ghost:#4a5868;--f1:#6fb1ec;--f2:#4fc5b2;--f3:#f2994a;--f4:#ef7fab;--f5:#b79af0;color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:var(--base);line-height:1.5;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body[data-mode="instructor"]{--base:20px}
+h1,h2,h3{font-family:var(--display);font-variation-settings:"wdth" 100;letter-spacing:-.01em;text-wrap:balance;margin:0}
+h1{font-size:2.4em;font-weight:800;line-height:1.05;font-variation-settings:"wdth" 125}
+h2{font-size:1.7em;font-weight:700;line-height:1.15}
+h3{font-size:1.15em;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+code,pre,.mono{font-family:var(--mono);font-size:.9em}
+.eyebrow{font-family:var(--display);font-weight:500;text-transform:uppercase;letter-spacing:.12em;font-size:.72em;color:var(--fg-2)}
+.wrap{max-width:1180px;margin:0 auto}
+.measure{max-width:68ch}
+
+/* header */
+header.top{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:flex-end;justify-content:space-between;padding-block:28px 18px}
+.brand{display:flex;flex-direction:column;gap:6px}
+.brand p{color:var(--fg-2);max-width:60ch}
+.modebar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--panel)}
+.seg button{border:0;background:transparent;color:var(--fg-2);font:inherit;font-weight:600;padding:8px 16px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--fg);font:inherit;font-weight:600;padding:9px 16px;border-radius:999px;cursor:pointer;line-height:1.2}
+.btn:hover{border-color:var(--fg-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.ghost{background:transparent}
+.btn.small{padding:6px 12px;font-size:.9em}
+.btn:disabled{opacity:.5;cursor:default}
+:is(button,input,select,[tabindex]):focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* step rail */
+nav.rail{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px 10px;border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+nav.rail ol{list-style:none;margin:0;padding:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin}
+nav.rail a{display:flex;align-items:baseline;gap:8px;white-space:nowrap;text-decoration:none;color:var(--fg-2);font-weight:600;padding:8px 12px;border-radius:8px;font-size:.92em}
+nav.rail a .n{font-family:var(--display);font-weight:800;color:var(--accent);font-size:.9em}
+nav.rail a:hover,nav.rail a.active{background:var(--panel);color:var(--fg)}
+
+/* sections */
+section.beat{padding-block:40px 24px;border-bottom:1px solid var(--line)}
+section.beat:last-of-type{border-bottom:0}
+.beat-head{display:grid;gap:8px;margin-bottom:22px}
+.lede{font-size:1.1em;color:var(--fg-2);max-width:68ch}
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g-side{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+@media (max-width:900px){.g2,.g3,.g-side{grid-template-columns:minmax(0,1fr)}}
+.grid>*{min-width:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.panel.soft{background:var(--panel-2);border-color:transparent}
+.panel h3{margin-bottom:8px}
+.stack{display:grid;gap:12px}
+.note{color:var(--fg-2);font-size:.95em}
+.tag{display:inline-block;font-size:.75em;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--panel-2);color:var(--fg-2);vertical-align:middle}
+.tag.sim{background:var(--accent-soft);color:var(--accent)}
+details.more{border:1px dashed var(--line);border-radius:var(--radius);padding:10px 14px}
+details.more summary{cursor:pointer;font-weight:600;color:var(--accent)}
+details.more[open] summary{margin-bottom:8px}
+.eq{font-family:var(--mono);font-size:.95em;background:var(--panel-2);padding:10px 12px;border-radius:8px;overflow-x:auto}
+ul.clean{margin:0;padding-left:1.2em;display:grid;gap:6px}
+
+/* reveal */
+.reveal{display:grid;gap:10px}
+.reveal .hidden-content{display:none}
+.reveal.open .hidden-content{display:block}
+.reveal.open .reveal-btn{display:none}
+.hidden-content{background:var(--accent-soft);border-left:4px solid var(--accent);padding:12px 14px;border-radius:0 8px 8px 0}
+
+/* discussion */
+.qcard{display:grid;gap:16px}
+.qnum{display:flex;gap:6px}
+.qnum span{width:36px;height:6px;border-radius:3px;background:var(--line)}
+.qnum span.on{background:var(--accent)}
+.question{font-family:var(--display);font-weight:700;font-size:1.5em;line-height:1.25;text-wrap:balance}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.timer{font-family:var(--mono);font-size:1.4em;font-weight:600;min-width:4ch;color:var(--fg-2)}
+.timer.on{color:var(--fg)}
+.phase{font-weight:600;color:var(--fg-2)}
+
+/* data table */
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92em;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--fg-2);font-weight:600;font-size:.85em;text-transform:uppercase;letter-spacing:.04em}
+tr.best td{background:var(--accent-soft);font-weight:600}
+tr.running td{background:var(--panel-2)}
+
+/* metrics */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.tile{background:var(--panel-2);border-radius:8px;padding:12px 14px;border-top:4px solid var(--line)}
+.tile .lbl{font-size:.78em;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-2);font-weight:600}
+.tile .val{font-family:var(--mono);font-size:1.5em;font-weight:600;font-variant-numeric:tabular-nums}
+.tile .sub{font-size:.85em;color:var(--fg-2)}
+.tile.train{border-color:var(--train)}.tile.cv{border-color:var(--cv)}.tile.test{border-color:var(--test)}.tile.base{border-color:var(--ghost)}
+
+/* sliders */
+.slider{display:grid;gap:6px}
+.slider label{display:flex;justify-content:space-between;align-items:baseline;font-weight:600}
+.slider label .v{font-family:var(--mono);font-weight:600;color:var(--accent)}
+input[type=range]{width:100%;accent-color:var(--accent);height:28px}
+.slider .ends{display:flex;justify-content:space-between;font-size:.8em;color:var(--fg-2)}
+
+/* charts */
+.chart{width:100%;display:block;overflow:visible}
+.chart text{font-family:var(--body);fill:var(--fg-2);font-size:12px}
+.chart .axis line,.chart .axis path{stroke:var(--line)}
+.chart .grid line{stroke:var(--line);stroke-dasharray:2 3}
+.chart .title{fill:var(--fg);font-weight:600;font-size:13px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.88em;color:var(--fg-2)}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.chartbox{display:grid;gap:8px}
+.chartbox h3{font-size:1em}
+.heat-cell{cursor:pointer}
+.heat-cell:hover{stroke:var(--fg);stroke-width:2}
+.heat-cell.sel{stroke:var(--fg);stroke-width:3}
+
+/* folds strip */
+.folds{display:grid;gap:8px}
+.strip{display:flex;flex-wrap:wrap;gap:3px}
+.strip i{display:block;width:12px;height:12px;border-radius:2px;background:var(--line);transition:transform .15s}
+.strip i.f1{background:var(--f1)}.strip i.f2{background:var(--f2)}.strip i.f3{background:var(--f3)}.strip i.f4{background:var(--f4)}.strip i.f5{background:var(--f5)}
+.strip i.test{background:repeating-linear-gradient(45deg,var(--ghost) 0 3px,transparent 3px 6px);border:1px solid var(--ghost)}
+.strip i.dim{opacity:.25}
+.strip i.val{transform:scale(1.35);outline:2px solid var(--fg)}
+.steplist{list-style:none;padding:0;margin:0;display:grid;gap:4px;counter-reset:s}
+.steplist li{display:flex;gap:10px;align-items:baseline;padding:4px 8px;border-radius:6px;color:var(--fg-2)}
+.steplist li::before{counter-increment:s;content:counter(s);font-family:var(--display);font-weight:800;color:var(--accent);min-width:1.2em}
+.steplist li.on{background:var(--accent-soft);color:var(--fg);font-weight:600}
+.steplist li.done{color:var(--fg)}
+
+/* candidate chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-family:var(--mono);font-size:.9em;cursor:pointer;background:var(--panel)}
+.chips label:has(input:checked){background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chips input{position:absolute;opacity:0;width:0;height:0}
+
+/* predict-first */
+.predict{display:grid;gap:10px}
+.predict .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px}
+.predict .opts label{display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:6px;border:1px solid var(--line);cursor:pointer}
+.predict .opts label.hit{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,transparent)}
+.predict .opts label.miss{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,transparent)}
+.predict .opts label.missed{border-color:var(--accent);background:var(--accent-soft)}
+
+/* code */
+.code{display:grid;gap:0;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.code .row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);border-bottom:1px solid var(--line)}
+.code .row:last-child{border-bottom:0}
+.code pre{margin:0;padding:8px 14px;background:var(--panel-2);white-space:pre;overflow-x:auto;font-size:.85em;line-height:1.5}
+.code .why{padding:8px 14px;font-size:.92em;color:var(--fg-2);border-left:1px solid var(--line)}
+.code .why b{color:var(--fg)}
+.code .row.head{background:var(--panel-2)}
+.code .row.head pre{color:var(--fg-2)}
+@media (max-width:760px){.code .row{grid-template-columns:minmax(0,1fr)}.code .why{border-left:0;border-top:1px dashed var(--line)}}
+details.walk{border:1px solid var(--line);border-radius:var(--radius);padding:12px 16px;background:var(--panel)}
+details.walk summary{cursor:pointer;font-family:var(--display);font-weight:700;font-size:1.05em}
+details.walk[open] summary{margin-bottom:12px}
+.callout{border:1px solid var(--line);border-left:4px solid var(--test);padding:10px 14px;border-radius:0 8px 8px 0;background:var(--panel)}
+
+/* checklist */
+.check{display:grid;gap:8px}
+.check label{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);cursor:pointer}
+.check input{width:20px;height:20px;margin-top:3px;accent-color:var(--accent)}
+.check label:has(input:checked){border-color:var(--ok)}
+.check label:has(input:checked) .t{text-decoration:line-through;color:var(--fg-2)}
+.prompts{display:grid;gap:10px}
+.prompts div{padding:12px 14px;border-radius:8px;background:var(--panel-2);font-family:var(--display);font-weight:500;font-size:1.05em}
+
+/* instructor stepping */
+body[data-mode="instructor"] section.beat{display:none}
+body[data-mode="instructor"] section.beat.active{display:block;min-height:60vh}
+.stepnav{display:none;justify-content:space-between;gap:12px;padding-block:24px}
+body[data-mode="instructor"] .stepnav{display:flex}
+body[data-mode="instructor"] .student-only{display:none !important}
+body[data-mode="student"] .instructor-only{display:none !important}
+footer{color:var(--fg-2);font-size:.9em;padding-block:28px;max-width:72ch}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="brand">
+    <div class="eyebrow">Regularization &amp; tuning · MSBA</div>
+    <h1>Shrink to Fit</h1>
+    <p>Ridge, LASSO, elastic net, and grid search, built up from one prediction problem. Think and discuss first; the explanations, the code, and the answers stay hidden until revealed.</p>
+  </div>
+  <div class="modebar">
+    <div class="seg" role="group" aria-label="Mode">
+      <button id="mode-instructor" aria-pressed="true">Instructor</button>
+      <button id="mode-student" aria-pressed="false">Student</button>
+    </div>
+    <button class="btn ghost" id="btn-reset">Reset</button>
+  </div>
+</header>
+
+<nav class="rail" aria-label="Sections">
+  <ol id="rail">
+    <li><a href="#problem" data-sec="problem"><span class="n">1</span>The problem</a></li>
+    <li><a href="#penalty" data-sec="penalty"><span class="n">2</span>Penalty slider</a></li>
+    <li><a href="#ridge-lasso" data-sec="ridge-lasso"><span class="n">3</span>Ridge vs LASSO</a></li>
+    <li><a href="#gridsearch" data-sec="gridsearch"><span class="n">4</span>Grid search &amp; CV</a></li>
+    <li><a href="#enet" data-sec="enet"><span class="n">5</span>Elastic net</a></li>
+    <li><a href="#code" data-sec="code"><span class="n">6</span>Python</a></li>
+    <li><a href="#pa" data-sec="pa"><span class="n">7</span>Your PA</a></li>
+  </ol>
+</nav>
+
+<!-- ============ 1. PROBLEM ============ -->
+<section class="beat active" id="problem">
+  <div class="beat-head">
+    <div class="eyebrow">1 · The prediction problem</div>
+    <h2>Predict next week's sales at a coffee shop you have never seen.</h2>
+    <p class="lede">A regional chain has 100 locations. For each one we know ten things about the store and its neighborhood, and last week's sales. The chain is opening new stores and wants a sales forecast from the store's characteristics alone.</p>
+  </div>
+  <div class="grid g-side">
+    <div class="panel stack">
+      <div><span class="tag sim">Simulated data</span> <span class="note">Generated in your browser from a fixed random seed so every number on this page is reproducible. Real sales data would not come with a known answer key.</span></div>
+      <div class="tablewrap" id="data-preview"></div>
+      <p class="note">First 6 of <b id="n-total">100</b> locations. <b id="n-train">60</b> are used for training and cross-validation; <b id="n-test">40</b> are locked away as a held-out test set until Section 4.</p>
+      <div class="controls">
+        <button class="btn small" id="btn-copy-csv">Copy dataset as CSV</button>
+        <button class="btn small student-only" id="btn-reseed">Try a different simulated dataset</button>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel">
+        <h3>The ten predictors</h3>
+        <ul class="clean" id="pred-list"></ul>
+        <p class="note" style="margin-top:10px">Some of these overlap (seats, parking, and store size all describe how big the store is). Some may have nothing to do with sales. That is the point.</p>
+      </div>
+      <div class="reveal" id="truth-reveal">
+        <button class="btn reveal-btn" data-reveal="truth-reveal">Reveal how the data were generated</button>
+        <div class="hidden-content">
+          <p><b>Answer key (only possible because the data are simulated).</b> Weekly sales were built from foot traffic, ad spend, store size, neighborhood income, and competitor count, plus random noise of about $2,800. Social posts, seats, and parking are correlated copies of other predictors (correlation near 0.9) with no effect of their own. Temperature and manager tenure are pure noise.</p>
+          <p class="note" style="margin-top:8px">Keep this in mind in Section 3: a model that keeps "seats" and drops "store size" has not discovered anything about seats.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel qcard" style="margin-top:22px" id="discussion">
+    <div class="eyebrow">Think · Discuss · Reveal</div>
+    <div class="qnum" id="qdots"></div>
+    <div class="question" id="qtext"></div>
+    <div class="controls">
+      <button class="btn" id="btn-think">Think <span class="note">(1 min)</span></button>
+      <button class="btn" id="btn-discuss">Discuss <span class="note">(2 min)</span></button>
+      <span class="timer" id="timer">—</span>
+      <span class="phase" id="phase"></span>
+    </div>
+    <div class="reveal" id="q-reveal">
+      <button class="btn primary reveal-btn" data-reveal="q-reveal">Reveal explanation</button>
+      <div class="hidden-content" id="qexpl"></div>
+    </div>
+    <div class="controls">
+      <button class="btn small" id="q-prev">◀ Previous question</button>
+      <button class="btn small" id="q-next">Next question ▶</button>
+      <span class="note">Thirteen questions, the same ones as Topic 10.2: think for a minute, discuss for two, then reveal. Answers are instructor notes.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. PENALTY ============ -->
+<section class="beat" id="penalty">
+  <div class="beat-head">
+    <div class="eyebrow">2 · One slider, three things move</div>
+    <h2>Regularization: a penalty for large coefficients.</h2>
+    <p class="lede">Ordinary least squares picks coefficients that minimize training error, full stop. A regularized model minimizes training error <em>plus a penalty</em> that grows with the size of the coefficients. The slider sets how heavy that penalty is. Watch the coefficients, the two errors, and the predictions move together.</p>
+  </div>
+  <div class="grid g-side">
+    <div class="stack">
+      <div class="panel stack">
+        <div class="controls">
+          <span class="eyebrow">Method</span>
+          <div class="seg" role="group" aria-label="Method">
+            <button data-m="ridge" class="m2" aria-pressed="true">Ridge</button>
+            <button data-m="lasso" class="m2" aria-pressed="false">LASSO</button>
+          </div>
+          <label class="note" style="display:flex;gap:6px;align-items:center;margin-left:auto"><input type="checkbox" id="show-baseline" checked> Show no-penalty baseline (grey)</label>
+        </div>
+        <div class="slider">
+          <label for="alpha2">Penalty strength <span>alpha = <span class="v" id="alpha2-v"></span></span></label>
+          <input type="range" id="alpha2" min="0" max="100" value="0" step="1">
+          <div class="ends"><span>Almost no penalty (like OLS)</span><span>Heavy penalty</span></div>
+        </div>
+        <div class="chartbox"><h3>Standardized coefficients <span class="note">(dollars of weekly sales per one standard deviation of the predictor)</span></h3><div id="coef2"></div></div>
+      </div>
+      <div class="panel chartbox">
+        <h3>Error as the penalty changes <span class="note">— the dashed line is where the slider is</span></h3>
+        <div id="curve2"></div>
+        <div class="legend"><span style="--c:var(--train)">Training RMSE</span><span style="--c:var(--cv)">5-fold cross-validation RMSE</span><span style="--c:var(--ghost)">No-penalty baseline</span></div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel stack">
+        <div class="tiles">
+          <div class="tile train"><div class="lbl">Training RMSE</div><div class="val" id="t2-train"></div><div class="sub">fit to the 60 training rows</div></div>
+          <div class="tile cv"><div class="lbl">CV RMSE</div><div class="val" id="t2-cv"></div><div class="sub">average over 5 validation folds</div></div>
+          <div class="tile base"><div class="lbl">Baseline (no penalty)</div><div class="val" id="t2-base"></div><div class="sub">CV RMSE of plain linear regression</div></div>
+        </div>
+        <p class="note">RMSE is in dollars of weekly sales: "typical miss." Lower is better.</p>
+      </div>
+      <div class="panel chartbox">
+        <div class="controls" style="justify-content:space-between"><h3 style="margin:0">Predicted vs. observed</h3>
+          <div class="seg" role="group" aria-label="Prediction type"><button class="p2" data-p="train" aria-pressed="true">Training fit</button><button class="p2" data-p="oof" aria-pressed="false">Cross-validated</button></div></div>
+        <div id="scatter2"></div>
+        <p class="note" id="scatter2-note"></p>
+      </div>
+      <div class="reveal" id="r2">
+        <button class="btn reveal-btn" data-reveal="r2">Reveal: what to notice</button>
+        <div class="hidden-content stack">
+          <p><b>Too little penalty</b> leaves the coefficients free to chase noise in these 60 rows. <b>Too much</b> drags every coefficient toward zero, including the useful ones, and predictions collapse toward the average. The CV curve has a low point in between; the training curve only ever gets worse as the penalty grows, which is why training error cannot pick the penalty.</p>
+          <p><b>Why standardize first?</b> The penalty treats a coefficient of 500 as "big" no matter what the variable is. But a coefficient on "store size in square feet" and one on "manager tenure in years" live on completely different scales. Standardizing each predictor (subtract its mean, divide by its standard deviation) puts every coefficient in the same units: dollars per one standard deviation. Then the penalty is fair, and the bars above are comparable.</p>
+          <details class="more"><summary>The equations, if you want them</summary>
+            <div class="stack">
+              <div class="eq">OLS:   minimize  Σ (yᵢ − ŷᵢ)²</div>
+              <div class="eq">Ridge: minimize  Σ (yᵢ − ŷᵢ)²  +  alpha · Σ βⱼ²</div>
+              <div class="eq">LASSO: minimize  (1/2n) Σ (yᵢ − ŷᵢ)²  +  alpha · Σ |βⱼ|</div>
+              <p class="note">The intercept is not penalized. scikit-learn's Ridge and Lasso scale the squared-error term differently (Lasso divides by 2n), so an <code>alpha</code> of 10 does not mean the same thing for both. That is why the slider's alpha range changes when you switch methods.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. RIDGE vs LASSO ============ -->
+<section class="beat" id="ridge-lasso">
+  <div class="beat-head">
+    <div class="eyebrow">3 · Two penalties, two personalities</div>
+    <h2>Ridge shrinks. LASSO shrinks and selects.</h2>
+    <p class="lede">Same data, same five folds. The only change is the shape of the penalty: squared coefficients (ridge) or absolute values (LASSO). Predict first, then look.</p>
+  </div>
+  <div class="grid g-side">
+    <div class="stack">
+      <div class="panel stack">
+        <div class="controls">
+          <span class="eyebrow">Show paths for</span>
+          <div class="seg" role="group" aria-label="Method"><button data-m="ridge" class="m3" aria-pressed="true">Ridge</button><button data-m="lasso" class="m3" aria-pressed="false">LASSO</button></div>
+          <label class="note" style="display:flex;gap:6px;align-items:center;margin-left:auto"><input type="checkbox" id="show-cvbest" checked> Mark the CV-chosen alpha</label>
+        </div>
+        <div class="chartbox"><h3>Coefficient paths: every predictor's coefficient as the penalty grows</h3><div id="path3"></div></div>
+        <details class="more"><summary>How to read a coefficient path</summary>
+          <p>Each line is one predictor. Left to right, the penalty gets heavier. At the far left the lines sit near their no-penalty (OLS) values. Moving right, every line heads toward zero. Under <b>ridge</b> they approach zero smoothly and never quite land. Under <b>LASSO</b> lines hit exactly zero and stay there; once a line is flat on the axis, that predictor is out of the model. The dashed vertical line marks the alpha that 5-fold cross-validation chose (Section 4 shows how).</p>
+        </details>
+      </div>
+      <div class="panel predict" id="predict3">
+        <div class="eyebrow">Predict before you look</div>
+        <p><b>At the alpha cross-validation picks for LASSO, which predictors do you think get a coefficient of exactly zero?</b> Check your guesses, then reveal.</p>
+        <div class="opts" id="predict3-opts"></div>
+        <div class="controls">
+          <button class="btn primary" id="btn-predict3">Reveal what LASSO actually did</button>
+          <span class="note" id="predict3-score"></span>
+        </div>
+        <div class="legend" id="predict3-legend" hidden><span style="--c:var(--ok)">Correct guess</span><span style="--c:var(--warn)">Guessed zero, kept</span><span style="--c:var(--accent)">Zeroed, not guessed</span></div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel">
+        <h3>Side by side at each method's CV-chosen alpha</h3>
+        <div class="tablewrap" id="table3"></div>
+      </div>
+      <div class="reveal" id="r3">
+        <button class="btn reveal-btn" data-reveal="r3">Reveal: four things to take away</button>
+        <div class="hidden-content">
+          <ul class="clean">
+            <li><b>Ridge shrinks toward zero but almost never reaches it.</b> Every predictor stays in the model; correlated predictors tend to share their effect.</li>
+            <li><b>LASSO can set coefficients to exactly zero.</b> The result is a smaller model that is easier to explain and cheaper to collect data for. Among correlated predictors, LASSO often keeps one and drops the rest, somewhat arbitrarily.</li>
+            <li><b>Neither is automatically better.</b> On this dataset the two CV errors are close. Ridge tends to win when many predictors each matter a little; LASSO when a few matter and the rest are noise. You find out by cross-validating, not by assuming.</li>
+            <li><b>Retained does not mean important, and certainly not causal.</b> Check the answer key in Section 1: if LASSO kept "seats" and dropped "store size," it chose a stand-in, not a cause. Regularization is a prediction tool. It does not test hypotheses.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. GRID SEARCH ============ -->
+<section class="beat" id="gridsearch">
+  <div class="beat-head">
+    <div class="eyebrow">4 · How the slider gets set in practice</div>
+    <h2>Grid search: try every candidate, let cross-validation vote.</h2>
+    <p class="lede">We cannot choose alpha by training error (it always prefers no penalty) and we must not choose it by test error (then the test set is no longer a fair test). So we split the training data into folds and let the folds judge each candidate.</p>
+  </div>
+  <div class="grid g-side">
+    <div class="stack">
+      <div class="panel folds">
+        <h3>Where every row lives</h3>
+        <div class="strip" id="strip"></div>
+        <div class="legend"><span style="--c:var(--f1)">Fold 1</span><span style="--c:var(--f2)">Fold 2</span><span style="--c:var(--f3)">Fold 3</span><span style="--c:var(--f4)">Fold 4</span><span style="--c:var(--f5)">Fold 5</span><span style="--c:var(--ghost)">Held-out test (40 rows)</span></div>
+        <p class="note">The 60 training rows are dealt into 5 folds. For each candidate alpha, each fold takes a turn as the validation set while the other four train the model. The 40 test rows take no part in this. They are opened once, at the very end.</p>
+      </div>
+      <div class="panel stack">
+        <div class="controls">
+          <span class="eyebrow">Method</span>
+          <div class="seg" role="group" aria-label="Method"><button data-m="ridge" class="m4" aria-pressed="true">Ridge</button><button data-m="lasso" class="m4" aria-pressed="false">LASSO</button></div>
+          <span class="eyebrow" style="margin-left:auto">Speed</span>
+          <div class="seg" role="group" aria-label="Speed"><button class="sp" data-s="slow" aria-pressed="false">Slow</button><button class="sp" data-s="normal" aria-pressed="true">Normal</button><button class="sp" data-s="fast" aria-pressed="false">Fast</button></div>
+        </div>
+        <div><div class="eyebrow" style="margin-bottom:6px">Candidate alphas (click to include)</div><div class="chips" id="chips4"></div></div>
+        <div class="controls">
+          <button class="btn primary" id="btn-run4">Run search</button>
+          <button class="btn" id="btn-stop4" disabled>Stop</button>
+          <span class="note" id="status4"></span>
+        </div>
+        <ol class="steplist" id="steps4">
+          <li>Take the next candidate alpha.</li>
+          <li>Fit on four folds, score on the fifth; repeat for all five folds.</li>
+          <li>Average the five validation errors.</li>
+          <li>Compare with the candidates so far.</li>
+          <li>Keep the alpha with the lowest average validation error.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel"><h3>Results table</h3><div class="tablewrap" id="table4"><p class="note">Run the search to fill this table.</p></div></div>
+      <div class="panel chartbox"><h3>Validation error by candidate</h3><div id="chart4"></div><div class="legend"><span style="--c:var(--cv)">Mean CV RMSE</span><span style="--c:var(--ghost)">Individual folds</span></div></div>
+      <div class="panel stack" id="final4">
+        <h3>Final step: open the test set once</h3>
+        <p class="note">Refit the winning alpha on all 60 training rows, then predict the 40 held-out stores. This number is the honest estimate of how the model will do on new stores. It is not used to choose anything.</p>
+        <div class="controls"><button class="btn" id="btn-test4" disabled>Evaluate on held-out test set</button></div>
+        <div class="tiles" id="tiles4" hidden>
+          <div class="tile cv"><div class="lbl">Best CV RMSE</div><div class="val" id="t4-cv"></div><div class="sub" id="t4-alpha"></div></div>
+          <div class="tile test"><div class="lbl">Test RMSE</div><div class="val" id="t4-test"></div><div class="sub">40 stores never used before</div></div>
+          <div class="tile base"><div class="lbl">Baseline test RMSE</div><div class="val" id="t4-base"></div><div class="sub">plain linear regression</div></div>
+        </div>
+        <p class="note" id="t4-note" hidden></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. ELASTIC NET ============ -->
+<section class="beat" id="enet">
+  <div class="beat-head">
+    <div class="eyebrow">5 · A dial between the two</div>
+    <h2>Elastic net mixes the ridge and LASSO penalties.</h2>
+    <p class="lede">Two tuning parameters now: <code>alpha</code> for how heavy the total penalty is, and <code>l1_ratio</code> for how much of it is LASSO-style (absolute values) versus ridge-style (squares). Grid search now runs over a grid in two dimensions, which is what the heatmap shows.</p>
+  </div>
+  <div class="grid g-side">
+    <div class="stack">
+      <div class="panel stack">
+        <div class="slider">
+          <label for="alpha5">alpha (total penalty strength) <span class="v" id="alpha5-v"></span></label>
+          <input type="range" id="alpha5" min="0" max="8" value="1" step="1">
+          <div class="ends"><span>0.1</span><span>1,000</span></div>
+        </div>
+        <div class="slider">
+          <label for="l1r5">l1_ratio (share of LASSO penalty) <span class="v" id="l1r5-v"></span></label>
+          <input type="range" id="l1r5" min="0" max="5" value="2" step="1">
+          <div class="ends"><span>0.1 · mostly ridge</span><span>1.0 · pure LASSO</span></div>
+        </div>
+        <div class="chartbox"><h3>Coefficients at these settings</h3><div id="coef5"></div></div>
+        <div class="tiles">
+          <div class="tile cv"><div class="lbl">CV RMSE</div><div class="val" id="t5-cv"></div><div class="sub">5 folds, same splits as before</div></div>
+          <div class="tile"><div class="lbl">Predictors kept</div><div class="val" id="t5-kept"></div><div class="sub">non-zero coefficients</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel chartbox">
+        <h3>Cross-validation RMSE over the (alpha, l1_ratio) grid <span class="note">— click a cell to load its settings</span></h3>
+        <div id="heat5"></div>
+        <p class="note" id="heat5-note"></p>
+      </div>
+      <div class="reveal" id="r5">
+        <button class="btn reveal-btn" data-reveal="r5">Reveal: why bother with a mixture?</button>
+        <div class="hidden-content stack">
+          <p>In scikit-learn, <code>alpha</code> is the overall penalty strength and <code>l1_ratio</code> is the mixture. <code>l1_ratio = 1</code> is exactly the LASSO penalty; values between 0 and 1 blend the two. For the pure ridge comparison use <code>Ridge</code> directly rather than <code>l1_ratio = 0</code> (sklearn's ElasticNet solver is not meant for that end).</p>
+          <p><b>Correlated predictors are the reason elastic net exists.</b> When store size, seats, and parking all say nearly the same thing, pure LASSO tends to pick one more or less at random and zero the others, and which one it picks can change if you change the sample. The ridge component spreads the shared effect across the group so the selection is steadier, while the LASSO component still removes predictors that contribute nothing. Move <code>l1_ratio</code> from 1.0 toward 0.1 and watch the overlapping trio in the bar chart.</p>
+          <details class="more"><summary>The equation</summary>
+            <div class="eq">ElasticNet: minimize  (1/2n) Σ (yᵢ − ŷᵢ)²  +  alpha · l1_ratio · Σ |βⱼ|  +  alpha · (1 − l1_ratio)/2 · Σ βⱼ²</div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. CODE ============ -->
+<section class="beat" id="code">
+  <div class="beat-head">
+    <div class="eyebrow">6 · From the dials to scikit-learn</div>
+    <h2>The same four ideas in Python.</h2>
+    <p class="lede">Every control on this page maps to one argument. Code is kept inside a <code>Pipeline</code> so that standardization is re-estimated inside each cross-validation fold; otherwise the validation rows leak into the scaler.</p>
+  </div>
+  <div class="reveal" id="r6">
+    <button class="btn primary reveal-btn" data-reveal="r6">Reveal code walkthroughs</button>
+    <div class="hidden-content" style="background:transparent;border:0;padding:0">
+      <div class="stack">
+        <div class="callout"><b>Negative scoring, positive numbers.</b> scikit-learn's model-selection tools maximize a score, so error metrics are passed as negatives: <code>scoring="neg_root_mean_squared_error"</code> returns values like −3058. Larger (closer to zero) is better. Flip the sign before reporting and say "RMSE ≈ $3,058," which is what this page does.</div>
+        <p class="note">Sample code uses placeholder names (<code>sales_df</code>, <code>weekly_sales</code>). Replace with the notebook's data and variable names when the notebook is in hand.</p>
+        <div id="walks" class="stack"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. PA ============ -->
+<section class="beat" id="pa">
+  <div class="beat-head">
+    <div class="eyebrow">7 · Into the programming assignment</div>
+    <h2>What to do with a dataset of your own.</h2>
+    <p class="lede">Not a solution, a route. Check items off as you work; the list lives only in your browser. Adapt this section to the actual PA once it is provided.</p>
+  </div>
+  <div class="grid g2">
+    <div class="check" id="checklist"></div>
+    <div class="stack">
+      <div class="panel">
+        <h3>Reflection prompts</h3>
+        <div class="prompts">
+          <div>Which model would you choose, and what evidence supports your decision?</div>
+          <div>Which predictors did LASSO or elastic net drop? Would a manager be surprised? Should they be?</div>
+          <div>How different are your best CV error and your test error? What does the gap tell you?</div>
+          <div>If you had to give up one predictor for cost reasons, how would the coefficient paths help you decide?</div>
+          <div>What would change if you had 10× more rows? 10× more predictors?</div>
+        </div>
+      </div>
+      <div class="panel soft">
+        <h3>Vocabulary to use in your write-up</h3>
+        <p class="note">regularization · penalty · shrinkage · standardization · training vs. validation vs. test · k-fold cross-validation · grid search · alpha · l1_ratio · sparsity · multicollinearity · bias–variance trade-off · RMSE</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stepnav"><button class="btn" id="step-prev">◀ Previous section</button><span class="note" id="step-label"></span><button class="btn primary" id="step-next">Next section ▶</button></div>
+
+<footer>
+  <p><b>About the numbers.</b> Every coefficient, prediction, and error on this page is computed live in your browser: ridge by its closed-form solution, LASSO and elastic net by coordinate descent on scikit-learn's objective functions, with 5-fold cross-validation on fixed fold assignments. Nothing is pre-drawn. The dataset is simulated from a fixed seed; the "Try a different simulated dataset" button (student mode) draws a new one and recomputes everything, so results will change. That variability is real and worth discussing.</p>
+</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>/* ===== Regularization teaching core =====
+   Everything displayed on the page comes from these functions, run live in the browser.
+   Conventions follow scikit-learn:
+     Ridge:      minimize ||y - Xw||^2 + alpha * ||w||^2
+     Lasso:      minimize (1/2n)||y - Xw||^2 + alpha * ||w||_1
+     ElasticNet: minimize (1/2n)||y - Xw||^2 + alpha*l1_ratio*||w||_1 + alpha*(1-l1_ratio)/2*||w||^2
+*/
+var REG = (function () {
+  // ---- deterministic RNG (so the simulated data is reproducible) ----
+  function mulberry32(seed) {
+    return function () {
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function makeNormal(rand) {
+    var spare = null;
+    return function () {
+      if (spare !== null) { var s = spare; spare = null; return s; }
+      var u = 0, v = 0;
+      while (u === 0) u = rand();
+      v = rand();
+      var r = Math.sqrt(-2 * Math.log(u)), th = 2 * Math.PI * v;
+      spare = r * Math.sin(th);
+      return r * Math.cos(th);
+    };
+  }
+
+  // ---- simulated dataset: weekly sales at coffee shop locations ----
+  // Predictor definitions. "truth" is the coefficient in the data-generating
+  // process, in dollars of weekly sales per one standard deviation of the predictor.
+  var PREDICTORS = [
+    { key: 'foot_traffic',   label: 'Foot traffic (daily passers-by)',    truth: 2600, role: 'signal' },
+    { key: 'ad_spend',       label: 'Ad spend ($/month)',                  truth: 1100, role: 'signal' },
+    { key: 'social_posts',   label: 'Social posts per week',               truth: 0,    role: 'overlap', overlapsWith: 'ad_spend' },
+    { key: 'store_sqft',     label: 'Store size (sq ft)',                  truth: 900,  role: 'signal' },
+    { key: 'seats',          label: 'Seats',                               truth: 0,    role: 'overlap', overlapsWith: 'store_sqft' },
+    { key: 'parking_spaces', label: 'Parking spaces',                      truth: 0,    role: 'overlap', overlapsWith: 'store_sqft' },
+    { key: 'median_income',  label: 'Neighborhood median income ($K)',     truth: 800,  role: 'signal' },
+    { key: 'competitors',    label: 'Competitors within 1 mile',           truth: -700, role: 'signal' },
+    { key: 'avg_temp',       label: 'Average temperature (°F)',            truth: 0,    role: 'noise' },
+    { key: 'manager_tenure', label: 'Manager tenure (years)',              truth: 0,    role: 'noise' }
+  ];
+  var P = PREDICTORS.length;
+
+  function generateData(seed, n) {
+    var rand = mulberry32(seed), nrm = makeNormal(rand);
+    var X = [], y = [];
+    for (var i = 0; i < n; i++) {
+      // latent standardized factors
+      var traffic = nrm(), ad = nrm(), size = nrm(), income = nrm(), comp = nrm(), temp = nrm(), tenure = nrm();
+      // correlated copies (correlation about 0.9 with their partner)
+      var social = 0.9 * ad + Math.sqrt(1 - 0.81) * nrm();
+      var seats = 0.92 * size + Math.sqrt(1 - 0.92 * 0.92) * nrm();
+      var parking = 0.85 * size + Math.sqrt(1 - 0.85 * 0.85) * nrm();
+      var z = [traffic, ad, social, size, seats, parking, income, comp, temp, tenure];
+      var mu = 18000;
+      for (var j = 0; j < P; j++) mu += PREDICTORS[j].truth * z[j];
+      var noise = 2800 * nrm();
+      y.push(Math.round(mu + noise));
+      // convert standardized factors to natural units (for display realism)
+      X.push([
+        Math.round(1400 + 450 * traffic),
+        Math.round(2200 + 800 * ad),
+        Math.round(Math.max(0, 9 + 3 * social)),
+        Math.round(1500 + 350 * size),
+        Math.round(Math.max(4, 32 + 9 * seats)),
+        Math.round(Math.max(0, 12 + 6 * parking)),
+        Math.round(72 + 18 * income),
+        Math.round(Math.max(0, 3 + 1.6 * comp)),
+        Math.round(63 + 9 * temp),
+        Math.round(Math.max(0, 4 + 2.5 * tenure) * 10) / 10
+      ]);
+    }
+    return { X: X, y: y };
+  }
+
+  // ---- linear algebra helpers ----
+  function mean(a) { var s = 0; for (var i = 0; i < a.length; i++) s += a[i]; return s / a.length; }
+  function colStats(X) {
+    var n = X.length, p = X[0].length, mu = new Array(p).fill(0), sd = new Array(p).fill(0);
+    for (var j = 0; j < p; j++) {
+      for (var i = 0; i < n; i++) mu[j] += X[i][j];
+      mu[j] /= n;
+      for (i = 0; i < n; i++) sd[j] += (X[i][j] - mu[j]) * (X[i][j] - mu[j]);
+      sd[j] = Math.sqrt(sd[j] / n) || 1; // population sd, like StandardScaler
+    }
+    return { mu: mu, sd: sd };
+  }
+  function standardize(X, stats) {
+    return X.map(function (row) { return row.map(function (v, j) { return (v - stats.mu[j]) / stats.sd[j]; }); });
+  }
+  function solve(A, b) { // Gaussian elimination with partial pivoting, small p
+    var n = b.length, M = A.map(function (r, i) { return r.slice().concat([b[i]]); });
+    for (var c = 0; c < n; c++) {
+      var piv = c;
+      for (var r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[piv][c])) piv = r;
+      var t = M[c]; M[c] = M[piv]; M[piv] = t;
+      if (Math.abs(M[c][c]) < 1e-12) continue;
+      for (r = 0; r < n; r++) if (r !== c) {
+        var f = M[r][c] / M[c][c];
+        for (var k = c; k <= n; k++) M[r][k] -= f * M[c][k];
+      }
+    }
+    return M.map(function (r, i) { return r[n] / (M[i][i] || 1e-12); });
+  }
+
+  // ---- fitters on standardized X and centered y (intercept = mean of y) ----
+  function fitRidge(Z, yc, alpha) {
+    var n = Z.length, p = Z[0].length, A = [], b = new Array(p).fill(0);
+    for (var j = 0; j < p; j++) { A.push(new Array(p).fill(0)); }
+    for (var i = 0; i < n; i++) for (j = 0; j < p; j++) {
+      b[j] += Z[i][j] * yc[i];
+      for (var k = j; k < p; k++) A[j][k] += Z[i][j] * Z[i][k];
+    }
+    for (j = 0; j < p; j++) { for (k = j; k < p; k++) A[k][j] = A[j][k]; A[j][j] += alpha; }
+    return solve(A, b);
+  }
+  function softThreshold(z, g) { return z > g ? z - g : (z < -g ? z + g : 0); }
+  function fitElasticNet(Z, yc, alpha, l1_ratio, w0) {
+    // coordinate descent on sklearn's objective
+    var n = Z.length, p = Z[0].length;
+    var w = w0 ? w0.slice() : new Array(p).fill(0);
+    var r = new Array(n), colSq = new Array(p).fill(0);
+    for (var i = 0; i < n; i++) { var pred = 0; for (var j = 0; j < p; j++) pred += Z[i][j] * w[j]; r[i] = yc[i] - pred; }
+    for (j = 0; j < p; j++) for (i = 0; i < n; i++) colSq[j] += Z[i][j] * Z[i][j];
+    var l1 = alpha * l1_ratio, l2 = alpha * (1 - l1_ratio);
+    for (var it = 0; it < 2000; it++) {
+      var maxDelta = 0;
+      for (j = 0; j < p; j++) {
+        var wj = w[j], rho = 0;
+        for (i = 0; i < n; i++) rho += Z[i][j] * (r[i] + Z[i][j] * wj);
+        rho /= n;
+        var wnew = softThreshold(rho, l1) / (colSq[j] / n + l2);
+        if (wnew !== wj) {
+          var d = wnew - wj;
+          for (i = 0; i < n; i++) r[i] -= Z[i][j] * d;
+          w[j] = wnew;
+          if (Math.abs(d) > maxDelta) maxDelta = Math.abs(d);
+        }
+      }
+      if (maxDelta < 1e-6) break;
+    }
+    return w;
+  }
+  function fitLasso(Z, yc, alpha, w0) { return fitElasticNet(Z, yc, alpha, 1, w0); }
+  function fitOLS(Z, yc) { return fitRidge(Z, yc, 0); }
+
+  // ---- a "pipeline": scaler fit on training rows only, then model ----
+  function fitPipeline(Xtr, ytr, method, alpha, l1_ratio) {
+    var stats = colStats(Xtr), Z = standardize(Xtr, stats), yb = mean(ytr);
+    var yc = ytr.map(function (v) { return v - yb; });
+    var w;
+    if (method === 'ols') w = fitOLS(Z, yc);
+    else if (method === 'ridge') w = fitRidge(Z, yc, alpha);
+    else if (method === 'lasso') w = fitLasso(Z, yc, alpha);
+    else w = fitElasticNet(Z, yc, alpha, l1_ratio);
+    return { stats: stats, intercept: yb, coef: w, method: method, alpha: alpha, l1_ratio: l1_ratio };
+  }
+  function predict(model, X) {
+    var Z = standardize(X, model.stats);
+    return Z.map(function (z) { var s = model.intercept; for (var j = 0; j < z.length; j++) s += z[j] * model.coef[j]; return s; });
+  }
+  function rmse(yhat, y) { var s = 0; for (var i = 0; i < y.length; i++) s += (yhat[i] - y[i]) * (yhat[i] - y[i]); return Math.sqrt(s / y.length); }
+
+  // ---- K-fold cross-validation (fixed fold assignment, reused everywhere) ----
+  function makeFolds(n, K, seed) {
+    var idx = []; for (var i = 0; i < n; i++) idx.push(i);
+    var rand = mulberry32(seed);
+    for (i = n - 1; i > 0; i--) { var j = Math.floor(rand() * (i + 1)); var t = idx[i]; idx[i] = idx[j]; idx[j] = t; }
+    var folds = []; for (var k = 0; k < K; k++) folds.push([]);
+    idx.forEach(function (ix, pos) { folds[pos % K].push(ix); });
+    return folds; // folds[k] = indices of validation rows for fold k
+  }
+  function crossValidate(X, y, folds, method, alpha, l1_ratio) {
+    var scores = [];
+    for (var k = 0; k < folds.length; k++) {
+      var inVal = {}; folds[k].forEach(function (i) { inVal[i] = true; });
+      var Xtr = [], ytr = [], Xva = [], yva = [];
+      for (var i = 0; i < X.length; i++) { if (inVal[i]) { Xva.push(X[i]); yva.push(y[i]); } else { Xtr.push(X[i]); ytr.push(y[i]); } }
+      var m = fitPipeline(Xtr, ytr, method, alpha, l1_ratio);
+      scores.push(rmse(predict(m, Xva), yva));
+    }
+    return { folds: scores, mean: mean(scores) };
+  }
+
+  // ---- penalty grids used by the page ----
+  function logspace(lo, hi, n) { var out = []; for (var i = 0; i < n; i++) out.push(Math.pow(10, lo + (hi - lo) * i / (n - 1))); return out; }
+
+  return {
+    PREDICTORS: PREDICTORS, generateData: generateData, colStats: colStats, standardize: standardize,
+    fitPipeline: fitPipeline, predict: predict, rmse: rmse, makeFolds: makeFolds, crossValidate: crossValidate,
+    logspace: logspace, mean: mean
+  };
+})();
+</script>
+<script>
+(function(){
+'use strict';
+// ====== Replaceable content ======
+var QUESTIONS = [
+  { q: "Plain linear regression. We fit a line (well, a plane) to the 60 training stores: weekly sales \u2248 intercept + coefficients \u00d7 the ten store characteristics. What exactly does least squares minimize, and why might a model that fits those 60 stores very well still forecast a new store poorly?",
+    a: "<p>Least squares picks the intercept and coefficients that make the <b>sum of squared training errors</b> as small as possible. It is judged only on the 60 stores it saw, so it will happily bend to whatever is peculiar about them \u2014 a few unusual stores, a lucky correlation \u2014 and those peculiarities do not repeat in the next store. Low training error is a fact about the past sample; forecasting is a claim about new stores.</p><p class=\"note\"><b>Follow-up.</b> Which number did we trust last week instead of training error? (Cross-validated test error.)</p>" },
+  { q: "Overfitting through the coefficients. Three of our ten predictors \u2014 seats, parking spaces and store size \u2014 all describe how big the store is, and two others may be pure noise. How can coefficients become overly sensitive to the particular 60 stores we happened to sample?",
+    a: "<p>When predictors overlap, many different combinations of coefficients give almost the same fitted values: a large positive coefficient on seats and a large negative one on store size can cancel. Least squares picks whichever combination fits <i>this</i> sample best, so a different 60 stores can flip the signs and sizes completely. Noise predictors get non-zero coefficients for the same reason \u2014 there is always some chance pattern to fit. Many predictors relative to rows makes all of this worse.</p>" },
+  { q: "Why accept a worse fit? Suppose we deliberately pull the coefficients back toward zero, so training error goes up a little. Why could that make the forecasts for new stores better?",
+    a: "<p>Part of what the unconstrained coefficients capture is signal and part is sample noise. Pulling them toward zero gives up a little of the signal (a bit more training error) but throws away a lot of the noise, so the model's predictions vary less from sample to sample. For new stores the trade is usually favourable \u2014 up to a point. Last week's picture applies: training error can only get worse as we restrain the model, while validation error falls first and rises later.</p><p class=\"note\"><b>Follow-up.</b> Does it <i>guarantee</i> better forecasts? No \u2014 it is a bet that the noise outweighs the lost signal, and cross-validation is how we check the bet.</p>" },
+  { q: "The penalty. Regularization turns that idea into a single thing to minimize: training error plus a penalty on coefficient size. In words, what are the two terms fighting over, and what decides who wins?",
+    a: "<p>The first term rewards fitting the 60 stores closely; the second charges a price for large coefficients. Minimizing their sum finds coefficients that fit well <i>for their size</i>. The exchange rate between the two is the tuning parameter <i>\u03bb</i> (scikit-learn calls it <code>alpha</code>): a larger <i>\u03bb</i> makes coefficient size more expensive, so the solution shrinks. The intercept is left out of the penalty \u2014 it just sets the overall level of sales and shrinking it would bias every forecast.</p>" },
+  { q: "Ridge regression penalizes the sum of squared coefficients, \u03bb \u03a3 \u03b2\u00b2. Why does that pull every coefficient toward zero, and why does it pull the biggest ones hardest?",
+    a: "<p>Squaring makes a coefficient of 4 cost sixteen times a coefficient of 1, so the cheapest way to lower the penalty is to trim the largest coefficients first. Every coefficient is shrunk somewhat, and the trimming of a coefficient that is already small buys almost nothing, so ridge rarely drives anything exactly to zero \u2014 it approaches zero smoothly. With overlapping predictors like seats, parking and size, ridge tends to spread the shared effect across the group instead of letting one coefficient balloon and another go negative.</p>" },
+  { q: "LASSO penalizes the sum of absolute coefficients, \u03bb \u03a3 |\u03b2|. How is the effect different, and why can LASSO set a coefficient to exactly zero when ridge does not?",
+    a: "<p>With absolute values, moving a coefficient from 0.1 to 0 saves the same amount of penalty as moving it from 4.1 to 4 \u2014 the last step to zero is never cheaper than the others. If a predictor is not earning its keep in the fit, the penalty wins and the coefficient lands on zero and stays there. (Under ridge that last step from 0.1 to 0 saves only 0.01, so it is almost never worth taking.) Predictors with a zero coefficient are out of the model, which is why LASSO is described as doing variable selection.</p>" },
+  { q: "Compare them. What do ridge and LASSO share, and what is the practical difference between shrinking a coefficient and zeroing it?",
+    a: "<p>Both minimize training error plus a <i>\u03bb</i>-weighted penalty on coefficient size, both need standardized predictors, both have <i>\u03bb</i> chosen by cross-validation, and neither penalizes the intercept. A shrunk coefficient keeps the predictor in the forecast with a muted effect; a zeroed one removes it, which gives a smaller model that is easier to explain and cheaper to feed with data. Among overlapping predictors LASSO often keeps one and drops the rest somewhat arbitrarily; ridge keeps them all with smaller coefficients. Which forecasts better depends on the data and is settled by cross-validation, not by preference.</p><p class=\"note\"><b>Follow-up.</b> A LASSO zero on <code>store size</code> while <code>seats</code> is kept does <b>not</b> mean store size is irrelevant or has no effect \u2014 LASSO chose a stand-in. Regularization is a forecasting tool, not a hypothesis test. (A mixture of the two penalties, elastic net, exists for exactly this correlated-group situation; the walkthrough shows it.)</p>" },
+  { q: "Units. Store size is measured in square feet (hundreds to thousands); manager tenure in years (0 to 20). Why does that matter once we start penalizing coefficient size, and what do we do about it?",
+    a: "<p>A coefficient's size depends on its predictor's units: sales per square foot is a tiny number, sales per year of tenure a large one, and neither says which predictor matters more. A penalty that treats every coefficient alike would therefore punish tenure heavily and square footage hardly at all. <b>Standardizing</b> each predictor (subtract its mean, divide by its standard deviation) puts every coefficient in the same units \u2014 dollars of sales per one standard deviation \u2014 so the penalty is fair and the coefficients are comparable. Large coefficients are not automatically a problem; they are only meaningful after this step.</p><p class=\"note\"><b>Follow-up.</b> Inside cross-validation the scaler must be fitted on each training fold alone (a pipeline does this); scaling all the rows first leaks the validation rows into the fit.</p>" },
+  { q: "The tuning parameter. What does the model become when \u03bb = 0, when \u03bb is small, and when \u03bb is enormous? And how is \u03bb different in kind from the coefficients?",
+    a: "<p>At <i>\u03bb = 0</i> the penalty vanishes and we are back to ordinary least squares. For small <i>\u03bb</i> the coefficients are gently shrunk and predictions barely change. As <i>\u03bb</i> grows the coefficients head to zero (LASSO drops predictors one by one) and the forecast collapses toward the average sales of the training stores \u2014 a model that ignores the store. The coefficients are <b>learned</b> by fitting, given a <i>\u03bb</i>; <i>\u03bb</i> itself is not learned from the fit \u2014 it is a <b>tuning parameter</b>, set from outside and chosen by comparing candidate values on validation data.</p><p class=\"note\"><b>Follow-up.</b> Software scales the error term differently (scikit-learn's <code>Lasso</code> divides it by <i>2n</i>, <code>Ridge</code> does not), so <code>alpha = 1</code> is not the same strength of penalty for ridge and LASSO, nor the same across data sets. The value is meaningless on its own; the cross-validation curve is what matters.</p>" },
+  { q: "Choosing \u03bb by cross-validation. Here are six candidate penalty strengths and the 5-fold cross-validation MSE each produced on the 60 training stores (hypothetical numbers, in millions of dollars\u00b2): \u03bb = 0: CV MSE 9.8; \u03bb = 0.1: CV MSE 9.1; \u03bb = 1: CV MSE 8.4; \u03bb = 10: CV MSE 8.2; \u03bb = 100: CV MSE 9.6; \u03bb = 1000: CV MSE 15.0. Which would you pick, and why? Why could training MSE not have made this choice?",
+    a: "<table class=\"mini\"><thead><tr><th><i>\u03bb</i></th><th>0</th><th>0.1</th><th>1</th><th>10</th><th>100</th><th>1000</th></tr></thead><tbody><tr><td>CV MSE</td><td>9.8</td><td>9.1</td><td>8.4</td><td>8.2</td><td>9.6</td><td>15.0</td></tr></tbody></table><p>Pick <i>\u03bb = 10</i>: it has the lowest cross-validated error, and the curve has the expected shape \u2014 unpenalized at 9.8, improving as the penalty bites, then collapsing (15.0) when the penalty crushes the useful coefficients too. The strongest penalty is clearly not the best. Training MSE would have chosen <i>\u03bb = 0</i> every time, because any penalty can only make the fit to the training stores worse. One caution: 8.4 and 8.2 are close, and five folds give a noisy average, so <i>\u03bb = 1</i> would also be defensible; some analysts take the most penalized value whose error is within the noise of the minimum.</p>" },
+  { q: "Grid search. We just compared six values of \u03bb by hand. Describe what GridSearchCV does with that list, in one or two sentences.",
+    a: "<p>It takes the list of candidate values (the grid), and for each one runs the <i>same</i> K-fold cross-validation \u2014 same folds for every candidate \u2014 records the mean validation score, picks the candidate with the best mean, and refits that model on all the training rows. It is the table above, automated, with the bookkeeping (<code>cv_results_</code>, <code>best_params_</code>, <code>best_estimator_</code>) kept for you. Two tuning parameters (as in elastic net) just make the grid two-dimensional.</p>" },
+  { q: "Validation versus test. The chain locked 40 stores away before we started. If cross-validation already tells us how well each \u03bb forecasts unseen stores, why keep those 40 untouched until the very end?",
+    a: "<p>Because we <i>used</i> the validation scores to choose. The best of six candidates is partly the luckiest of six, so its cross-validated error is a little optimistic \u2014 and if we also chose features, methods and <i>\u03bb</i> on it, more so. The 40 held-out stores took no part in any decision, so the one error we compute on them after refitting the chosen model is an honest estimate of performance on genuinely new stores. Open the test set once, report the number, and do not go back and re-tune.</p>" },
+  { q: "Put it together. In four or five sentences, explain to a manager how regularization, ridge/LASSO, the tuning parameter and cross-validation work together to produce a sales forecast for a store the chain has never seen.",
+    a: "<p>We fit a linear model to the training stores but charge a price for large coefficients, which stops the model from memorizing quirks of our sample (regularization). Ridge charges by squared size and shrinks everything a little; LASSO charges by absolute size and can drop predictors entirely, giving a simpler model. How heavy the charge should be \u2014 the tuning parameter \u2014 is not something the fit can tell us, so we try a grid of values and let cross-validation on the training stores vote for the one that forecasts held-out stores best. We refit with that value on all the training stores, check it once on the stores we locked away, and that model, with standardized inputs, is what forecasts the new store.</p>" }
+];
+var CHECKLIST = [
+  ['Define the prediction question and the outcome', 'What exactly are you predicting, for whom, and in what units?'],
+  ['Establish a baseline', 'A plain linear regression (and the "predict the mean" model) tell you what you have to beat.'],
+  ['Compare ridge, LASSO, and elastic net', 'Same training data, same cross-validation folds, inside a Pipeline with standardization.'],
+  ['Use cross-validation to choose tuning parameters', 'GridSearchCV over alpha (and l1_ratio). Report the best CV error in positive units.'],
+  ['Evaluate the final model on held-out data', 'Once. After every choice has been made.'],
+  ['Explain predictive performance and coefficient patterns', 'Which predictors shrank, which dropped out, and whether that matches domain sense.'],
+  ['Discuss limitations and justify modeling choices', 'Why this model, why these folds, what could still go wrong with new data.']
+];
+
+// ====== Setup ======
+var DEFAULT_SEED = 20264, N_TRAIN = 60, N_TEST = 40, K = 5;
+var S = {}; // state
+var $ = function(id){ return document.getElementById(id); };
+var fmt$ = function(v){ return '$' + Math.round(v).toLocaleString('en-US'); };
+var fmtA = function(a){ return a >= 100 ? Math.round(a).toLocaleString('en-US') : a >= 10 ? a.toFixed(1) : a.toFixed(2); };
+var RIDGE_GRID = REG.logspace(-1, 3, 25), LASSO_GRID = REG.logspace(0, 3.5, 25);
+var ENET_ALPHAS = REG.logspace(-1, 3, 9), ENET_L1 = [0.1, 0.3, 0.5, 0.7, 0.9, 1.0];
+var CAND = { ridge: REG.logspace(-1, 3, 9), lasso: REG.logspace(0, 3.5, 8) };
+var shortLabel = ['Foot traffic','Ad spend','Social posts','Store size','Seats','Parking','Median income','Competitors','Avg temp','Mgr tenure'];
+
+function buildData(seed){
+  var d = REG.generateData(seed, N_TRAIN + N_TEST);
+  S.seed = seed;
+  S.Xtr = d.X.slice(0, N_TRAIN); S.ytr = d.y.slice(0, N_TRAIN);
+  S.Xte = d.X.slice(N_TRAIN); S.yte = d.y.slice(N_TRAIN);
+  S.folds = REG.makeFolds(N_TRAIN, K, seed + 1);
+  S.ols = REG.fitPipeline(S.Xtr, S.ytr, 'ols');
+  S.olsTrain = REG.rmse(REG.predict(S.ols, S.Xtr), S.ytr);
+  S.olsCV = REG.crossValidate(S.Xtr, S.ytr, S.folds, 'ols').mean;
+  S.olsTest = REG.rmse(REG.predict(S.ols, S.Xte), S.yte);
+  S.path = {};
+  ['ridge','lasso'].forEach(function(m){
+    var grid = m === 'ridge' ? RIDGE_GRID : LASSO_GRID;
+    var rows = grid.map(function(a){
+      var mod = REG.fitPipeline(S.Xtr, S.ytr, m, a);
+      var cv = REG.crossValidate(S.Xtr, S.ytr, S.folds, m, a);
+      return { alpha: a, coef: mod.coef, model: mod, train: REG.rmse(REG.predict(mod, S.Xtr), S.ytr), cv: cv.mean, cvFolds: cv.folds };
+    });
+    var best = 0; rows.forEach(function(r, i){ if (r.cv < rows[best].cv) best = i; });
+    S.path[m] = { grid: grid, rows: rows, bestIdx: best };
+  });
+  S.enet = ENET_ALPHAS.map(function(a){ return ENET_L1.map(function(l){
+    var cv = REG.crossValidate(S.Xtr, S.ytr, S.folds, 'enet', a, l);
+    var mod = REG.fitPipeline(S.Xtr, S.ytr, 'enet', a, l);
+    return { alpha: a, l1: l, cv: cv.mean, coef: mod.coef };
+  }); });
+}
+
+// ====== SVG helpers ======
+var NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, text){ var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; }
+function svg(w, h){ var s = el('svg', { viewBox: '0 0 ' + w + ' ' + h, class: 'chart', role: 'img' }); return s; }
+function niceTicks(lo, hi, n){
+  var span = hi - lo || 1, step = Math.pow(10, Math.floor(Math.log10(span / n))), err = span / n / step;
+  step *= err >= 7.5 ? 10 : err >= 3.5 ? 5 : err >= 1.5 ? 2 : 1;
+  var t = [], v = Math.ceil(lo / step) * step; while (v <= hi + 1e-9) { t.push(v); v += step; } return t;
+}
+
+function barChart(container, values, ghost, opts){
+  container.innerHTML = '';
+  var p = values.length, W = 640, rowH = 26, L = 118, R = 60, T = 8, H = T + p * rowH + 26;
+  var s = svg(W, H);
+  var all = values.concat(ghost || []).concat([0]);
+  var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all); var pad = (hi - lo) * 0.08 || 100; lo -= pad; hi += pad;
+  var x = function(v){ return L + (v - lo) / (hi - lo) * (W - L - R); };
+  var g = el('g', { class: 'grid' });
+  niceTicks(lo, hi, 5).forEach(function(t){ g.appendChild(el('line', { x1: x(t), x2: x(t), y1: T, y2: H - 22 })); s.appendChild(el('text', { x: x(t), y: H - 6, 'text-anchor': 'middle' }, (t / 1000).toFixed(t % 1000 ? 1 : 0) + 'k')); });
+  s.appendChild(g);
+  for (var j = 0; j < p; j++){
+    var y = T + j * rowH;
+    s.appendChild(el('text', { x: L - 8, y: y + 17, 'text-anchor': 'end' }, shortLabel[j]));
+    if (ghost && opts.showGhost){ var gv = ghost[j]; s.appendChild(el('rect', { x: Math.min(x(0), x(gv)), y: y + 3, width: Math.abs(x(gv) - x(0)), height: rowH - 6, fill: 'var(--ghost)', opacity: .55, rx: 2 })); }
+    var v = values[j], isZero = v === 0;
+    s.appendChild(el('rect', { x: Math.min(x(0), x(v)), y: y + 7, width: Math.max(Math.abs(x(v) - x(0)), isZero ? 0 : 1), height: rowH - 14, fill: opts.color || 'var(--accent)', rx: 2 }));
+    var lblx = v >= 0 ? x(v) + 6 : x(v) - 6;
+    s.appendChild(el('text', { x: lblx, y: y + 17, 'text-anchor': v >= 0 ? 'start' : 'end', style: isZero ? 'font-weight:600;fill:var(--fg)' : '' }, isZero ? '= 0' : Math.round(v).toLocaleString('en-US')));
+  }
+  s.appendChild(el('line', { x1: x(0), x2: x(0), y1: T, y2: H - 22, stroke: 'var(--fg-2)' }));
+  container.appendChild(s);
+}
+
+function lineChart(container, series, opts){
+  container.innerHTML = '';
+  var W = 640, H = opts.height || 260, L = 64, R = opts.rightLabels ? 110 : 16, T = 12, B = 40;
+  var s = svg(W, H);
+  var xs = [], ys = [];
+  series.forEach(function(se){ se.x.forEach(function(v){ xs.push(v); }); se.y.forEach(function(v){ ys.push(v); }); });
+  if (opts.yIncludeZero) ys.push(0);
+  var xlo = Math.min.apply(null, xs), xhi = Math.max.apply(null, xs);
+  var ylo = Math.min.apply(null, ys), yhi = Math.max.apply(null, ys); var ypad = (yhi - ylo) * 0.08 || 1; ylo -= ypad; yhi += ypad;
+  var fx = opts.logX ? function(v){ return L + (Math.log10(v) - Math.log10(xlo)) / (Math.log10(xhi) - Math.log10(xlo)) * (W - L - R); } : function(v){ return L + (v - xlo) / (xhi - xlo) * (W - L - R); };
+  var fy = function(v){ return T + (yhi - v) / (yhi - ylo) * (H - T - B); };
+  var g = el('g', { class: 'grid' });
+  niceTicks(ylo, yhi, 5).forEach(function(t){ g.appendChild(el('line', { x1: L, x2: W - R, y1: fy(t), y2: fy(t) })); s.appendChild(el('text', { x: L - 8, y: fy(t) + 4, 'text-anchor': 'end' }, opts.yFmt ? opts.yFmt(t) : Math.round(t))); });
+  s.appendChild(g);
+  var xt = opts.logX ? [] : niceTicks(xlo, xhi, 6);
+  if (opts.logX){ for (var e = Math.ceil(Math.log10(xlo)); e <= Math.floor(Math.log10(xhi) + 1e-9); e++) xt.push(Math.pow(10, e)); }
+  xt.forEach(function(t){ s.appendChild(el('text', { x: fx(t), y: H - B + 18, 'text-anchor': 'middle' }, opts.xFmt ? opts.xFmt(t) : t)); s.appendChild(el('line', { x1: fx(t), x2: fx(t), y1: H - B, y2: H - B + 5, stroke: 'var(--line)' })); });
+  s.appendChild(el('line', { x1: L, x2: W - R, y1: H - B, y2: H - B, stroke: 'var(--line)' }));
+  s.appendChild(el('text', { x: (L + W - R) / 2, y: H - 4, 'text-anchor': 'middle' }, opts.xLabel || ''));
+  s.appendChild(el('text', { x: 14, y: T + 4, 'text-anchor': 'start', class: 'title' }, opts.yLabel || ''));
+  if (opts.hline != null) s.appendChild(el('line', { x1: L, x2: W - R, y1: fy(opts.hline), y2: fy(opts.hline), stroke: 'var(--ghost)', 'stroke-width': 2, 'stroke-dasharray': '6 4' }));
+  if (opts.vline != null) s.appendChild(el('line', { x1: fx(opts.vline), x2: fx(opts.vline), y1: T, y2: H - B, stroke: 'var(--fg)', 'stroke-width': 1.5, 'stroke-dasharray': '5 4' }));
+  if (opts.vline2 != null) s.appendChild(el('line', { x1: fx(opts.vline2), x2: fx(opts.vline2), y1: T, y2: H - B, stroke: 'var(--fg-2)', 'stroke-width': 1.5, 'stroke-dasharray': '2 4' }));
+  series.forEach(function(se){
+    var d = se.x.map(function(v, i){ return (i ? 'L' : 'M') + fx(v).toFixed(1) + ' ' + fy(se.y[i]).toFixed(1); }).join(' ');
+    s.appendChild(el('path', { d: d, fill: 'none', stroke: se.color, 'stroke-width': se.width || 2.5, opacity: se.opacity || 1 }));
+    if (se.dots) se.x.forEach(function(v, i){ s.appendChild(el('circle', { cx: fx(v), cy: fy(se.y[i]), r: 3.5, fill: se.color })); });
+    if (opts.rightLabels && se.label){ var lastY = fy(se.y[se.y.length - 1]); s.appendChild(el('text', { x: W - R + 6, y: lastY + 4, style: 'fill:' + se.color + ';font-size:11px' }, se.label)); }
+  });
+  if (opts.points) opts.points.forEach(function(pt){ s.appendChild(el('circle', { cx: fx(pt.x), cy: fy(pt.y), r: pt.r || 3, fill: pt.color, opacity: pt.opacity || .6 })); });
+  if (opts.marker) opts.marker.forEach(function(pt){ s.appendChild(el('circle', { cx: fx(pt.x), cy: fy(pt.y), r: 6, fill: pt.color, stroke: 'var(--panel)', 'stroke-width': 2 })); });
+  container.appendChild(s);
+  return { fx: fx, fy: fy, svg: s };
+}
+
+function scatterChart(container, obs, pred, opts){
+  container.innerHTML = '';
+  var W = 480, H = 320, L = 64, R = 16, T = 12, B = 44;
+  var s = svg(W, H);
+  var all = obs.concat(pred), lo = Math.min.apply(null, all), hi = Math.max.apply(null, all), pad = (hi - lo) * .05; lo -= pad; hi += pad;
+  var fx = function(v){ return L + (v - lo) / (hi - lo) * (W - L - R); }, fy = function(v){ return T + (hi - v) / (hi - lo) * (H - T - B); };
+  var g = el('g', { class: 'grid' });
+  niceTicks(lo, hi, 5).forEach(function(t){ g.appendChild(el('line', { x1: L, x2: W - R, y1: fy(t), y2: fy(t) })); s.appendChild(el('text', { x: L - 8, y: fy(t) + 4, 'text-anchor': 'end' }, (t / 1000).toFixed(0) + 'k')); s.appendChild(el('text', { x: fx(t), y: H - B + 18, 'text-anchor': 'middle' }, (t / 1000).toFixed(0) + 'k')); });
+  s.appendChild(g);
+  s.appendChild(el('line', { x1: fx(lo), y1: fy(lo), x2: fx(hi), y2: fy(hi), stroke: 'var(--fg-2)', 'stroke-dasharray': '5 4' }));
+  obs.forEach(function(o, i){ s.appendChild(el('circle', { cx: fx(o), cy: fy(pred[i]), r: 5, fill: opts.color, opacity: .7 })); });
+  s.appendChild(el('text', { x: (L + W - R) / 2, y: H - 4, 'text-anchor': 'middle' }, 'Observed weekly sales'));
+  s.appendChild(el('text', { x: 14, y: T + 4, class: 'title' }, 'Predicted'));
+  container.appendChild(s);
+}
+
+// ====== Reveal buttons ======
+document.querySelectorAll('.reveal-btn').forEach(function(b){ b.addEventListener('click', function(){ $(b.getAttribute('data-reveal')).classList.add('open'); }); });
+function closeReveals(){ document.querySelectorAll('.reveal.open').forEach(function(r){ r.classList.remove('open'); }); }
+
+function toast(msg){ var t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('show'); }, 1800); }
+
+// ====== Section 1 ======
+function renderData(){
+  $('n-total').textContent = N_TRAIN + N_TEST; $('n-train').textContent = N_TRAIN; $('n-test').textContent = N_TEST;
+  var h = '<table><thead><tr><th>Store</th><th>Weekly sales</th>' + REG.PREDICTORS.map(function(p, j){ return '<th>' + shortLabel[j] + '</th>'; }).join('') + '</tr></thead><tbody>';
+  for (var i = 0; i < 6; i++) h += '<tr><td>#' + (i + 1) + '</td><td><b>' + fmt$(S.ytr[i]) + '</b></td>' + S.Xtr[i].map(function(v){ return '<td>' + v.toLocaleString('en-US') + '</td>'; }).join('') + '</tr>';
+  $('data-preview').innerHTML = h + '</tbody></table>';
+  $('pred-list').innerHTML = REG.PREDICTORS.map(function(p){ return '<li>' + p.label + '</li>'; }).join('');
+}
+$('btn-copy-csv').addEventListener('click', function(){
+  var head = ['set', 'weekly_sales'].concat(REG.PREDICTORS.map(function(p){ return p.key; })).join(',');
+  var rows = S.Xtr.map(function(r, i){ return ['train', S.ytr[i]].concat(r).join(','); }).concat(S.Xte.map(function(r, i){ return ['test', S.yte[i]].concat(r).join(','); }));
+  var csv = head + '\n' + rows.join('\n') + '\n';
+  var done = function(){ toast('CSV copied (' + (N_TRAIN + N_TEST) + ' rows, seed ' + S.seed + ')'); };
+  try { navigator.clipboard.writeText(csv).then(done, function(){ fallbackCopy(csv); done(); }); } catch (e) { fallbackCopy(csv); done(); }
+});
+function fallbackCopy(txt){ var ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); }
+
+var qi = 0, timerId = null;
+function renderQ(){
+  $('qdots').innerHTML = QUESTIONS.map(function(q, i){ return '<span class="' + (i <= qi ? 'on' : '') + '"></span>'; }).join('');
+  $('qtext').textContent = 'Q' + (qi + 1) + '. ' + QUESTIONS[qi].q;
+  $('qexpl').innerHTML = QUESTIONS[qi].a;
+  $('q-reveal').classList.remove('open');
+  $('q-prev').disabled = qi === 0; $('q-next').disabled = qi === QUESTIONS.length - 1;
+  stopTimer();
+}
+function stopTimer(){ clearInterval(timerId); timerId = null; $('timer').textContent = '—'; $('timer').classList.remove('on'); $('phase').textContent = ''; }
+function startTimer(sec, label){
+  stopTimer(); var left = sec; $('phase').textContent = label; $('timer').classList.add('on');
+  var tick = function(){ var m = Math.floor(left / 60), s = left % 60; $('timer').textContent = m + ':' + (s < 10 ? '0' : '') + s; if (left <= 0) { clearInterval(timerId); $('phase').textContent = label + ' — time'; } left--; };
+  tick(); timerId = setInterval(tick, 1000);
+}
+$('btn-think').addEventListener('click', function(){ startTimer(60, 'Think quietly'); });
+$('btn-discuss').addEventListener('click', function(){ startTimer(120, 'Discuss with a neighbor'); });
+$('q-prev').addEventListener('click', function(){ if (qi > 0) { qi--; renderQ(); } });
+$('q-next').addEventListener('click', function(){ if (qi < QUESTIONS.length - 1) { qi++; renderQ(); } });
+
+// ====== Section 2 ======
+var m2 = 'ridge', p2 = 'train';
+function alphaFromSlider(v, method){ var grid = method === 'ridge' ? RIDGE_GRID : LASSO_GRID; var lo = Math.log10(grid[0]), hi = Math.log10(grid[grid.length - 1]); return Math.pow(10, lo + (hi - lo) * v / 100); }
+function render2(){
+  var a = alphaFromSlider(+$('alpha2').value, m2);
+  var mod = REG.fitPipeline(S.Xtr, S.ytr, m2, a);
+  var cv = REG.crossValidate(S.Xtr, S.ytr, S.folds, m2, a);
+  var train = REG.rmse(REG.predict(mod, S.Xtr), S.ytr);
+  $('alpha2-v').textContent = fmtA(a);
+  var color = m2 === 'ridge' ? 'var(--ridge)' : 'var(--lasso)';
+  barChart($('coef2'), mod.coef, S.ols.coef, { showGhost: $('show-baseline').checked, color: color });
+  $('t2-train').textContent = fmt$(train); $('t2-cv').textContent = fmt$(cv.mean); $('t2-base').textContent = fmt$(S.olsCV);
+  var pth = S.path[m2];
+  lineChart($('curve2'), [
+    { x: pth.grid, y: pth.rows.map(function(r){ return r.train; }), color: 'var(--train)' },
+    { x: pth.grid, y: pth.rows.map(function(r){ return r.cv; }), color: 'var(--cv)' }
+  ], { logX: true, xLabel: 'alpha (log scale)', yLabel: 'RMSE ($)', yFmt: function(t){ return (t / 1000).toFixed(1) + 'k'; }, hline: S.olsCV, vline: a, marker: [{ x: a, y: train, color: 'var(--train)' }, { x: a, y: cv.mean, color: 'var(--cv)' }] });
+  var pred, note;
+  if (p2 === 'train') { pred = REG.predict(mod, S.Xtr); note = 'Each dot is a training store: the model saw this store when it was fit. RMSE here is the training RMSE.'; }
+  else {
+    pred = new Array(N_TRAIN);
+    S.folds.forEach(function(f){ var inVal = {}; f.forEach(function(i){ inVal[i] = true; }); var Xt = [], yt = []; for (var i = 0; i < N_TRAIN; i++) if (!inVal[i]) { Xt.push(S.Xtr[i]); yt.push(S.ytr[i]); } var mm = REG.fitPipeline(Xt, yt, m2, a); var pv = REG.predict(mm, f.map(function(i){ return S.Xtr[i]; })); f.forEach(function(i, k){ pred[i] = pv[k]; }); });
+    note = 'Each dot is a training store predicted by a model that was fit without it (its fold was held out). This is what cross-validation measures.';
+  }
+  scatterChart($('scatter2'), S.ytr, pred, { color: color });
+  $('scatter2-note').textContent = note;
+}
+$('alpha2').addEventListener('input', render2);
+$('show-baseline').addEventListener('change', render2);
+document.querySelectorAll('.m2').forEach(function(b){ b.addEventListener('click', function(){ m2 = b.getAttribute('data-m'); document.querySelectorAll('.m2').forEach(function(x){ x.setAttribute('aria-pressed', x === b); }); render2(); }); });
+document.querySelectorAll('.p2').forEach(function(b){ b.addEventListener('click', function(){ p2 = b.getAttribute('data-p'); document.querySelectorAll('.p2').forEach(function(x){ x.setAttribute('aria-pressed', x === b); }); render2(); }); });
+
+// ====== Section 3 ======
+var m3 = 'ridge';
+var pathColors = ['var(--f1)', 'var(--f3)', 'var(--f4)', 'var(--f2)', 'var(--f5)', 'var(--ridge)', 'var(--lasso)', 'var(--train)', 'var(--ghost)', 'var(--fg-2)'];
+function render3(){
+  var pth = S.path[m3];
+  var series = REG.PREDICTORS.map(function(p, j){ return { x: pth.grid, y: pth.rows.map(function(r){ return r.coef[j]; }), color: pathColors[j], width: 2, label: shortLabel[j] }; });
+  lineChart($('path3'), series, { logX: true, xLabel: 'alpha (log scale)', yLabel: 'Standardized coefficient ($)', yFmt: function(t){ return (t / 1000).toFixed(1) + 'k'; }, hline: 0, vline: $('show-cvbest').checked ? pth.grid[pth.bestIdx] : null, rightLabels: true, height: 340, yIncludeZero: true });
+  var rb = S.path.ridge.rows[S.path.ridge.bestIdx], lb = S.path.lasso.rows[S.path.lasso.bestIdx];
+  var h = '<table><thead><tr><th>Predictor</th><th style="color:var(--ridge)">Ridge</th><th style="color:var(--lasso)">LASSO</th></tr></thead><tbody>';
+  REG.PREDICTORS.forEach(function(p, j){ h += '<tr><td>' + shortLabel[j] + '</td><td>' + Math.round(rb.coef[j]).toLocaleString('en-US') + '</td><td>' + (lb.coef[j] === 0 ? '<b>0</b>' : Math.round(lb.coef[j]).toLocaleString('en-US')) + '</td></tr>'; });
+  h += '<tr><td>Predictors kept</td><td>' + rb.coef.filter(function(c){ return c !== 0; }).length + ' / 10</td><td>' + lb.coef.filter(function(c){ return c !== 0; }).length + ' / 10</td></tr>';
+  h += '<tr><td>CV-chosen alpha</td><td>' + fmtA(rb.alpha) + '</td><td>' + fmtA(lb.alpha) + '</td></tr>';
+  h += '<tr><td>CV RMSE</td><td>' + fmt$(rb.cv) + '</td><td>' + fmt$(lb.cv) + '</td></tr>';
+  h += '<tr><td>Baseline CV RMSE (no penalty)</td><td colspan="2" style="text-align:center">' + fmt$(S.olsCV) + '</td></tr></tbody></table>';
+  $('table3').innerHTML = h;
+}
+document.querySelectorAll('.m3').forEach(function(b){ b.addEventListener('click', function(){ m3 = b.getAttribute('data-m'); document.querySelectorAll('.m3').forEach(function(x){ x.setAttribute('aria-pressed', x === b); }); render3(); }); });
+$('show-cvbest').addEventListener('change', render3);
+function resetPredict3(){
+  $('predict3-opts').innerHTML = REG.PREDICTORS.map(function(p, j){ return '<label><input type="checkbox" data-j="' + j + '"> ' + shortLabel[j] + '</label>'; }).join('');
+  $('predict3-score').textContent = ''; $('predict3-legend').hidden = true; $('btn-predict3').disabled = false;
+}
+$('btn-predict3').addEventListener('click', function(){
+  var lb = S.path.lasso.rows[S.path.lasso.bestIdx], hits = 0, zeros = 0;
+  $('predict3-opts').querySelectorAll('label').forEach(function(l){ var cb = l.querySelector('input'), j = +cb.getAttribute('data-j'), z = lb.coef[j] === 0; cb.disabled = true; l.classList.remove('hit', 'miss', 'missed'); if (z) zeros++; if (cb.checked && z) { l.classList.add('hit'); hits++; } else if (cb.checked && !z) l.classList.add('miss'); else if (!cb.checked && z) l.classList.add('missed'); });
+  $('predict3-score').textContent = 'LASSO zeroed ' + zeros + ' predictor' + (zeros === 1 ? '' : 's') + ' at alpha = ' + fmtA(lb.alpha) + '. You called ' + hits + ' of them.' + (zeros === 0 ? ' Nothing was dropped on this dataset; that happens.' : '');
+  $('predict3-legend').hidden = false; $('btn-predict3').disabled = true;
+  m3 = 'lasso'; document.querySelectorAll('.m3').forEach(function(x){ x.setAttribute('aria-pressed', x.getAttribute('data-m') === 'lasso'); }); render3();
+});
+
+// ====== Section 4 ======
+var m4 = 'ridge', speed = 'normal', running = false, stopFlag = false, results4 = null, best4 = null;
+function renderStrip(activeFold){
+  var h = ''; var foldOf = new Array(N_TRAIN); S.folds.forEach(function(f, k){ f.forEach(function(i){ foldOf[i] = k + 1; }); });
+  for (var i = 0; i < N_TRAIN; i++) h += '<i class="f' + foldOf[i] + (activeFold ? (foldOf[i] === activeFold ? ' val' : ' dim') : '') + '" title="Training row ' + (i + 1) + ', fold ' + foldOf[i] + '"></i>';
+  for (i = 0; i < N_TEST; i++) h += '<i class="test" title="Held-out test row"></i>';
+  $('strip').innerHTML = h;
+}
+function renderChips(){ $('chips4').innerHTML = CAND[m4].map(function(a, i){ return '<label><input type="checkbox" value="' + i + '"' + (i % 2 === 0 || i === CAND[m4].length - 1 ? ' checked' : '') + '> ' + fmtA(a) + '</label>'; }).join(''); }
+function setStep(n){ $('steps4').querySelectorAll('li').forEach(function(li, i){ li.classList.toggle('on', i === n); li.classList.toggle('done', i < n); }); }
+function renderTable4(rows, highlight, bestIdx){
+  if (!rows.length) { $('table4').innerHTML = '<p class="note">Run the search to fill this table.</p>'; return; }
+  var h = '<table><thead><tr><th>alpha</th>' + [1,2,3,4,5].map(function(k){ return '<th>Fold ' + k + '</th>'; }).join('') + '<th>Mean CV RMSE</th></tr></thead><tbody>';
+  rows.forEach(function(r, i){ h += '<tr class="' + (i === bestIdx ? 'best' : (i === highlight ? 'running' : '')) + '"><td>' + fmtA(r.alpha) + '</td>' + [0,1,2,3,4].map(function(k){ return '<td>' + (r.folds[k] != null ? fmt$(r.folds[k]) : '·') + '</td>'; }).join('') + '<td><b>' + (r.mean != null ? fmt$(r.mean) : '') + '</b></td></tr>'; });
+  $('table4').innerHTML = h + '</tbody></table>';
+}
+function renderChart4(rows, bestIdx){
+  var done = rows.filter(function(r){ return r.mean != null; });
+  if (!done.length) { $('chart4').innerHTML = '<p class="note">Candidates appear here as they are scored.</p>'; return; }
+  var pts = []; rows.forEach(function(r){ r.folds.forEach(function(f){ if (f != null) pts.push({ x: r.alpha, y: f, color: 'var(--ghost)', r: 3.5, opacity: .8 }); }); });
+  var color = m4 === 'ridge' ? 'var(--ridge)' : 'var(--lasso)';
+  lineChart($('chart4'), [{ x: done.map(function(r){ return r.alpha; }), y: done.map(function(r){ return r.mean; }), color: 'var(--cv)', dots: true }], { logX: true, xLabel: 'candidate alpha (log scale)', yLabel: 'Validation RMSE ($)', yFmt: function(t){ return (t / 1000).toFixed(1) + 'k'; }, points: pts, marker: bestIdx != null ? [{ x: rows[bestIdx].alpha, y: rows[bestIdx].mean, color: color }] : null });
+}
+var delays = { slow: 900, normal: 450, fast: 120 };
+function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+$('btn-run4').addEventListener('click', async function(){
+  var sel = Array.prototype.map.call($('chips4').querySelectorAll('input:checked'), function(c){ return CAND[m4][+c.value]; });
+  if (!sel.length) { toast('Pick at least one candidate alpha'); return; }
+  running = true; stopFlag = false; $('btn-run4').disabled = true; $('btn-stop4').disabled = false; $('btn-test4').disabled = true; $('tiles4').hidden = true; $('t4-note').hidden = true;
+  results4 = sel.map(function(a){ return { alpha: a, folds: [null, null, null, null, null], mean: null }; }); best4 = null;
+  for (var c = 0; c < results4.length && !stopFlag; c++){
+    var r = results4[c]; setStep(0); $('status4').textContent = 'Candidate ' + (c + 1) + ' of ' + results4.length + ': alpha = ' + fmtA(r.alpha); renderTable4(results4, c, best4); await wait(delays[speed]);
+    setStep(1);
+    for (var k = 0; k < K && !stopFlag; k++){
+      renderStrip(k + 1);
+      var inVal = {}; S.folds[k].forEach(function(i){ inVal[i] = true; }); var Xt = [], yt = [], Xv = [], yv = [];
+      for (var i = 0; i < N_TRAIN; i++) { if (inVal[i]) { Xv.push(S.Xtr[i]); yv.push(S.ytr[i]); } else { Xt.push(S.Xtr[i]); yt.push(S.ytr[i]); } }
+      var mm = REG.fitPipeline(Xt, yt, m4, r.alpha); r.folds[k] = REG.rmse(REG.predict(mm, Xv), yv);
+      renderTable4(results4, c, best4); renderChart4(results4, best4); await wait(delays[speed] * .6);
+    }
+    if (stopFlag) break;
+    renderStrip(null); setStep(2); r.mean = REG.mean(r.folds); renderTable4(results4, c, best4); renderChart4(results4, best4); await wait(delays[speed]);
+    setStep(3); var prev = best4; if (best4 === null || r.mean < results4[best4].mean) best4 = c;
+    $('status4').textContent = best4 === c ? (prev === null ? 'First candidate scored: ' + fmt$(r.mean) : 'New best: ' + fmt$(r.mean) + ' beats ' + fmt$(results4[prev].mean)) : fmt$(r.mean) + ' does not beat the best so far (' + fmt$(results4[best4].mean) + ')';
+    renderTable4(results4, null, best4); renderChart4(results4, best4); await wait(delays[speed]);
+  }
+  renderStrip(null);
+  if (!stopFlag && best4 !== null){ setStep(4); $('status4').textContent = 'Selected alpha = ' + fmtA(results4[best4].alpha) + ' (mean CV RMSE ' + fmt$(results4[best4].mean) + '). The test set has still not been touched.'; $('btn-test4').disabled = false; }
+  else { $('status4').textContent = 'Stopped.'; setStep(-1); }
+  running = false; $('btn-run4').disabled = false; $('btn-stop4').disabled = true;
+});
+$('btn-stop4').addEventListener('click', function(){ stopFlag = true; });
+$('btn-test4').addEventListener('click', function(){
+  var a = results4[best4].alpha, mod = REG.fitPipeline(S.Xtr, S.ytr, m4, a), test = REG.rmse(REG.predict(mod, S.Xte), S.yte);
+  $('t4-cv').textContent = fmt$(results4[best4].mean); $('t4-alpha').textContent = (m4 === 'ridge' ? 'Ridge' : 'LASSO') + ', alpha = ' + fmtA(a); $('t4-test').textContent = fmt$(test); $('t4-base').textContent = fmt$(S.olsTest);
+  $('tiles4').hidden = false; $('btn-test4').disabled = true;
+  var n = $('t4-note'); n.hidden = false;
+  var diff = test - results4[best4].mean;
+  n.textContent = 'The test RMSE is ' + fmt$(Math.abs(diff)) + (diff > 0 ? ' higher' : ' lower') + ' than the CV estimate. With 40 test stores, differences of a few hundred dollars are ordinary sampling variation; the test number is what you would report. ' + (test < S.olsTest ? 'Here regularization beat the no-penalty baseline on new stores.' : 'Here the no-penalty baseline did at least as well on these 40 stores, which is a fair outcome to report. Regularization helps most when data are scarce relative to the number of predictors.');
+});
+document.querySelectorAll('.m4').forEach(function(b){ b.addEventListener('click', function(){ if (running) return; m4 = b.getAttribute('data-m'); document.querySelectorAll('.m4').forEach(function(x){ x.setAttribute('aria-pressed', x === b); }); renderChips(); reset4(); }); });
+document.querySelectorAll('.sp').forEach(function(b){ b.addEventListener('click', function(){ speed = b.getAttribute('data-s'); document.querySelectorAll('.sp').forEach(function(x){ x.setAttribute('aria-pressed', x === b); }); }); });
+function reset4(){ results4 = null; best4 = null; renderTable4([], null, null); renderChart4([], null); $('status4').textContent = ''; setStep(-1); $('btn-test4').disabled = true; $('tiles4').hidden = true; $('t4-note').hidden = true; renderStrip(null); }
+
+// ====== Section 5 ======
+var sel5 = null;
+function render5(){
+  var ai = +$('alpha5').value, li = +$('l1r5').value, cell = S.enet[ai][li];
+  $('alpha5-v').textContent = fmtA(cell.alpha); $('l1r5-v').textContent = cell.l1.toFixed(1);
+  barChart($('coef5'), cell.coef, S.ols.coef, { showGhost: true, color: 'var(--accent)' });
+  $('t5-cv').textContent = fmt$(cell.cv); $('t5-kept').textContent = cell.coef.filter(function(c){ return c !== 0; }).length + ' / 10';
+  renderHeat(ai, li);
+}
+function renderHeat(ai, li){
+  var c = $('heat5'); c.innerHTML = '';
+  var rows = ENET_ALPHAS.length, cols = ENET_L1.length, W = 560, L = 70, T = 30, cw = (W - L - 20) / cols, ch = 34, H = T + rows * ch + 30;
+  var s = svg(W, H);
+  var vals = []; S.enet.forEach(function(r){ r.forEach(function(x){ vals.push(x.cv); }); });
+  var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), bi = 0, bj = 0;
+  S.enet.forEach(function(r, i){ r.forEach(function(x, j){ if (x.cv < S.enet[bi][bj].cv) { bi = i; bj = j; } }); });
+  var shade = function(v){ var t = (v - lo) / (hi - lo || 1); return 'color-mix(in srgb, var(--cv) ' + Math.round((1 - t) * 85 + 5) + '%, var(--panel))'; };
+  s.appendChild(el('text', { x: L + (W - L - 20) / 2, y: 14, 'text-anchor': 'middle', class: 'title' }, 'l1_ratio →'));
+  ENET_L1.forEach(function(l, j){ s.appendChild(el('text', { x: L + cw * (j + .5), y: T - 6, 'text-anchor': 'middle' }, l.toFixed(1))); });
+  s.appendChild(el('text', { x: 10, y: T + rows * ch + 24, class: 'title' }, 'alpha ↓'));
+  S.enet.forEach(function(r, i){
+    s.appendChild(el('text', { x: L - 8, y: T + ch * (i + .5) + 4, 'text-anchor': 'end' }, fmtA(r[0].alpha)));
+    r.forEach(function(x, j){
+      var t = (x.cv - lo) / (hi - lo || 1);
+      var rect = el('rect', { x: L + cw * j + 1, y: T + ch * i + 1, width: cw - 2, height: ch - 2, rx: 4, fill: shade(x.cv), class: 'heat-cell' + (i === ai && j === li ? ' sel' : '') });
+      rect.appendChild(el('title', {}, 'alpha ' + fmtA(x.alpha) + ', l1_ratio ' + x.l1.toFixed(1) + ': CV RMSE ' + fmt$(x.cv)));
+      rect.addEventListener('click', function(){ $('alpha5').value = i; $('l1r5').value = j; render5(); });
+      s.appendChild(rect);
+      s.appendChild(el('text', { x: L + cw * (j + .5), y: T + ch * (i + .5) + 4, 'text-anchor': 'middle', style: 'pointer-events:none;font-size:11px;fill:' + (t < .45 ? '#fff' : 'var(--fg)') }, (x.cv / 1000).toFixed(2) + 'k'));
+    });
+  });
+  c.appendChild(s);
+  var b = S.enet[bi][bj];
+  $('heat5-note').textContent = 'Darker is lower error. Lowest on this grid: alpha = ' + fmtA(b.alpha) + ', l1_ratio = ' + b.l1.toFixed(1) + ' (CV RMSE ' + fmt$(b.cv) + '). For comparison, plain linear regression scores ' + fmt$(S.olsCV) + '.';
+}
+$('alpha5').addEventListener('input', render5); $('l1r5').addEventListener('input', render5);
+
+// ====== Section 6 ======
+var WALKS = [
+  { title: 'Ridge regression in a pipeline', rows: [
+    ['from sklearn.pipeline import Pipeline\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.linear_model import Ridge\nfrom sklearn.model_selection import cross_val_score, train_test_split', 'Import the pieces. <b>Pipeline</b> chains the scaler and the model so they are treated as one estimator.'],
+    ['X = sales_df.drop(columns="weekly_sales")\ny = sales_df["weekly_sales"]\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.4, random_state=1)', 'Split <b>before anything else</b>. The test rows are the grey hatched squares in Section 4: they stay closed until the very end.'],
+    ['ridge_pipe = Pipeline([\n    ("scale", StandardScaler()),\n    ("model", Ridge(alpha=10))\n])', '<b>StandardScaler</b> is the standardization step from Section 2. <b>alpha=10</b> is the slider: larger means heavier penalty. Because the scaler is inside the pipeline, it is re-fit on the training part of every fold.'],
+    ['cv_scores = cross_val_score(ridge_pipe, X_train, y_train,\n    cv=5, scoring="neg_root_mean_squared_error")\nprint(-cv_scores.mean())', '5-fold CV on the training rows only. The score is <b>negative</b> RMSE (sklearn maximizes scores), so negate it to report a positive dollar figure: this is the "CV RMSE" tile.'],
+    ['ridge_pipe.fit(X_train, y_train)\nridge_pipe.named_steps["model"].coef_', 'Fit on all training rows and read the standardized coefficients: the bars in Section 2 (one per predictor, in dollars per standard deviation).']
+  ]},
+  { title: 'LASSO: same shape, different penalty', rows: [
+    ['from sklearn.linear_model import Lasso', 'Only the model class changes.'],
+    ['lasso_pipe = Pipeline([\n    ("scale", StandardScaler()),\n    ("model", Lasso(alpha=100, max_iter=10000))\n])', 'Lasso\'s <b>alpha</b> is on a different scale from Ridge\'s (its loss is divided by 2n), which is why the slider range changes when you toggle methods. <b>max_iter</b> gives the coordinate-descent solver room to converge; raise it if you see a ConvergenceWarning.'],
+    ['lasso_pipe.fit(X_train, y_train)\ncoefs = lasso_pipe.named_steps["model"].coef_\n(coefs == 0).sum()', 'Count the exact zeros. That is the "Predictors kept" number in Section 3. Ridge coefficients are almost never exactly zero; Lasso\'s often are.'],
+    ['import pandas as pd\npd.Series(coefs, index=X_train.columns).sort_values()', 'Label the coefficients with their predictor names so the bar chart is readable.']
+  ]},
+  { title: 'GridSearchCV: the animation in Section 4, in four lines', rows: [
+    ['from sklearn.model_selection import GridSearchCV\nimport numpy as np', 'GridSearchCV runs the loop you watched: for every candidate, fit on 4 folds and score on the 5th, five times.'],
+    ['param_grid = {"model__alpha": np.logspace(-1, 3, 9)}', 'The candidate chips. <b>model__alpha</b> means "the alpha of the step named model" (two underscores). <b>logspace</b> spaces candidates evenly on a log scale, like the slider.'],
+    ['search = GridSearchCV(ridge_pipe, param_grid, cv=5,\n    scoring="neg_root_mean_squared_error",\n    return_train_score=True)\nsearch.fit(X_train, y_train)', '<b>cv=5</b> is the fold strip. <b>return_train_score</b> lets you plot the training curve next to the CV curve, as in Section 2. Fitting the search fits the scaler inside each fold automatically.'],
+    ['search.best_params_\n-search.best_score_', 'The selected alpha and its mean CV RMSE (negated back to dollars). These are the "Selected" line and the highlighted row in the results table.'],
+    ['results = pd.DataFrame(search.cv_results_)\nresults[["param_model__alpha", "mean_test_score",\n         "std_test_score"]]', 'The full results table. Note that sklearn calls the validation folds "test" here; they are <b>not</b> the held-out test set.'],
+    ['from sklearn.metrics import root_mean_squared_error\nroot_mean_squared_error(y_test, search.predict(X_test))', '<b>Now</b> open the test set. <code>search.predict</code> uses the best alpha refit on all training rows (refit=True is the default). This is the purple tile.']
+  ]},
+  { title: 'Elastic net with a two-parameter grid', rows: [
+    ['from sklearn.linear_model import ElasticNet\nenet_pipe = Pipeline([\n    ("scale", StandardScaler()),\n    ("model", ElasticNet(max_iter=10000))\n])', 'ElasticNet has two tuning parameters, so the pipeline is built without fixing either.'],
+    ['param_grid = {\n    "model__alpha": np.logspace(-1, 3, 9),\n    "model__l1_ratio": [0.1, 0.3, 0.5, 0.7, 0.9, 1.0],\n}', 'Two lists make a grid: 9 × 6 = 54 cells, each cross-validated 5 times (270 fits). This is the heatmap in Section 5. <b>l1_ratio=1.0</b> is LASSO; for pure ridge use the Ridge class rather than l1_ratio=0.'],
+    ['enet_search = GridSearchCV(enet_pipe, param_grid, cv=5,\n    scoring="neg_root_mean_squared_error")\nenet_search.fit(X_train, y_train)\nenet_search.best_params_', 'Same search object, bigger grid. The best cell is the one the heatmap note reports.'],
+    ['heat = (pd.DataFrame(enet_search.cv_results_)\n    .assign(rmse=lambda d: -d["mean_test_score"])\n    .pivot(index="param_model__alpha",\n           columns="param_model__l1_ratio", values="rmse"))', 'Reshape the results into the alpha × l1_ratio table and plot it with <code>sns.heatmap(heat)</code> to reproduce Section 5.']
+  ]}
+];
+function renderWalks(){
+  $('walks').innerHTML = WALKS.map(function(w, i){
+    var rows = w.rows.map(function(r){ return '<div class="row"><pre>' + r[0].replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</pre><div class="why">' + r[1] + '</div></div>'; }).join('');
+    return '<details class="walk"' + (i === 0 ? ' open' : '') + '><summary>' + w.title + '</summary><div class="code"><div class="row head"><pre>Python</pre><div class="why">What this line does</div></div>' + rows + '</div></details>';
+  }).join('');
+}
+
+// ====== Section 7 ======
+function renderChecklist(){
+  $('checklist').innerHTML = CHECKLIST.map(function(c, i){ return '<label><input type="checkbox" id="chk' + i + '"><span><span class="t"><b>' + c[0] + '</b></span><br><span class="note">' + c[1] + '</span></span></label>'; }).join('');
+}
+
+// ====== Modes, stepping, rail, reset ======
+var SECS = ['problem', 'penalty', 'ridge-lasso', 'gridsearch', 'enet', 'code', 'pa'], cur = 0, mode = 'instructor';
+function setMode(m){
+  mode = m; document.body.setAttribute('data-mode', m);
+  $('mode-instructor').setAttribute('aria-pressed', m === 'instructor'); $('mode-student').setAttribute('aria-pressed', m === 'student');
+  try { localStorage.setItem('shrink-mode', m); } catch (e) {}
+  showSection(cur);
+}
+function showSection(i){
+  cur = Math.max(0, Math.min(SECS.length - 1, i));
+  document.querySelectorAll('section.beat').forEach(function(s, k){ s.classList.toggle('active', k === cur); });
+  document.querySelectorAll('#rail a').forEach(function(a, k){ a.classList.toggle('active', k === cur); });
+  $('step-label').textContent = (cur + 1) + ' / ' + SECS.length; $('step-prev').disabled = cur === 0; $('step-next').disabled = cur === SECS.length - 1;
+}
+$('mode-instructor').addEventListener('click', function(){ setMode('instructor'); });
+$('mode-student').addEventListener('click', function(){ setMode('student'); });
+$('step-prev').addEventListener('click', function(){ showSection(cur - 1); window.scrollTo({ top: 0 }); });
+$('step-next').addEventListener('click', function(){ showSection(cur + 1); window.scrollTo({ top: 0 }); });
+document.querySelectorAll('#rail a').forEach(function(a, k){ a.addEventListener('click', function(e){ e.preventDefault(); showSection(k); if (mode === 'instructor') window.scrollTo({ top: 0 }); else { var t = $(SECS[k]); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }); });
+if ('IntersectionObserver' in window){
+  var io = new IntersectionObserver(function(entries){ if (mode !== 'student') return; entries.forEach(function(en){ if (en.isIntersecting) { var k = SECS.indexOf(en.target.id); document.querySelectorAll('#rail a').forEach(function(a, i){ a.classList.toggle('active', i === k); }); } }); }, { rootMargin: '-40% 0px -55% 0px' });
+  SECS.forEach(function(id){ io.observe($(id)); });
+}
+
+function renderAll(){
+  renderData(); render2(); render3(); resetPredict3(); renderChips(); reset4(); render5(); renderWalks(); renderChecklist();
+}
+function resetAll(){
+  stopFlag = true; closeReveals(); qi = 0; renderQ();
+  $('alpha2').value = 0; m2 = 'ridge'; p2 = 'train'; document.querySelectorAll('.m2').forEach(function(x){ x.setAttribute('aria-pressed', x.getAttribute('data-m') === 'ridge'); }); document.querySelectorAll('.p2').forEach(function(x){ x.setAttribute('aria-pressed', x.getAttribute('data-p') === 'train'); }); $('show-baseline').checked = true;
+  m3 = 'ridge'; document.querySelectorAll('.m3').forEach(function(x){ x.setAttribute('aria-pressed', x.getAttribute('data-m') === 'ridge'); }); $('show-cvbest').checked = true;
+  m4 = 'ridge'; document.querySelectorAll('.m4').forEach(function(x){ x.setAttribute('aria-pressed', x.getAttribute('data-m') === 'ridge'); });
+  $('alpha5').value = 1; $('l1r5').value = 2;
+  document.querySelectorAll('details').forEach(function(d){ d.open = false; });
+  buildData(DEFAULT_SEED); renderAll(); showSection(0); window.scrollTo({ top: 0 }); toast('Reset to the starting state');
+}
+$('btn-reset').addEventListener('click', resetAll);
+$('btn-reseed').addEventListener('click', function(){ var seed = 20000 + Math.floor(Math.random() * 1000); buildData(seed); renderAll(); closeReveals(); toast('New simulated dataset (seed ' + seed + ')'); });
+
+// boot
+var savedMode = 'instructor'; try { savedMode = localStorage.getItem('shrink-mode') || 'instructor'; } catch (e) {}
+buildData(DEFAULT_SEED); renderQ(); renderAll(); setMode(savedMode);
+})();
+</script>
+
+</body></html>
