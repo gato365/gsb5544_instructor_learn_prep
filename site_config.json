@@ -292,6 +292,23 @@
           "student": "assignments/practice_activities/week_10/GSB_5544_PA_10_2_penalized_regression_solutions.ipynb"
         }
       ]
+    },
+    {
+      "label": "Week 11 — Introduction to Classification",
+      "items": [
+        {
+          "title": "Topic 11.1 — Classification: What Every Score Measures (confusion matrix, accuracy and baseline, precision / recall / specificity / NPV, F1, multi-class averages, thresholds, PR and ROC curves, log loss)",
+          "student": "assignments/practice_activities/week_11/GSB5544_Topic_11_1_Classification_Scores-empty.ipynb",
+          "solution": "assignments/practice_activities/week_11/GSB5544_Topic_11_1_Classification_Scores-solution.ipynb",
+          "publish_solution": true
+        },
+        {
+          "title": "PA 11.1 — Introduction to Classification (storms: a hurricane rule and its scores, 10-NN status; Titanic: 10-NN survival, probabilities, thresholds, precision–recall curves)",
+          "student": "assignments/practice_activities/week_11/GSB_5544_PA_11_1_Intro_to_Classification.ipynb",
+          "solution": "assignments/practice_activities/week_11/GSB_5544_PA_11_1_Intro_to_Classification-solution.ipynb",
+          "publish_solution": true
+        }
+      ]
     }
   ]
 }
