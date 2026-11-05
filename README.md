@@ -51,6 +51,7 @@ Teaching materials for GSB 5544 (Cal Poly).
   - `GSB_5544_PA_10_2_penalized_regression_solutions.ipynb` — the penalized-regression code walkthrough (Ames, all predictors) with DISCUSS prompts and the loans PA 10.2, kept as received
 - `assignments/practice_activities/week_11/`
   - Topic 11.1 (Classification: What Every Score Measures — every score defined from the confusion matrix, computed by hand and checked with scikit-learn: accuracy and baseline, precision / recall / specificity / NPV, F1 and the harmonic mean, multi-class averages, thresholds and the 0.5 tie rule, PR and ROC curves, log loss; Palmer penguins) — built by `tools/build_week11_topics.py`
+  - Topic 11.2 (Classification Metrics in Context: cancer screening and fire detection — a guided, calculator-only class activity: ten statistics defined from the confusion matrix, two hypothetical scenarios at two thresholds each, and a closing discussion on error costs and thresholds; student notebook plus a separate instructor answer key) — built by `tools/build_week11_metrics_activity.py`
   - `GSB_5544_PA_11_1_Intro_to_Classification.ipynb` — student notebook (storms hurricane rule and 10-NN status; Titanic 10-NN survival, thresholds, PR curves), kept untouched as received; the `-solution.ipynb` instructor key is built by `tools/build_week11_pas.py`. See `week_11/README.md`
 - `assignments/labs/`, `assignments/quizzes/`
 

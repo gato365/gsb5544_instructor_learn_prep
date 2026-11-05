@@ -6,8 +6,14 @@
 | **Topic 11.1 Solutions** | `GSB5544_Topic_11_1_Classification_Scores-solution.ipynb` — completed and **executed** (needs `palmerpenguins`; a guarded install cell covers Colab). | `tools/build_week11_topics.py` |
 | **PA 11.1** (student) | `GSB_5544_PA_11_1_Intro_to_Classification.ipynb` — storms: a hand-made hurricane rule and its accuracy / precision / recall / F1 for both classes, 10-NN reasoning about status; Titanic: 10-NN survival from age, sex and class, predicted probabilities, precision / recall / F1 for both classes, threshold 0.8, precision–recall curves for both classes. **Kept as received.** | — |
 | **PA 11.1 Solutions** | `GSB_5544_PA_11_1_Intro_to_Classification-solution.ipynb` — every DISCUSS prompt answered in words and checked by code; every coding question in five beats (approach, code, what it does, expected output, common mistakes). **Executed** against the live data. | `tools/build_week11_pas.py` |
+| **Topic 11.2** (student) | `GSB5544_Topic_11_2_Classification_Metrics_in_Context-empty.ipynb` — *Classification Metrics in Context: Cancer Screening and Fire Detection.* A guided, discussion-led class activity, **calculator only (no code cells)**. Part 1: the confusion matrix and ten statistics (accuracy, error rate, precision, recall, F1, specificity, FPR, FNR, NPV, balanced accuracy), each with its equation, plain-language definition, the question it answers, numerator and denominator, range and direction; a "which denominator" table. Parts 2 and 3: two hypothetical scenarios, each the same 1,000 cases at two thresholds; every calculation question runs equation → meaning of the values → calculation → interpretation. Part 4: costs of the two errors, thresholds as cutoffs on predicted probabilities (logistic regression), what else one would need to know. 38 questions (20 calculation, 18 discussion); labelled work space, not blanks. About 75 minutes; the key gives a 50-minute cut. | `tools/build_week11_metrics_activity.py` |
+| **Topic 11.2 Answer key** (instructor) | `GSB5544_Topic_11_2_Classification_Metrics_in_Context-solution.ipynb` — every calculation worked, an interpretation for each, suggested discussion responses, instructor notes (timing, where the discussion is headed) and a table of all ten statistics for the four threshold rows. Nothing to execute. Listed on the site with the solution link withheld (`publish_solution: false`). | `tools/build_week11_metrics_activity.py` |
 
 Edit the generators, not the `.ipynb` files, and re-run them.
+
+Topic 11.1 includes fill-in-the-blank definitions in the prose and tables, alongside the code blanks.
+The student version uses `____` for missing terms and phrases; the solution shows the matching completions
+in **bold**. Formulas and worked examples provide context for the definitions.
 
 ## Headline numbers
 
@@ -18,6 +24,16 @@ Edit the generators, not the `.ipynb` files, and re-run them.
 rule differs from `predict()` on the exact-0.5 ties); AUC 0.957, AP 0.955, log loss 0.266. Species: Adelie
 precision 0.881 / recall 1.000, Chinstrap 1.000 / 0.706 (5 of 17 called Adelie), Gentoo 1.000 / 1.000; accuracy
 0.940; macro recall 0.902, weighted 0.940.
+
+**Topic 11.2** (hypothetical counts, TP / FP / FN / TN; every value is computed in the generator). Cancer
+screening, 1,000 people, 100 with cancer — A 90 / 180 / 10 / 720: accuracy 0.810 ("no one has cancer" scores 0.900),
+precision 0.333, recall 0.900, F1 0.486, specificity 0.800, FPR 0.200, FNR 0.100, NPV 0.986, balanced accuracy 0.850;
+B 80 / 45 / 20 / 855: 0.935, 0.640, 0.800, 0.711, 0.950, 0.050, 0.200, 0.977, 0.875. A → B trades 135 fewer false
+positives for 10 more misses (13.5 per miss). Fire detection, 1,000 periods, 50 with a fire — A 45 / 95 / 5 / 855:
+accuracy 0.900 ("never alarm" 0.950), precision 0.321, recall 0.900, F1 0.474 (0.473 from rounded inputs),
+specificity 0.900, FPR 0.100, FNR 0.100, NPV 0.994, balanced accuracy 0.900; B 35 / 19 / 15 / 931: 0.966, 0.648, 0.700,
+0.673, 0.980, 0.020, 0.300, 0.984, 0.840. A → B trades 76 fewer false alarms for 10 more undetected fires (7.6 per
+miss). Accuracy and F1 favor B in both scenarios; balanced accuracy favors B for screening and A for fire.
 
 **PA 11.1 — storms** (19,066 records, 4,684 hurricanes). Rule *wind ≥ 64 knots*: TP 4,684, FN 0, FP 128 (125
 extratropical), TN 14,254 → accuracy **99.33 %**, hurricane precision **97.34 %**, recall **100 %**, F1 **98.65 %**;
@@ -40,5 +56,6 @@ precision **0.919**, recall **0.415**; non-survivors **0.779** / **0.983**. PR c
 ```bash
 python3 tools/build_week11_topics.py   # regenerate + execute Topic 11.1 (palmerpenguins; no downloads)
 python3 tools/build_week11_pas.py      # rebuild + execute the PA 11.1 solution (reads storms + Titanic live)
+python3 tools/build_week11_metrics_activity.py   # write the Topic 11.2 activity and its answer key (no code, nothing executed)
 python3 tools/build_site.py            # rebuild docs/index.html
 ```

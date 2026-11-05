@@ -17,6 +17,7 @@ Topic 11.1 — Classification: What Every Score Measures
   Needs scikit-learn, pandas, matplotlib and palmerpenguins in the kernel (one guarded pip-install cell for Colab).
 Same markers as the earlier builders:
   «text»            inside a code cell  -> "text" in the solution, "____" in the student version
+  «text»            inside markdown    -> bold answer in the solution, inline-code blank in the student version
   **Answer:** ...   as a markdown cell  -> kept in the solution, replaced by a "Your answer" prompt
 """
 
@@ -54,6 +55,8 @@ md(t, """
 *The target is a category now. Errors are counted, not measured in dollars, and one model produces a dozen
 different scores. Each one is a ratio of counts from the same 2 × 2 table; this notebook defines each from that
 table, computes it by hand, checks it with scikit-learn, and asks what it ignores.*
+
+**Definition key:** bold completions in the definitions match the `____` blanks in the student notebook.
 """)
 
 md(t, """
@@ -107,12 +110,14 @@ md(t, """
 ---
 ## 1. From regression to classification
 
+**Classification** predicts a «category or class label»; **regression** predicts a «numerical value».
+
 Everything about the *recipe* is unchanged: `X`, `y`, split, create, `.fit`, `.predict`, evaluate. Two things
 change because the target is a **category**:
 
 1. **What the model outputs.** A class label — and, for most classifiers, a **probability for each class**.
-   A $k$-nearest-neighbor *classifier* takes a majority vote among the $k$ nearest training rows, and its
-   estimated probability of class $c$ is simply the share of neighbors in that class:
+   A $k$-nearest-neighbor *classifier* takes a «majority vote» among the $k$ nearest training rows, and its
+   estimated probability of class $c$ is simply the «share of neighbors in that class»:
    $$\\hat p(c \\mid x) = \\frac{\\#\\{\\text{neighbors of } x \\text{ in class } c\\}}{k}.$$
    With $k = 10$ the only possible probabilities are $0, 0.1, \\dots, 1$.
 2. **How error is measured.** A prediction is either right or wrong; there is no "off by \\$9,000". So every score
@@ -155,15 +160,18 @@ md(t, """
 ---
 ## 2. The confusion matrix
 
-Pick a **positive class** — the one you are trying to detect (female here; "hurricane", "survived", "fraud",
+The **confusion matrix** is a table of counts comparing «actual classes» with «predicted classes».
+Pick a **positive class** — the «class you are trying to detect» (female here; "hurricane", "survived", "fraud",
 "spam" elsewhere). Every test row then lands in one of four cells:
 
 | | predicted **positive** | predicted **negative** |
 |---|---|---|
-| actually **positive** | **TP** true positive | **FN** false negative (a miss) |
-| actually **negative** | **FP** false positive (a false alarm) | **TN** true negative |
+| actually **positive** | **TP** «true positive» | **FN** «false negative» (a miss) |
+| actually **negative** | **FP** «false positive» (a false alarm) | **TN** «true negative» |
 
-with $TP + FP + FN + TN = n$. Two kinds of mistake — **misses** (FN) and **false alarms** (FP) — and every score
+In these names, **true / false** tells whether the prediction is «correct or incorrect»; **positive / negative**
+tells the «predicted class». The four counts satisfy $TP + FP + FN + TN = n$.
+Two kinds of mistake — **misses** (FN) and **false alarms** (FP) — and every score
 in this notebook is a way of weighing them. scikit-learn's `confusion_matrix(y_true, y_pred)` puts **actual
 classes in rows and predicted classes in columns, in sorted label order**, so with labels `[0, 1]` the layout is
 $\\begin{pmatrix} TN & FP \\\\ FN & TP \\end{pmatrix}$ — the positive class is the *second* row and column. Read it
@@ -196,12 +204,15 @@ md(t, """
 ---
 ## 3. Accuracy and its baseline
 
+**Accuracy** is the proportion of all predictions that are «correct»; the **error rate** is the proportion
+that are «incorrect».
+
 $$\\text{accuracy} = \\frac{TP + TN}{n}, \\qquad \\text{error rate} = 1 - \\text{accuracy} = \\frac{FP + FN}{n}.$$
 
 Accuracy treats a miss and a false alarm as equally bad and ignores which class each row belongs to. That is fine
 when the classes are balanced and the two errors cost the same. It is **misleading when one class is rare**: if
 3 % of transactions are fraud, "never flag anything" has accuracy 0.97 while catching no fraud at all. Always
-compare accuracy with the **majority-class baseline** — the accuracy of predicting the most common class for
+compare accuracy with the **majority-class baseline** — the accuracy of predicting the «most common class» for
 every row — which is the larger of the two class shares.
 """)
 
@@ -236,17 +247,17 @@ and each is blind to one of the two error types.
 
 | score | formula | reads as | ignores |
 |---|---|---|---|
-| **precision** (positive predictive value) | $\\dfrac{TP}{TP + FP}$ | of the rows the model *called* positive, the share that are positive | misses (FN) |
-| **recall** (sensitivity, true-positive rate) | $\\dfrac{TP}{TP + FN}$ | of the rows that *are* positive, the share the model caught | false alarms (FP) |
-| **specificity** (true-negative rate) | $\\dfrac{TN}{TN + FP}$ | of the rows that *are* negative, the share the model left alone | misses (FN) |
-| **negative predictive value** | $\\dfrac{TN}{TN + FN}$ | of the rows the model *called* negative, the share that are negative | false alarms (FP) |
+| **precision** (positive predictive value) | $\\dfrac{TP}{TP + FP}$ | of the rows the model «called positive», the share that are «actually positive» | misses (FN) |
+| **recall** (sensitivity, true-positive rate) | $\\dfrac{TP}{TP + FN}$ | of the rows that are «actually positive», the share the model «called positive» | false alarms (FP) |
+| **specificity** (true-negative rate) | $\\dfrac{TN}{TN + FP}$ | of the rows that are «actually negative», the share the model «called negative» | misses (FN) |
+| **negative predictive value** | $\\dfrac{TN}{TN + FN}$ | of the rows the model «called negative», the share that are «actually negative» | false alarms (FP) |
 
 Two symmetries worth saying out loud. **Precision and recall both have TP on top**; precision divides by the
 *predicted-positive column*, recall by the *actual-positive row*. And the last two scores are nothing new:
 **specificity is the recall of the negative class** and **NPV is the precision of the negative class**. That is
 exactly what scikit-learn's `pos_label=0` computes, and it is what PA 11.1 means by "precision for the
-non-hurricane class". The **false-positive rate** is $FP/(FP + TN) = 1 - \\text{specificity}$; it returns in the
-ROC curve.
+non-hurricane class". The **false-positive rate** is the share of «actual negatives» that the model
+«incorrectly calls positive»: $FP/(FP + TN) = 1 - \\text{specificity}$. It returns in the ROC curve.
 """)
 
 code(t, """
@@ -284,7 +295,7 @@ md(t, """
 ## 5. F1: one number from two
 
 Precision and recall pull in opposite directions (section 7 shows the mechanism), so a single summary is useful.
-The **F1 score** is their **harmonic mean**:
+The **F1 score** is the «harmonic mean» of «precision and recall»:
 
 $$F_1 = \\frac{2}{\\dfrac{1}{\\text{precision}} + \\dfrac{1}{\\text{recall}}} = \\frac{2 \\cdot \\text{precision} \\cdot \\text{recall}}{\\text{precision} + \\text{recall}} = \\frac{2\\,TP}{2\\,TP + FP + FN}.$$
 
@@ -332,10 +343,13 @@ single "positive" class, so each score is computed **one class against the rest*
 diagonal cell, FN the rest of its row, FP the rest of its column. `classification_report` does this for every
 class and then averages two ways:
 
-- **macro average**: the plain mean of the per-class scores — every class counts equally, so a rare class with
+- **macro average**: the plain mean of the per-class scores — every class receives «equal weight», so a rare class with
   poor recall pulls it down;
-- **weighted average**: each class weighted by its number of actual rows (`support`) — dominated by the common
+- **weighted average**: each class weighted by its «number of actual rows» (`support`) — dominated by the common
   classes, close to accuracy.
+
+**One-vs-rest** means treating the class of interest as «positive» and all other classes as «negative».
+**Support** is the number of rows that «actually belong to a class».
 
 Accuracy is still $\\text{trace}/n$, the diagonal over the total.
 """)
@@ -372,6 +386,9 @@ its 0.706 recall is visible; the weighted average lets the two well-classified c
 md(t, """
 ---
 ## 7. Probabilities and the threshold
+
+The **decision threshold** $t$ is the «probability cutoff» used to convert a predicted probability into a
+«class label».
 
 A classifier that outputs probabilities is really two things: a **score** $\\hat p$ and a **decision rule**
 "predict positive if $\\hat p \\ge t$". The default $t = 0.5$ (predict the more likely class) is a choice, not a
@@ -424,17 +441,19 @@ md(t, """
 
 Rather than one threshold, plot the trade-off over all of them.
 
-**Precision–recall curve.** For each distinct value of $\\hat p$ used as a threshold, plot (recall, precision).
+**Precision–recall curve.** For each distinct value of $\\hat p$ used as a threshold, plot «recall» on the
+horizontal axis and «precision» on the vertical axis.
 With $k = 10$ there are at most eleven distinct probabilities, so the curve is a handful of points joined by
 lines; `precision_recall_curve` returns the two arrays plus one extra endpoint (recall 0, precision 1) and the
 thresholds that produced the rest. A model with no information gives a flat line at the positive share
-(here 0.5); a perfect one hugs the top-right corner. **Average precision (AP)** summarizes the curve as the
-precision averaged over recall levels (the area under it, step-wise).
+(here 0.5); a perfect one hugs the top-right corner. **Average precision (AP)** summarizes the curve as a
+weighted mean of precision values, with each weight equal to the «increase in recall» at that step (step-wise area).
 
-**ROC curve.** Plot the true-positive rate (recall) against the **false-positive rate** $FP/(FP + TN)$ for each
-threshold. The diagonal is random guessing; the top-left corner is perfect. The **area under the ROC curve
-(AUC)** has a clean probabilistic meaning: *the probability that a randomly chosen positive row receives a
-higher score than a randomly chosen negative row.* AUC = 0.5 is chance, 1 is perfect ranking.
+**ROC curve.** Plot the «true-positive rate (recall)» on the vertical axis against the «false-positive rate»
+$FP/(FP + TN)$ on the horizontal axis for each threshold. The diagonal is random guessing; the top-left corner
+is perfect. The **area under the ROC curve (AUC)** has a clean probabilistic meaning: the probability that a
+randomly chosen positive row receives a «higher score» than a randomly chosen negative row, plus half the
+probability of a tie. AUC = 0.5 is chance, 1 is perfect ranking.
 
 Both curves describe the *scores*, before any threshold is chosen. The PR curve is the more informative of
 the two when the positive class is rare, because precision reacts to the number of false alarms relative to the
@@ -464,7 +483,8 @@ both be true, and which curve would you show the fraud team?
 
 answer(t, """
 (a) The row with threshold 0.5: recall 0.881, precision 0.881. (b) Pick a random female and a random male from
-the test set; 95.7 % of the time the model gives the female the higher P(female). (c) With fraud at 1 %, the
+the test set; the model ranks the female higher in 95.7 % of pairs, counting a tied score as half a win.
+(c) With fraud at 1 %, the
 model can rank almost every fraud above almost every legitimate transaction (high AUC) while still flagging
 many more legitimate transactions than frauds at any useful threshold, because there are so many legitimate
 ones — so precision, and hence AP, stays low. Show the PR curve; it tells the team how many false alarms each
@@ -476,13 +496,15 @@ md(t, """
 ---
 ## 9. Scoring the probabilities themselves
 
-Every score so far judges *decisions*. **Log loss** judges the probabilities directly:
+The confusion-matrix scores judge decisions, and AP and AUC summarize rankings across thresholds.
+**Log loss** judges the probabilities directly: it is the average «negative logarithm» of the predicted
+probability assigned to the «actual class»:
 
 $$\\text{log loss} = -\\frac{1}{n}\\sum_{i=1}^{n}\\Big[y_i \\log \\hat p_i + (1 - y_i)\\log(1 - \\hat p_i)\\Big],$$
 
 where $\\hat p_i$ is the predicted probability of the positive class. A confident correct prediction
 ($\\hat p = 0.95$ when $y = 1$) costs $-\\log 0.95 = 0.05$; a confident wrong one ($\\hat p = 0.05$ when $y = 1$)
-costs $-\\log 0.05 = 3.0$; a shrug ($\\hat p = 0.5$) costs $0.69$ either way. Lower is better; predicting the
+costs $-\\log 0.05 = 3.0$; a shrug ($\\hat p = 0.5$) costs $0.69$ either way. «Lower» log loss is better; predicting the
 positive share for every row gives the baseline. KNN can output exactly 0 or 1, which would cost infinity when
 wrong, so scikit-learn clips the probabilities first. Log loss is what to optimize when the probabilities will be
 *used* as probabilities (expected profit, ranking, pricing), not just thresholded.
@@ -575,7 +597,8 @@ md(t, """
 be useless for a rare class at every threshold?
 """)
 answer(t, """
-A randomly chosen positive row gets a higher score than a randomly chosen negative row 80 % of the time. If
+A randomly chosen positive row outranks a randomly chosen negative row in 80 % of pairs, counting a tied
+score as half a win. If
 positives are 1 % of rows, even a good ranking leaves hundreds of negatives scored above the typical positive, so
 every threshold that catches most positives also flags many more negatives than positives: precision is low at
 every operating point, which the PR curve (not the ROC curve) makes visible.
@@ -627,6 +650,8 @@ def solution_cells(cells: list[dict]) -> list[dict]:
         c = copy.deepcopy(c)
         if c["cell_type"] == "code":
             c["source"] = BLANK.sub(lambda m: m.group(1), c["source"])
+        elif c["cell_type"] == "markdown":
+            c["source"] = BLANK.sub(lambda m: f"**{m.group(1)}**", c["source"])
         out.append(c)
     return out
 
@@ -639,6 +664,8 @@ def student_cells(cells: list[dict], student_title: str) -> list[dict]:
             c["source"] = BLANK.sub("____", c["source"])
         elif c["source"].startswith("**Answer:**"):
             c["source"] = "**Your answer:** *(write it here — replace this line)*"
+        elif c["cell_type"] == "markdown":
+            c["source"] = BLANK.sub("`____`", c["source"])
         out.append(c)
     out[0]["source"] = student_title
     return out
@@ -665,7 +692,10 @@ TOPICS = [
      "*The target is a category now. Errors are counted, not measured in dollars, and one model produces a dozen "
      "different scores. Each one is a ratio of counts from the same 2 × 2 table; this notebook defines each from "
      "that table, computes it by hand, checks it with scikit-learn, and asks what it ignores. Fill each `____` blank "
-     "as you work; the ✅ checks and the review questions ask for a formula, a number or a sentence.*"),
+     "in the definitions and code as you work; the ✅ checks and the review questions ask for a formula, a number "
+     "or a sentence.*\n\n"
+     "**Definition practice:** replace each `____` in the prose and tables with the missing term or phrase. "
+     "Use the formulas and examples to check the meaning."),
 ]
 
 

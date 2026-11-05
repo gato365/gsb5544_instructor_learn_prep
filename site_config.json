@@ -303,6 +303,13 @@
           "publish_solution": true
         },
         {
+          "title": "Topic 11.2 — Classification Metrics in Context: Cancer Screening and Fire Detection (guided class activity, calculator only: ten statistics from the confusion matrix, two thresholds per scenario, precision vs recall, what happens after a positive prediction)",
+          "student": "assignments/practice_activities/week_11/GSB5544_Topic_11_2_Classification_Metrics_in_Context-empty.ipynb",
+          "solution": "assignments/practice_activities/week_11/GSB5544_Topic_11_2_Classification_Metrics_in_Context-solution.ipynb",
+          "publish_solution": false,
+          "solution_placeholder": "Answer key posted after the class discussion."
+        },
+        {
           "title": "PA 11.1 — Introduction to Classification (storms: a hurricane rule and its scores, 10-NN status; Titanic: 10-NN survival, probabilities, thresholds, precision–recall curves)",
           "student": "assignments/practice_activities/week_11/GSB_5544_PA_11_1_Intro_to_Classification.ipynb",
           "solution": "assignments/practice_activities/week_11/GSB_5544_PA_11_1_Intro_to_Classification-solution.ipynb",
