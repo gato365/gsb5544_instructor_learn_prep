@@ -315,6 +315,23 @@
           "publish_solution": true
         }
       ]
+    },
+    {
+      "label": "Week 12 — Project Exploration (final project)",
+      "items": [
+        {
+          "title": "Topic 12.1 — Project Exploration: NFL Running Backs and the Hall of Fame (ETV: extract, transform, visualize; SSVA: summary statistic → visualization → analysis; a 20-minute fill-in-and-discuss opener on the instructor's own project outline, four figures, six how-to-improve prompts)",
+          "student": "assignments/practice_activities/week_12/GSB5544_Topic_12_1_Project_Exploration_NFL_Hall_of_Fame-empty.ipynb",
+          "solution": "assignments/practice_activities/week_12/GSB5544_Topic_12_1_Project_Exploration_NFL_Hall_of_Fame-solution.ipynb",
+          "publish_solution": true
+        },
+        {
+          "title": "Topic 12.2 — Extraction Walkthrough: Building the Week 12 Data Files from Their Sources (where the two CSVs came from — Wikipedia's inductee table and the nflverse season files — rebuilt live step by step; read-along with explain-step-by-step, write-the-code, fill-in-the-blank and discuss prompts; needs the internet)",
+          "student": "assignments/practice_activities/week_12/GSB5544_Topic_12_2_Extraction_Walkthrough_Building_the_NFL_Data_Files-empty.ipynb",
+          "solution": "assignments/practice_activities/week_12/GSB5544_Topic_12_2_Extraction_Walkthrough_Building_the_NFL_Data_Files-solution.ipynb",
+          "publish_solution": true
+        }
+      ]
     }
   ]
 }
